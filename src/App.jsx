@@ -5,7 +5,9 @@ import { TopMenu } from "./components/TopMenu";
 import { AppRouter } from "./AppRouter";
 import { getCurrentWeather } from "./services/WeatherService";
 import { WeatherIndicator } from "./components/WeatherIndicator";
-
+import { Header } from './components/Header';
+import { Menu } from './components/Menu';
+import { fill } from "lodash";
 export function App() {
   const [weatherData, setWeatherData] = useState();
 
@@ -19,19 +21,28 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <Stack direction='column'>
-        <Grid container direction='row'>
-          <Grid item xs={12} md={8}>
-            <TopMenu />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <WeatherIndicator weatherData={weatherData} />
-          </Grid>
-        </Grid>
-        <Box sx={{mx: { xs: 1, md: 4 }, my: 4}}>
-          <AppRouter />
+      <Stack 
+        direction='row' 
+        height='100%' 
+        width='100%' 
+        spacing= 'auto'>
+        <Box 
+          sx={{
+            px: { xs: 2, sm: 4, lm: 6},
+            py: 4,
+            borderRadius: 1,
+            bgcolor: '#ffffff'
+            // minWidth: '4vh',
+            // minHeight: '100%',
+          }} 
+        >
+          <Menu />
         </Box>
+        {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
+          <Header seccion='Bandeja de entrada' usuario='Ariel Nuñez' />
+        </Stack> */}
+        
       </Stack>
-    </BrowserRouter>
+    </BrowserRouter>      
   )
 }

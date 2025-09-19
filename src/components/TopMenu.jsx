@@ -19,4 +19,4 @@ export function TopMenu() {
     <MenuOption path='/films' label='Películas' />
     <MenuOption path='/actors' label='Actores' />
   </Stack>;
-}
+} 
