@@ -7,26 +7,33 @@ import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { Stack } from "@mui/material";
+import { Nav } from "./Nav"
+import { Icon } from "./Icon"
 export function Menu(props) {
   return (
     <Stack 
       direction="column"
       height='100%'
+      width='100%'
       spacing= 'auto'
       position='relative'
       alignItems='center'
+      margin='auto'
+
+
+
     >
-        <HomeRoundedIcon />
+      <Icon icon={<HomeRoundedIcon sx={{color:'#F2F2F2'}} fontSize="large"/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Home'/>
+        
+      <Nav items={[
+        {icon:<ViewListRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Mis solicitudes'},
+        {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada'},
+        {icon:<PersonRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Pacientes'},
+        {icon:<CalendarMonthRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Calendario'}
+      ]} />
 
-
-        <Stack height='25%' spacing= 'auto'>
-          <ViewListRoundedIcon />
-          <InboxRoundedIcon />
-          <PersonRoundedIcon />
-          <CalendarMonthRoundedIcon />
-        </Stack>
-        <SettingsRoundedIcon />
-        <LogoutRoundedIcon />
+      <Icon icon={<SettingsRoundedIcon sx={{color:'#F2F2F2'}}/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Configuración'/>
+      <Icon icon={<LogoutRoundedIcon sx={{color:'#F2F2F2'}}/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Salir'/>
     </Stack>
   )
 }

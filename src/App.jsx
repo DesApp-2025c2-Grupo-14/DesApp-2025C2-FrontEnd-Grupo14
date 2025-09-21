@@ -24,14 +24,15 @@ export function App() {
       <Stack 
         direction='row' 
         height='100%' 
-        width='100%' 
+        width='100%'
         spacing= 'auto'>
         <Box 
+          width='13vw'
           sx={{
-            px: { xs: 2, sm: 4, lm: 6},
+            
+            // px: { xs: 2, sm: 4, lm: 6},
             py: 4,
-            borderRadius: 1,
-            bgcolor: '#ffffff'
+            bgcolor: '#021F59'
             // minWidth: '4vh',
             // minHeight: '100%',
           }} 
