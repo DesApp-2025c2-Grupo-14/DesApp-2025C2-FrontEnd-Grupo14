@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Outlet } from "react-router-dom";
 import { TopMenu } from "./components/TopMenu";
 import { AppRouter } from "./AppRouter";
 import { getCurrentWeather } from "./services/WeatherService";
@@ -21,6 +21,7 @@ export function App() {
 
   return (
     <BrowserRouter>
+      <AppRouter />
       <Stack 
         direction='row' 
         height='100%' 
@@ -42,7 +43,6 @@ export function App() {
         {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
           <Header seccion='Bandeja de entrada' usuario='Ariel Nuñez' />
         </Stack> */}
-        <AppRouter />
       </Stack>
     </BrowserRouter>      
   )

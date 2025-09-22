@@ -18,7 +18,7 @@ export function Menu(props) {
       spacing= 'auto'
       position='relative'
       alignItems='center'
-      margin='auto'
+      
 
 
 
@@ -26,7 +26,7 @@ export function Menu(props) {
       <Icon icon={<HomeRoundedIcon sx={{color:'#F2F2F2'}} fontSize="large"/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Inicio'/>
         
       <Nav items={[
-        {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada', url: '/.'},
+        {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada', url: '/bandeja-de-entrada'},
         {icon:<ViewListRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Mis solicitudes', url: '/mis-solicitudes'},
         {icon:<PersonRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Pacientes', url: '/pacientes'},
         {icon:<CalendarMonthRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Calendario', url: '/calendario'}
