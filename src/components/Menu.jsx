@@ -26,10 +26,10 @@ export function Menu(props) {
       <Icon icon={<HomeRoundedIcon sx={{color:'#F2F2F2'}} fontSize="large"/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Inicio'/>
         
       <Nav items={[
-        {icon:<ViewListRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Mis solicitudes'},
-        {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada'},
-        {icon:<PersonRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Pacientes'},
-        {icon:<CalendarMonthRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Calendario'}
+        {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada', url: '/.'},
+        {icon:<ViewListRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Mis solicitudes', url: '/mis-solicitudes'},
+        {icon:<PersonRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Pacientes', url: '/pacientes'},
+        {icon:<CalendarMonthRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Calendario', url: '/calendario'}
       ]} />
 
       <Icon icon={<SettingsRoundedIcon sx={{color:'#F2F2F2'}}/>} color='#F2F2F2' bgColor='#2E4CA6' selectedColor={null} label='Configuración'/>

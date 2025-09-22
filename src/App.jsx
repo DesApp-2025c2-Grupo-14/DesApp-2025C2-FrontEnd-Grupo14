@@ -42,7 +42,7 @@ export function App() {
         {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
           <Header seccion='Bandeja de entrada' usuario='Ariel Nuñez' />
         </Stack> */}
-        
+        <AppRouter />
       </Stack>
     </BrowserRouter>      
   )
