@@ -8,13 +8,10 @@ import { grey } from "@mui/material/colors";
 export function AppRouter() {
   return (
     <Routes>
-      <Route path='/films' element={<FilmsPage />} />
-      <Route path='/actors' element={<ActorsPage />} />
-      <Route path='/' element={
-        <Box sx={{ typography: 'h5', color: grey[900] }}>
-          Elija una opción del menú
-        </Box>
-      } />
+      <Route path='/' element={ <Box /> } />
+      <Route path='/mis-solicitudes' element={<Box />} />
+      <Route path='/pacientes' element={<Box />} />
+      <Route path='/calendario' element={<Box />} />
     </Routes>
   );
 }
