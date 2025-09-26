@@ -21,12 +21,11 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <AppRouter />
       <Stack 
         direction='row' 
         height='100%' 
         width='100%'
-        spacing= 'auto'>
+        >
         <Box 
           width='13vw'
           sx={{
@@ -40,6 +39,7 @@ export function App() {
         >
           <Menu />
         </Box>
+          <AppRouter />
         {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
           <Header seccion='Bandeja de entrada' usuario='Ariel Nuñez' />
         </Stack> */}
