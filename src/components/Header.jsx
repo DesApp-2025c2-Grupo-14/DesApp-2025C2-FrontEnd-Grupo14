@@ -19,10 +19,10 @@ export function Header(props) {
         
       >
         <Typography variant="h6" color="inherit">
-          {props.seccion || 'seccion'}
+          {props.seccion || ''}
         </Typography>
         <Typography variant="h6" color="inherit">
-          {props.usuario || 'usuario'}
+          {props.usuario || ''}
         </Typography>
       </Stack>
     </Toolbar>
