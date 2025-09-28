@@ -10,7 +10,7 @@ export function DetalleSolicitud(props) {
         <Stack 
             direction='column' 
             width='100%' 
-            height='inherit' 
+            height='100%' 
             alignItems='space-between'
         >
             <Header seccion={props.solicitud} usuario = '' />

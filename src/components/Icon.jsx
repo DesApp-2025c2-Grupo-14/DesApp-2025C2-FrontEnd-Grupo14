@@ -27,6 +27,7 @@ export function Icon(props) {
         direction='row'
         alignItems='center'
         spacing='10px'
+        width='100%'
       >
         {props.icon}
         <Typography style={{color: props.color}}>
