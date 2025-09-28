@@ -20,9 +20,9 @@ export function App() {
     fetchWeatherData();
   }, []);
 
-  return  (
-      <BrowserRouter>
-        <Stack 
+  return (
+    <BrowserRouter>
+      <Stack 
         direction='row' 
         height='100%' 
         width='100%'
