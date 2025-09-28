@@ -12,7 +12,7 @@ import { DatosProvider  } from "./context/datos";
 import { BuscadorPacientes } from "./components/BuscadorPacientes";
 import { InfoContainer } from "./components/InfoContainer";
 import { red } from "@mui/material/colors";
-
+import { HistoriaClinica } from './components/HistoriaClinica';
 export function App() {
   const [weatherData, setWeatherData] = useState();
 
@@ -51,7 +51,7 @@ export function App() {
                   <BuscadorPacientes />
                 </Stack> 
                 <Stack width='100%'paddingLeft= '10px' sx={{bgcolor: 'rgba(253, 252, 250, 1)',borderRadius: 3,border :'2px solid'}}>
-                  <InfoContainer />
+                  <InfoContainer /> 
                 </Stack> 
               </DatosProvider>
             </Stack>
