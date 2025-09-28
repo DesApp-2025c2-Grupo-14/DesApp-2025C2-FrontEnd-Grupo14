@@ -6,25 +6,41 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Toolbar from "@mui/material/Toolbar";
 import { BasicCard } from "./Card";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Box
+      sx={
+        {
+          flexGrow:0,
+          height: 'inherit',
+          width: '100%',
+          overflow: 'auto'
+        }
+      }
+      direction='column'
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
-      {...other}
+      
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{width: '100%',}}>
           {children}
         </Box>
       )}
-    </div>
+    </Box>
+    // {value === index && (
+    //     <Box sx={{height: '10%'}}>
+    //       {children}
+    //     </Box>
+    //   )}
   );
 }
 
@@ -145,44 +161,56 @@ export function Listado() {
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: "background.paper", width: "auto" }}>
-      <AppBar position="static" sx={{ bgcolor: "#2E4CA6" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          indicatorColor="secondary"
-          textColor="inherit"
-          variant="fullWidth"
-          aria-label="full width tabs example"
-          centered
-        >
-          <Tab label="General" {...a11yProps(0)} />
-          <Tab label="Reintegros" {...a11yProps(1)} />
-          <Tab label="Autorizaciones" {...a11yProps(2)} />
-          <Tab label="Recetas" {...a11yProps(3)} />
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0} dir={theme.direction}>
-        {solicitudes.map((p) => (
-          <BasicCard
-            key={p.id}
-            nombreSolicitud={p.nombre}
-            descripcion={p.descripcion}
-            fecha={p.fecha}
-            selected={selectedId === p.id}
-            onSelect={(id) => setSelectedId(p.id)}
-          ></BasicCard>
-        ))}
-      </TabPanel>
-      <TabPanel value={value} index={1} dir={theme.direction}>
-        {renderSolicitudesPorTipo("Reintegro")}
-      </TabPanel>
-      <TabPanel value={value} index={2} dir={theme.direction}>
-        {renderSolicitudesPorTipo("Autorizacion")}
-      </TabPanel>
-      <TabPanel value={value} index={3} dir={theme.direction}>
-        {renderSolicitudesPorTipo("Receta")}
-      </TabPanel>
-    </Box>
+    <Toolbar
+      sx={{
+        bgcolor:'#F9F9FF',
+        overflow: 'auto',
+        width:'50%',
+        margin: 2
+      }} 
+    > 
+      <Stack direction='column' justifyContent='space-between' sx={{}}>
+        <AppBar position="absolute" sx={{ bgcolor: "#2E4CA6" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="secondary"
+            textColor="inherit"
+            variant="fullWidth"
+            aria-label="full width tabs example"
+            centered
+          >
+            <Tab label="General" {...a11yProps(0)} />
+            <Tab label="Reintegros" {...a11yProps(1)} />
+            <Tab label="Autorizaciones" {...a11yProps(2)} />
+            <Tab label="Recetas" {...a11yProps(3)} />
+          </Tabs>
+        </AppBar>
+
+        <Stack direction='row' sx={{ flex: 1,maxHeight: '80vh', overflowY: "auto"}}>
+          <TabPanel value={value} index={0} dir={theme.direction}>
+            {solicitudes.map((p) => (
+              <BasicCard
+                key={p.id}
+                nombreSolicitud={p.nombre}
+                descripcion={p.descripcion}
+                fecha={p.fecha}
+                selected={selectedId === p.id}
+                onSelect={() => setSelectedId(p.id)}
+              />
+            ))}
+          </TabPanel>
+          <TabPanel value={value} index={1} dir={theme.direction}>
+            {renderSolicitudesPorTipo("Reintegro")}
+          </TabPanel>
+          <TabPanel value={value} index={2} dir={theme.direction}>
+            {renderSolicitudesPorTipo("Autorizacion")}
+          </TabPanel>
+          <TabPanel value={value} index={3} dir={theme.direction}>
+            {renderSolicitudesPorTipo("Receta")}
+          </TabPanel>
+        </Stack>
+      </Stack>
+    </Toolbar>
   );
 }
