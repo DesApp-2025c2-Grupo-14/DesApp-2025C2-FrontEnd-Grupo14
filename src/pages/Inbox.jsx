@@ -1,6 +1,7 @@
 import React from 'react'
 import { Header } from '../components/Header'
 import { Listado } from '../components/Listado'
+import { DetalleSolicitud } from '../components/DetalleSolicitud'
 import { Box, Card, CardMedia, Grid, Stack, Typography } from "@mui/material";
 
 export function Inbox(props) {
@@ -8,10 +9,13 @@ export function Inbox(props) {
   return (
     <Stack
         width='100%'
+        height='100%'
+        
     >
         <Header seccion={props.seccion} usuario={props.usuario} />
-        <Stack>
+        <Stack direction='row' width='100%' height='100%' spacing='auto'>
             <Listado />
+            <DetalleSolicitud solicitud = 'Reintegro #1' tipo = {0} />
         </Stack>
     </Stack>
   )
