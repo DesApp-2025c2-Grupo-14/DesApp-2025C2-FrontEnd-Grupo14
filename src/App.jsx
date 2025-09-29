@@ -9,6 +9,7 @@ import { Menu } from './components/Menu';
 import { fill } from "lodash";
 import { red } from "@mui/material/colors";
 import { HistoriaClinica } from './components/HistoriaClinica';
+
 export function App() {
   const [weatherData, setWeatherData] = useState();
 
@@ -39,6 +40,7 @@ export function App() {
           }} 
         >
           <Menu />
+          
         </Box>
           <AppRouter />
         {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
