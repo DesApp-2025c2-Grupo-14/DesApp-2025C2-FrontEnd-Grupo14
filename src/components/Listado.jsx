@@ -59,7 +59,8 @@ function a11yProps(index) {
 export function Listado() {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-  const solicitudes = [
+  /*const solicitudes = */
+  const [solicitudes, setSolicitudes] = React.useState ([
     {
       id: 1,
       tipo: "Reintegro",
@@ -140,7 +141,11 @@ export function Listado() {
         "Solicita reintegro de los gastos de atención odontológica, incluyendo limpieza profesional y tratamiento de caries menores, adjuntando las facturas y comprobantes de pago para el reembolso correspondiente.",
       fecha: "2025-09-08",
     },
-  ];
+  ])
+  const handleAnalizar = (id) => {
+    // Filtra la lista quitando el elemento seleccionado
+    setSolicitudes(solicitudes.filter((item) => item.id !== id));
+  };
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -156,6 +161,7 @@ export function Listado() {
           fecha={s.fecha}
           selected={selectedId === s.id}
           onSelect={(id) => setSelectedId(s.id)}
+          onAnalizar = {()=>handleAnalizar(s.id)}
         />
       ));
   };
@@ -166,7 +172,8 @@ export function Listado() {
         bgcolor:'#F9F9FF',
         overflow: 'auto',
         width:'50%',
-        margin: 2
+        margin: 2,
+        borderRadius: 3
       }} 
     > 
       <Stack direction='column' justifyContent='space-between' sx={{}}>
@@ -197,6 +204,7 @@ export function Listado() {
                 fecha={p.fecha}
                 selected={selectedId === p.id}
                 onSelect={() => setSelectedId(p.id)}
+                onAnalizar = {()=>handleAnalizar(p.id)}
               />
             ))}
           </TabPanel>

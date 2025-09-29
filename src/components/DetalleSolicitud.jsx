@@ -19,7 +19,8 @@ export function DetalleSolicitud(props) {
                     bgcolor:'#F9F9FF',
                     margin: 2,
                     height: '100%',
-                    py: 2
+                    py: 2,
+                    borderRadius:3
                     }}
                 
             >   

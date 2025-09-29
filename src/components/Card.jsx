@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 export function BasicCard(props) {
-  const { id, nombreSolicitud, descripcion, fecha, selected, onSelect } = props;
+  const { id, nombreSolicitud, descripcion, fecha, selected, onSelect, onAnalizar } = props;
 
   return (
     <Card
@@ -33,7 +33,7 @@ export function BasicCard(props) {
         <Typography variant="body2" sx={{textAlign: "right"}}>{fecha}</Typography>
       </CardContent>
       <CardActions>
-        <Button variant="contained" size="medium" sx ={{bgcolor: '#2E4CA6'}}>
+        <Button variant="contained" size="medium" sx ={{bgcolor: '#2E4CA6'}} onClick={onAnalizar}>
         
           Analizar
         </Button>
