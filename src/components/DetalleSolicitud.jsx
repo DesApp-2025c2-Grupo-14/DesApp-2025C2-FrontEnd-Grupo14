@@ -7,7 +7,7 @@ export function DetalleSolicitud(props) {
     return (
         <Stack 
             direction='column' 
-            width='100%' 
+            width='80%' 
             height='100%' 
             alignItems='space-between'
         >

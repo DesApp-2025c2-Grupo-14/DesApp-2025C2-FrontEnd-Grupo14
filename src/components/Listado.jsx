@@ -17,7 +17,7 @@ function TabPanel(props) {
     <Box
       sx={
         {
-          flexGrow:0,
+          // flexGrow:0,
           height: 'inherit',
           width: '100%',
           overflow: 'auto'
