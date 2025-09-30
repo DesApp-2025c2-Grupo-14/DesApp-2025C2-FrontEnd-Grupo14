@@ -1,48 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { Box, Grid, Stack } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
-import { TopMenu } from "./components/TopMenu";
+import { Stack, Box } from "@mui/material";
 import { AppRouter } from "./AppRouter";
-import { getCurrentWeather } from "./services/WeatherService";
-import { WeatherIndicator } from "./components/WeatherIndicator";
-import { Header } from './components/Header';
-import { Menu } from './components/Menu';
-import { fill } from "lodash";
+import { Menu } from "./components/Menu";
+import { Header } from "./components/Header";
+
 export function App() {
-  const [weatherData, setWeatherData] = useState();
-
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-      const obtainedData = await getCurrentWeather('Buenos Aires');
-      setWeatherData(obtainedData);
-    }
-    fetchWeatherData();
-  }, []);
-
   return (
     <BrowserRouter>
-      <Stack 
-        direction='row' 
-        height='100%' 
-        width='100%' 
-        spacing= 'auto'>
-        <Box 
+      <Stack direction="row" height="100vh" width="100%">
+        <Box
           sx={{
-            px: { xs: 2, sm: 4, lm: 6},
-            py: 4,
-            borderRadius: 1,
-            bgcolor: '#ffffff'
-            // minWidth: '4vh',
-            // minHeight: '100%',
-          }} 
+            width: "70px",
+            bgcolor: "#ffffff",
+            borderRight: "8px solid #fae6a7e1",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            py: 2,
+          }}
         >
           <Menu />
         </Box>
-        {/* <Stack item xs={12} md={8} direction='row' width='100%' padding= '10px' height='10vh'>
-          <Header seccion='Bandeja de entrada' usuario='Ariel Nuñez' />
-        </Stack> */}
-        
+
+        <Stack direction="column" flex={1}>
+
+          {/* Contenido debajo del header */}
+          <Box flex={1} p={2} bgcolor="#fff">
+            <AppRouter />
+          </Box>
+        </Stack>
       </Stack>
-    </BrowserRouter>      
-  )
+    </BrowserRouter>
+  );
 }
