@@ -10,9 +10,9 @@ export function AppRouter() {
     <Routes>
       <Route path='/' element={ <Inbox seccion='Bandeja de entrada' usuario='Pepe Argento' /> } />
       <Route path='/bandeja-de-entrada' element={ <Inbox seccion='Bandeja de entrada' usuario='Pepe Argento'/> } />
-      <Route path='/mis-solicitudes' element={<Box />} />
-      <Route path='/pacientes' element={<Box />} />
-      <Route path='/calendario' element={<Box />} />
+      <Route path='/mis-solicitudes' element={<Box width='100%'/>} />
+      <Route path='/pacientes' element={<Box width='100%'/>} />
+      <Route path='/calendario' element={<Box width='100%'/>} />
     </Routes>
   );
 }

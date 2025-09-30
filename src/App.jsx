@@ -25,9 +25,10 @@ export function App() {
         direction='row' 
         height='100%' 
         width='100%'
+        
         >
         <Box 
-          width='13vw'
+          width='15%'
           sx={{
             
             // px: { xs: 2, sm: 4, lm: 6},

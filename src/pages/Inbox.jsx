@@ -16,7 +16,7 @@ export function Inbox(props) {
         height="100%"
       >
         <Listado />
-        <DetalleSolicitud solicitud="Reintegro #1" tipo={0} />
+        <DetalleSolicitud solicitud="" tipo={null} />
       </Stack>
     </Stack>
   )
