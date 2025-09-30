@@ -1,10 +1,8 @@
 import React from 'react'
 import { Header } from './Header'
 import { Box, Stack, Divider, AppBar, Toolbar, Typography, Button, Drawer } from "@mui/material";
-
+import DescriptionIcon from '@mui/icons-material/Description';
 export function DetalleSolicitud(props) {
-
-    console.log(props)
 
     return (
         <Stack 
@@ -14,7 +12,7 @@ export function DetalleSolicitud(props) {
             alignItems='space-between'
         >
             <Header seccion={props.solicitud} usuario = '' />
-            <Toolbar
+            {props.tipo !== null ? <Toolbar
                 sx={{
                     bgcolor:'#F9F9FF',
                     margin: 2,
@@ -37,7 +35,7 @@ export function DetalleSolicitud(props) {
                     }
                 >
                     
-                    <Stack direction='row' justifyContent='space-between'>
+                    {<Stack direction='row' justifyContent='space-between'>
                         <Stack direction='column' alignItems='center'> 
                             <Typography variant="h6" color="inherit">
                                 Fecha
@@ -54,7 +52,7 @@ export function DetalleSolicitud(props) {
                                 Sanatorio Guemes
                             </Toolbar>
                         </Stack>
-                    </Stack>
+                    </Stack>}
                     <Stack width='100%' direction='column' alignItems='center'>
                         <Typography variant="h6" color="inherit">
                             Paciente
@@ -181,6 +179,52 @@ export function DetalleSolicitud(props) {
                     </Typography>
                 </Stack>
             </Toolbar>
+            :
+            <Toolbar
+                sx={{
+                    bgcolor:'#F9F9FF',
+                    margin: 2,
+                    height: '100%',
+                    py: 2,
+                    borderRadius:3
+                    }}
+                
+            >    
+                <Stack
+                   width='100%' height='100%'direction='column' alignItems='center' justifyContent='center'
+                >
+                    <Box
+                        sx={
+                            {
+                                display: 'flex',
+                                width: '18%',
+                                height: '23%',
+                                backgroundColor: "#F4F5FA",
+                                borderRadius: '50%',
+                                border: 'solid 1px',
+                                borderColor: '#2E4CA6',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }
+                        }
+                    >
+                        <DescriptionIcon 
+                            sx={{
+                                width: '5vw',
+                                height: '5vh',
+                                color: '#2E4CA6'
+                            }}
+                        />
+                    </Box>
+                    <Typography variant="h6" color="inherit">
+                        Solicitudes
+                    </Typography>
+                    <Typography variant="p" color="#8B8D97">
+                        Haz clic en una solicitud para ver los detalles
+                    </Typography>
+                </Stack>
+            </Toolbar>
+             }
         </Stack>
     )
 }
