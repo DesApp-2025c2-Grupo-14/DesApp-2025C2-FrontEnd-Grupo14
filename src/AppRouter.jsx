@@ -1,6 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import { FilmsPage } from "./pages/FilmsPage";
-// import { FilmsPage } from "./pages/FilmsPageReduxStyle";
 import { Inbox } from "./pages/Inbox";
 import { Box } from "@mui/material";
 import { grey } from "@mui/material/colors";

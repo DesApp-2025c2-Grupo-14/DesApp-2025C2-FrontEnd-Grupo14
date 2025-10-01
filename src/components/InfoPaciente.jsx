@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import { DatosContext } from "../context/datos";
-import { Box, Typography, Stack, Button } from "@mui/material";
+import { Box, Typography, Stack, Button, Grid, TextField } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-export function InfoPaciente({ onAbrirHistoria }) {
+export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
   const { datoSeleccionado } = useContext(DatosContext);
 
   return (
-    <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
+    <Stack sx={{height: "100%", width:'100%' }}>
       {!datoSeleccionado ? (
         <Box sx={{ alignContent: "center", height: "100%" }}>
           <Stack sx={{ alignItems: "center" }}>
@@ -24,67 +24,80 @@ export function InfoPaciente({ onAbrirHistoria }) {
         <Stack
           justifyContent={"space-evenly"}
           height="100%"
-          width="100%"
-          bgcolor="grey"
+          bgcolor="#F2F2F2"
           borderRadius={3}
           p={2}
+          m={3}
+          
         >
-          <Stack direction="column" alignItems="center">
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Integrante</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>
-                  {datoSeleccionado.nombre} {datoSeleccionado.apellido}
-                </Typography>
-              </Box>
+            <Stack direction="column" alignItems="center" width='100%'>
+              <Stack px={3} width= '65%' textAlign="center">
+                <TextField
+                  label="Nombre completo"
+                  fullWidth
+                  value={datoSeleccionado.nombre +' '+ datoSeleccionado.apellido || ""}
+                  InputProps={{ readOnly: true }}
+                />
+              </Stack>
+            </Stack>
+
+          <Stack direction="row" justifyContent="space-evenly">
+            <Stack px={3} textAlign="center">
+              <TextField
+                label="Parentesco"
+                fullWidth
+                value={datoSeleccionado.parentesco || ""}
+                InputProps={{ readOnly: true }}
+              />
+            </Stack>
+
+            <Stack px={3}  textAlign="center">
+              <TextField
+                label="Fecha Nacimiento"
+                fullWidth
+                value={datoSeleccionado.fechaNacimiento || ""}
+                InputProps={{ readOnly: true }}
+              />
             </Stack>
           </Stack>
 
           <Stack direction="row" justifyContent="space-evenly">
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Parentesco</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>{datoSeleccionado.parentesco}</Typography>
-              </Box>
+            <Stack px={3}  textAlign="center">
+              <TextField
+                label="Documento"
+                fullWidth
+                value={datoSeleccionado.dni || ""}
+                InputProps={{ readOnly: true }}
+              />
             </Stack>
 
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>DNI</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>{datoSeleccionado.dni}</Typography>
-              </Box>
-            </Stack>
-          </Stack>
-
-          <Stack direction="row" justifyContent="space-evenly">
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Documento</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>{datoSeleccionado.dni}</Typography>
-              </Box>
-            </Stack>
-
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Afiliado</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>{datoSeleccionado.nroAfiliado}</Typography>
-              </Box>
+            <Stack px={3}  textAlign="center">
+              <TextField
+                label="Afiliado"
+                fullWidth
+                value={datoSeleccionado.nroAfiliado || ""}
+                InputProps={{ readOnly: true }}
+              />
             </Stack>
           </Stack>
 
           <Stack direction="row" justifyContent="space-evenly">
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Plan Médico</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>PlanMedico</Typography>
-              </Box>
+            <Stack px={3} textAlign="center">
+              <TextField
+                label="Plan medico"
+                fullWidth
+                value={datoSeleccionado.planMedico || ""}
+                InputProps={{ readOnly: true }}
+              />
             </Stack>
 
-            <Stack px={3} width={200} textAlign="center">
-              <Typography px={5}>Teléfono</Typography>
-              <Box bgcolor="white" borderRadius={5}>
-                <Typography>{datoSeleccionado.telefono}</Typography>
-              </Box>
+            <Stack px={3}  textAlign="center">
+              <TextField
+                label="Teléfono"
+                fullWidth
+                value={datoSeleccionado.telefono || ""}
+                InputProps={{ readOnly: true }}
+              />
             </Stack>
           </Stack>
 
@@ -97,12 +110,14 @@ export function InfoPaciente({ onAbrirHistoria }) {
               <Typography>Historial clínico</Typography>
             </Button>
 
-            <Button variant="contained" sx={{ borderRadius: 3, px: 3 }}>
+            <Button variant="contained"
+             sx={{ borderRadius: 3, px: 3 }}
+             onClick={onAbrirSituacion}
+             >
               <Typography>Situaciones terapéuticas</Typography>
             </Button>
           </Stack>
-        </Stack>
-      )}
+      </Stack>)}
     </Stack>
   );
 }

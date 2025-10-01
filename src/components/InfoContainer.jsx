@@ -1,18 +1,33 @@
 import { useState, useContext } from "react";
 import { InfoPaciente } from "./InfoPaciente";
 import { HistoriaClinica } from "./HistoriaClinica";
+import { SituacionTerapeutica } from "./SituacionTerap"; // Asegurate de tener este componente
 import { DatosContext } from "../context/datos";
+
 export function InfoContainer() {
-  const [mostrarHistorial, setMostrarHistoria] = useState(false);
+  const [vista, setVista] = useState("info");
   const { datoSeleccionado } = useContext(DatosContext);
+
   return (
     <>
-      {!mostrarHistorial ? (
-        <InfoPaciente onAbrirHistoria={() => setMostrarHistoria(true)} />
-      ) : (
-         <HistoriaClinica
+      {vista === "info" && (
+        <InfoPaciente
+          onAbrirHistoria ={() => setVista("historial")}
+          onAbrirSituacion ={() => setVista("situacion")}
+        />
+      )}
+
+      {vista === "historial" && (
+        <HistoriaClinica
           datoSeleccionado={datoSeleccionado}
-          onCerrarHistoria={() => setMostrarHistoria(false)}
+          onCerrarHistoria={() => setVista("info")}
+        />
+      )}
+
+      {vista === "situacion" && (
+        <SituacionTerapeutica
+          datoSeleccionado={datoSeleccionado}
+          onCerrarSituacion={() => setVista("info")}
         />
       )}
     </>

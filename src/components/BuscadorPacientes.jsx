@@ -67,8 +67,9 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
         size="small"
         value={busqueda}
         onChange={e => setBusqueda(e.target.value)}
+        //sx={{ input: { color: 'white' } }}
         InputLabelProps={{
-          sx: { fontSize: '0.8rem' }
+          sx: { fontSize: '0.8rem'}
         }}
         InputProps={{
           startAdornment: (
@@ -98,7 +99,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
                 padding: 3,
                 borderRadius: 6,
                 border: '2px solid black',
-                bgcolor: seleccionado === i ? 'red' : 'brown'
+                bgcolor: seleccionado === i ? '#0146ab' : '#F2F2F2'
               }}
             >
               <Stack>

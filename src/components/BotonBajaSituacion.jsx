@@ -1,27 +1,27 @@
 import { Button } from "@mui/material";
 
-export function BotonBajaSituacion({ historia, onBorrado }) {
-  const borrarHistoria = () => {
+export function BotonBajaSituacion({ situacion, onBorrado }) {
+  const borrarSituacion = () => {
     //recupera las historias o sino usa un array vacio
-    const historiasGuardadas = JSON.parse(localStorage.getItem("historias")) || [];
+    const situacionesGuardadas = JSON.parse(localStorage.getItem("situaciones")) || [];
 
-    //filtra las historias para eliminar la que coincide con el id de la historia pasada por props
-    const nuevasHistorias = historiasGuardadas.filter(
-      (h) => h.id !== historia.id
+    //filtra las Situaciones para eliminar la que coincide con el id de la historia pasada por props
+    const nuevasSituaciones = situacionesGuardadas.filter(
+      (s) => s.id !== situacion.id
     );
 
-    // actualiza la lista de historias sin la historia eliminada
-    localStorage.setItem("historias", JSON.stringify(nuevasHistorias));
+    // actualiza la lista de Situaciones sin la historia eliminada
+    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
 
     if (onBorrado) {
-      onBorrado(nuevasHistorias);
+      onBorrado(nuevasSituaciones);
     }
   };
 
   return (
     // boton de borrado
-    <Button color="error" onClick={borrarHistoria}>
-      Borrar Historia
+    <Button color="error" onClick={borrarSituacion}>
+      Borrar Situacion
     </Button>
   );
 }

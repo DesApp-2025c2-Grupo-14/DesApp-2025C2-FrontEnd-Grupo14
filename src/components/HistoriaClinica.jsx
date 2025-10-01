@@ -2,7 +2,6 @@
 import { useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 import historiasMock from "../data/historiasClinicas";
-import { BotonBajaSituacion } from "./BotonBajaSituacion";
 
 export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
   const [historiaSeleccionada, setHistoriaSeleccionada] = useState(null);
@@ -34,7 +33,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
   };
 
   return (
-<Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
+<Stack sx={{ alignContent: "center", height: "100%" }}>
   <Box width="90%" mx="auto" mb={2}>
     <Typography variant="h4" sx={{ textAlign: "center", color: "black" }}>
       Historial Clínico
@@ -45,7 +44,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
     </Stack>
   </Box>
 
-      <Stack height="100%" width="90%" mx="auto" bgcolor="grey" borderRadius={3} p={4}>
+      <Stack height="100%" width="90%" m="auto" marginBottom={3} bgcolor="grey" borderRadius={3} p={4}>
         <Box mb={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Box
           sx={{display: "flex",alignItems: "center",backgroundColor: "white",
@@ -138,17 +137,6 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
               </Typography>
             </Box>
           </DialogContent>
-          <DialogActions>
-            {/* Boton para eliminar la historia clínica (Temporal) */}
-            <BotonBajaSituacion
-              historia={historiaSeleccionada}
-              onBorrado={(nuevasHistorias) => {
-                setHistorias(nuevasHistorias);
-                setHistoriaSeleccionada(null);
-              }}
-            />
-            <Button onClick={() => setHistoriaSeleccionada(null)}>Cerrar</Button>
-          </DialogActions>
         </Dialog>
       </Stack>
     </Stack>
