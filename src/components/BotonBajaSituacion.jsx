@@ -21,7 +21,7 @@ export function BotonBajaSituacion({ situacion, onBorrado }) {
   return (
     // boton de borrado
     <Button color="error" onClick={borrarSituacion}>
-      Borrar Situacion
+      Dar de baja
     </Button>
   );
 }

@@ -1,4 +1,3 @@
-// src/components/HistoriaClinica.jsx
 import { useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 import historiasMock from "../data/historiasClinicas";

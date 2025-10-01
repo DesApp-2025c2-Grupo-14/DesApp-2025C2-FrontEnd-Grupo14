@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 import situacionesMock from "../data/situacionesTerapeuticas";
 import { BotonCrearSituacion } from "./BotonCrearSituacion";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
 import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
-
+import dayjs from 'dayjs';
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [situacionSeleccionada, setSituacionSeleccionada] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
+  const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
 
   // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
@@ -21,7 +22,8 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
       return situacionesMock;
     }
   });
-  // filtado de situaciones por nroafiliado y si se elige por las de el prestador logueado
+
+  // filtado de situaciones por nroafiliado 
   const situacionesFiltradas = situaciones
     .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado)
 
@@ -30,6 +32,47 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
     localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
     setSituaciones(situacionesMock);
     setSituacionSeleccionada(null);
+  };
+
+/*  // efecto usado para cambiar la fecha final
+  useEffect(() => {
+    if (situacionSeleccionada) {
+      setNuevaFechaFinal(situacionSeleccionada.fechaFinal || "");
+    }
+  }, [situacionSeleccionada]);
+  */
+ // efecto usado para cambiar la fecha final
+  useEffect(() => {
+    if (situacionSeleccionada) {
+      //
+      const fechaISO = situacionSeleccionada.fechaFinal 
+        //verifica si hay fecha cargada y si esta la cambia al formato iso que entiende el input
+        ? dayjs(situacionSeleccionada.fechaFinal, "DD/MM/YYYY").format("YYYY-MM-DD") : "";
+      setNuevaFechaFinal(fechaISO);
+    }
+  }, [situacionSeleccionada]); 
+
+
+  const guardarFechaFinal = () => {
+    const fechaFormato = dayjs(nuevaFechaFinal).format("DD/MM/YYYY"); 
+    // buscar la situacion seleccionada y crea un nuevo array con la fecha final actualizada
+    const nuevasSituaciones = situaciones.map((s) =>
+      s.id === situacionSeleccionada.id
+        ? { ...s, fechaFinal: fechaFormato }
+        : s
+    );
+    // actualizar estado de situaciones
+    setSituaciones(nuevasSituaciones);
+    // guardar nuevo array en localStorage
+    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
+    setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
+  };
+
+  const agregarSituacion = (nuevaSituacion) => {
+    const nuevasSituaciones = [...situaciones, nuevaSituacion];
+    setSituaciones(nuevasSituaciones);
+    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
+    setCrearSituacion(false);
   };
 
   return (
@@ -43,22 +86,6 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
           <Button variant="outlined" onClick={restaurarSituaciones}>Restaurar datos</Button>
         </Stack>
       </Box>
-
-      {/* <Stack height="100%" width="90%" mx="auto" bgcolor="grey" borderRadius={3} p={4}>
-        <Box mb={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Box
-          sx={{display: "flex",alignItems: "center",backgroundColor: "white",
-            padding: "4px 8px",borderRadius: 1,fontSize: "0.875rem",width: "fit-content"
-    }} >
-            <Typography sx={{ mr: 1 }}>Ver mis notas</Typography>
-          <Checkbox
-            size="small"
-            checked={verSoloMisNotas}
-            onChange={(e) => setVerSoloMisNotas(e.target.checked)}
-          />
-        </Box>
-      </Box>
- */}
         <Stack
           spacing={2}
           
@@ -112,7 +139,11 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
           open={!!crearSituacion}
           onClose={() => setCrearSituacion(null)}
         >
-          <FormularioSituacionTerapeutica/>
+          <FormularioSituacionTerapeutica
+            nroAfiliado={datoSeleccionado?.nroAfiliado}
+            onGuardar={agregarSituacion}
+            onCancelar={() => setCrearSituacion(false)}
+          />
         </Dialog>
 
 
@@ -135,10 +166,25 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
               <Typography variant="subtitle2">Fecha Inicio</Typography>
               <Typography>{situacionSeleccionada?.fechaInicio}</Typography>
             </Box>
-            <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
-              <Typography variant="subtitle2">Fecha Final</Typography>
-              <Typography>{situacionSeleccionada?.fechaFinal}</Typography>
-            </Box>
+              <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
+                <Typography variant="subtitle2">Fecha Final</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {/* muestra la fecha asignada si existe */}
+                  Actual: {situacionSeleccionada?.fechaFinal || "No asignada"}
+                </Typography>
+                <input
+                  type="date"
+                  value={nuevaFechaFinal}
+                  /* actualizar estado */
+                  onChange={(e) => setNuevaFechaFinal(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    marginTop: "8px"
+                  }}
+                />
+              </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Notas</Typography>
               <Typography whiteSpace="pre-line">
@@ -153,7 +199,10 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
                 setSituacionSeleccionada(null);
               }}
             />
-            <Button onClick={() => setSituacionSeleccionada(null)}>Cerrar</Button>
+            {/* <Button onClick={() => setSituacionSeleccionada(null)}>Cerrar</Button> */}
+            <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
+              Guardar Fecha Final
+            </Button>
           </DialogActions>
 
           </DialogContent>
@@ -161,3 +210,4 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
       </Stack>
   );
 }
+
