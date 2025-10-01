@@ -8,7 +8,7 @@ export function Header(props) {
     <Toolbar 
       variant="dense"
       sx={{
-          bgcolor:'#aec3f3',
+          bgcolor:'#F9F9FF',
           margin: 2
         }}
       >
