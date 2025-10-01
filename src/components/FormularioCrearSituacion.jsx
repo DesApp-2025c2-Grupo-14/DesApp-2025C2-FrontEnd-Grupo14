@@ -9,10 +9,10 @@ export default function FormularioCrearSituacion({ onGuardar, onCancelar, nroAfi
   const [nombre, setNombre] = useState("");
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFinal, setFechaFinal] = useState(null);
-  const [notas, setNotas] = useState("");
+  const [descripcion, setdescripcion] = useState("");
 
   const handleSubmit = () => {
-    if (!nombre || !fechaInicio || !notas) {
+    if (!nombre || !fechaInicio || !descripcion) {
       alert("Por favor completa los campos obligatorios");
       return;
     }
@@ -23,7 +23,7 @@ export default function FormularioCrearSituacion({ onGuardar, onCancelar, nroAfi
       fechaInicio: fechaInicio.format("DD/MM/YY"),  
       fechaFinal: fechaFinal ? fechaFinal.format("DD/MM/YY") : "",
       nroAfiliado,
-      notas
+      descripcion
     };
 
     onGuardar(nuevaSituacion);
@@ -85,13 +85,13 @@ export default function FormularioCrearSituacion({ onGuardar, onCancelar, nroAfi
           </LocalizationProvider>
 
           <TextField
-            label="Notas"
+            label="descripcion"
             variant="outlined"
             multiline
             rows={4}
             fullWidth
-            value={notas}
-            onChange={(e) => setNotas(e.target.value)}
+            value={descripcion}
+            onChange={(e) => setdescripcion(e.target.value)}
             sx={{ backgroundColor: "#ffffff", borderRadius: "6px" }}
           />
         </Stack>

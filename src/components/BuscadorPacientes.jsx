@@ -99,7 +99,8 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
                 padding: 3,
                 borderRadius: 6,
                 border: '2px solid black',
-                bgcolor: seleccionado === i ? '#0146ab' : '#F2F2F2'
+                bgcolor: seleccionado === i ? '#0146ab' : '#F2F2F2',
+                color: seleccionado === i ? 'white' : 'black'
               }}
             >
               <Stack>

@@ -33,17 +33,17 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
 
   return (
 <Stack sx={{ alignContent: "center", height: "100%" }}>
-  <Box width="90%" mx="auto" mb={2}>
-    <Typography variant="h4" sx={{ textAlign: "center", color: "black" }}>
-      Historial Clínico
-    </Typography>
+  <Box mwidth="90%" x="auto" mb={2} marginRight={5}>
+        <Typography variant="h4" sx={{ textAlign: "center", color: "#1976d2"  }} marginTop={2}>
+          Historial Clínico
+        </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
       <Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>
       <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button>
     </Stack>
   </Box>
 
-      <Stack height="100%" width="90%" m="auto" marginBottom={3} bgcolor="grey" borderRadius={3} p={4}>
+      <Stack height="100%" width="90%" m="auto" marginBottom={3} borderRadius={3} p={4}>
         <Box mb={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Box
           sx={{display: "flex",alignItems: "center",backgroundColor: "white",
@@ -71,7 +71,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
           {historiasFiltradas.length === 0 ? (
             <Box sx={{ alignContent: "center", height: "100%" }}>
               <Stack sx={{ alignItems: "center" }}>
-                <Typography>No cuenta con historias clínicas registradas</Typography>
+                <Typography sx={{ color: "#1976d2", fontSize: "18px" }}>No cuenta con historias clínicas registradas</Typography>
               </Stack>
             </Box>
           ) : (

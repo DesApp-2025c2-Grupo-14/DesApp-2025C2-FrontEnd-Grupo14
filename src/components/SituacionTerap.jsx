@@ -78,7 +78,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
-        <Typography variant="h4" sx={{ textAlign: "center", color: "black" }}>
+        <Typography variant="h4" sx={{ textAlign: "center", color: "#1976d2"  }} marginTop={2}>
           Situaciones Terapeuticas
         </Typography>
         <Stack direction="row" justifyContent="space-between" px={2}>
@@ -99,7 +99,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
           {situacionesFiltradas.length === 0 ? (
             <Box sx={{ alignContent: "center", height: "100%" }}>
               <Stack sx={{ alignItems: "center" }}>
-                <Typography>No cuenta con situaciones terapéuticas registradas</Typography>
+                <Typography sx={{color: "#1976d2" }}>No cuenta con situaciones terapéuticas registradas</Typography>
               </Stack>
             </Box>
           ) : (
@@ -125,16 +125,25 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
                   <Typography variant="h6" fontWeight="bold">
                     {situacion.nombre}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Fecha: {situacion.fechaInicio}
+                  <Typography variant="body2" color="text.secondary">
+                    Fecha Inicio: {situacion.fechaInicio}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Fecha Fin: {situacion.fechaFinal}
                   </Typography>
                 </Paper>
               ))}
             </Stack>
           )}
         </Stack>
-        <Button onClick={() => setCrearSituacion(true)} variant="contained">Crear Situación</Button>
-       
+          <Box width="100%" mx="auto" mt="auto" sx={{ display: "flex", justifyContent: "center" }}>
+            <Button 
+              onClick={() => setCrearSituacion(true)} 
+              variant="contained"
+            >
+              Crear Situación
+            </Button>
+          </Box>
        <Dialog
           open={!!crearSituacion}
           onClose={() => setCrearSituacion(null)}
@@ -186,9 +195,9 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
                 />
               </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
-              <Typography variant="subtitle2">Notas</Typography>
+              <Typography variant="subtitle2">Descripción</Typography>
               <Typography whiteSpace="pre-line">
-                {situacionSeleccionada?.notas}
+                {situacionSeleccionada?.descripcion}
               </Typography>
             </Box>
             <DialogActions>
@@ -201,7 +210,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
             />
             {/* <Button onClick={() => setSituacionSeleccionada(null)}>Cerrar</Button> */}
             <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
-              Guardar Fecha Final
+              Modificar Fecha Final
             </Button>
           </DialogActions>
 
