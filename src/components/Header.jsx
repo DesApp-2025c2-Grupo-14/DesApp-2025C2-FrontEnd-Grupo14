@@ -9,7 +9,9 @@ export function Header(props) {
       variant="dense"
       sx={{
           bgcolor:'#F9F9FF',
-          margin: 2
+          margin: 2,
+          border: 2,
+          borderRadius: 2
         }}
       >
       <Stack 

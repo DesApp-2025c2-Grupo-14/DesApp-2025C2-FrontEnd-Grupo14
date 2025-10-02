@@ -169,7 +169,7 @@ export function Listado() {
   return (
     <Toolbar
       sx={{
-        bgcolor:'#F9F9FF',
+        bgcolor:'#aec3f3',
         overflow: 'auto',
         width:'50%',
         margin: 2,
