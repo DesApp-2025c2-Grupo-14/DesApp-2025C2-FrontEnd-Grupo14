@@ -16,7 +16,7 @@
     "@mui/material": "^5.15.11",
     "@mui/x-date-pickers": "^5.0.16",
     "@reduxjs/toolkit": "^2.2.1",
-    "axios": "^1.6.7",
+    "axios": "^1.12.2",
     "dayjs": "^1.11.18",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
