@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 
-export function BotonBajaSituacion({ situacion, onBorrado }) {
-  const borrarSituacion = () => {
+export function BotonBajaSituacion({onBorrado}) {
+  /* const borrarSituacion = () => {
     //recupera las historias o sino usa un array vacio
     const situacionesGuardadas = JSON.parse(localStorage.getItem("situaciones")) || [];
 
@@ -16,11 +16,11 @@ export function BotonBajaSituacion({ situacion, onBorrado }) {
     if (onBorrado) {
       onBorrado(nuevasSituaciones);
     }
-  };
-
+  }; */
+// saco lo del localStorage para usar el borrado de situacion terap
   return (
     // boton de borrado
-    <Button color="error" onClick={borrarSituacion}>
+    <Button color="error" onClick={onBorrado}>
       Dar de baja
     </Button>
   );

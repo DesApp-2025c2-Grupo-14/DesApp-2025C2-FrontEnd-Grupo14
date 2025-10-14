@@ -78,10 +78,23 @@ useEffect(() => {
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
   }; */
-
+  const borrarSituacion = async () =>{
+        try {
+          // uso el delete del back para borrar la situacion
+          await axios.delete(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
+          //creo la nueva lista sin la situacion
+          const nuevasSituaciones = situaciones.filter(s => s._id !== situacionSeleccionada._id);
+          //actualizo la lista
+          setSituaciones(nuevasSituaciones);
+          setSituacionSeleccionada(null);
+        } catch (error) {
+          alert("No se pudo borrar la situación.");
+          console.error(error);
+        }
+  }  
   const guardarFechaFinal = async () => {
   try {// el put para cambiar fecha Final
-    const response = await axios.put(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
+    const response = await axios.patch(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
     const nuevasSituaciones = situaciones.map((s) =>
       s._id === situacionSeleccionada._id ? response.data : s
     );
@@ -94,14 +107,34 @@ useEffect(() => {
   }
 };
 
-
-  const agregarSituacion = (nuevaSituacion) => {
+  const agregarSituacion = async (nuevaSituacion)=>{
+    try{
+      const datos ={
+        ...nuevaSituacion,
+        // aca armo la situacion para mandarla al back, pasando las fechas al formato necesario 
+        fechaInicio: nuevaSituacion.fechaInicio.toISOString(),
+        fechaFinal: nuevaSituacion.fechaFinal ? nuevaSituacion.fechaFinal.toISOString() : null
+      }
+      // post de situaciones usando id para crear
+      const res = await axios.post(`http://localhost:3001/pacientes/${datoSeleccionado._id}/crearSituacion`, datos)
+      // recupero la situacion del back ya creada
+      const situacionNueva = res.data.situacion
+      // actualizo la lista con el nuevo estado
+      setSituaciones((prevSituaciones) => [...prevSituaciones, situacionNueva]);
+      setCrearSituacion(false);
+    }catch(error){
+    console.error("Error al crear la nueva situacion:", error);
+    alert("No se pudo crear la nueva situacion");
+}
+  }
+  
+/*   const agregarSituacion = (nuevaSituacion) => {
     const nuevasSituaciones = [...situaciones, nuevaSituacion];
     setSituaciones(nuevasSituaciones);
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setCrearSituacion(false);
   };
-  console.log("situacionSelec:", situacionSeleccionada)
+  console.log("situacionSelec:", situacionSeleccionada) */
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
@@ -176,7 +209,6 @@ useEffect(() => {
           onClose={() => setCrearSituacion(null)}
         >
           <FormularioSituacionTerapeutica
-            nroAfiliado={datoSeleccionado?.nroAfiliado}
             onGuardar={agregarSituacion}
             onCancelar={() => setCrearSituacion(false)}
           />
@@ -231,13 +263,8 @@ useEffect(() => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <BotonBajaSituacion
-              situacion={situacionSeleccionada}
-              onBorrado={(nuevasSituaciones) => {
-                setSituaciones(nuevasSituaciones);
-                setSituacionSeleccionada(null);
-              }}
-            />
+            {/* boton actualizado que solo ejecuta borrarsituacion */}
+            <BotonBajaSituacion onBorrado={borrarSituacion} />
             {/* aca se bloquea el boton hasta ingresar fecha */}
             <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
               Modificar Fecha Final
