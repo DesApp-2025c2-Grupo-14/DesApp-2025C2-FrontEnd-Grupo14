@@ -3,7 +3,7 @@ const historiasClinicas = [
     id: 1,
     nroAfiliado: "10001-01",
     titulo: "Consulta Cardiológica",
-    prestador: "Dr. Peralta",
+    prestador: "Dr. Pepe",
     fecha: "2023-03-15",
     notas: "Presión arterial alta, recomendar dieta",
   },

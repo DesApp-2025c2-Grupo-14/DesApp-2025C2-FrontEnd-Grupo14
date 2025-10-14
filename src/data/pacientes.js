@@ -1,5 +1,5 @@
 const pacientes = [
-  { dni: '30123456', nombre: 'María', apellido: 'González', nroAfiliado: '10001-01', telefono: '1112345678', parentesco: 'Titular', fechaNacimiento: '1975-03-12', planMedico: 'Plata' },
+  { dni: '30123456', nombre: 'María', apellido: 'González', nroAfiliado: '10001-01', telefono: '1112345678', parentesco: 'Titular', fechaNacimiento: '1895-03-12', planMedico: 'Plata' },
   { dni: '32109876', nombre: 'Lucía', apellido: 'González', nroAfiliado: '10001-02', telefono: '1112345679', parentesco: 'Hija', fechaNacimiento: '2005-08-19', planMedico: 'Plata' },
   { dni: '29123457', nombre: 'Carlos', apellido: 'González', nroAfiliado: '10001-03', telefono: '1112345680', parentesco: 'Esposo', fechaNacimiento: '1972-11-04', planMedico: 'Plata' },
   { dni: '27234567', nombre: 'Martín', apellido: 'González', nroAfiliado: '10001-04', telefono: '1112345681', parentesco: 'Hijo', fechaNacimiento: '2008-06-15', planMedico: 'Plata' },
