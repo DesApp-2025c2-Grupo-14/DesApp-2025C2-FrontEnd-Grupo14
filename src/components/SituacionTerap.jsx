@@ -1,18 +1,21 @@
 import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
-import situacionesMock from "../data/situacionesTerapeuticas";
+//import situacionesMock from "../data/situacionesTerapeuticas";
 import { BotonCrearSituacion } from "./BotonCrearSituacion";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
 import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
 import dayjs from 'dayjs';
+import axios from "axios";
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [situacionSeleccionada, setSituacionSeleccionada] = useState(null);
+  const [situaciones, setSituaciones] = useState([]);
+  const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
-
-  // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
+  console.log("situacion", situacionSeleccionada)
+/*   // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
   const [situaciones, setSituaciones] = useState(() => {
     const guardadas = localStorage.getItem("situaciones");
     if (guardadas) {
@@ -21,39 +24,47 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
       localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
       return situacionesMock;
     }
-  });
+  }); */
 
-  // filtado de situaciones por nroafiliado 
+/*   // filtado de situaciones por nroafiliado 
   const situacionesFiltradas = situaciones
-    .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado)
+    .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado) */
 
-  // funcion temporal para restaurar el estado original del mock
+/*   // funcion temporal para restaurar el estado original del mock
   const restaurarSituaciones = () => {
     localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
     setSituaciones(situacionesMock);
     setSituacionSeleccionada(null);
-  };
+  }; */
 
-/*  // efecto usado para cambiar la fecha final
-  useEffect(() => {
-    if (situacionSeleccionada) {
-      setNuevaFechaFinal(situacionSeleccionada.fechaFinal || "");
+useEffect(() => {
+  if (situacionSeleccionada) {
+    const fechaFinal = situacionSeleccionada.fechaFinal;
+    setNuevaFechaFinal(fechaFinal || "");
+  }
+}, [situacionSeleccionada]);
+
+
+  useEffect(()=>{
+    if(!datoSeleccionado?.nroAfiliado){
+      setSituaciones([]);
+      return;
     }
-  }, [situacionSeleccionada]);
-  */
- // efecto usado para cambiar la fecha final
-  useEffect(() => {
-    if (situacionSeleccionada) {
-      //
-      const fechaISO = situacionSeleccionada.fechaFinal 
-        //verifica si hay fecha cargada y si esta la cambia al formato iso que entiende el input
-        ? dayjs(situacionSeleccionada.fechaFinal, "DD/MM/YYYY").format("YYYY-MM-DD") : "";
-      setNuevaFechaFinal(fechaISO);
+
+    const fetchSituaciones = async () =>{
+      setError(null)
+      try{
+        const response = await axios.get(`http://localhost:3001/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
+        setSituaciones(response.data.situaciones);
+      }catch(err){
+      setError("Error al cargar las situaciones terapéuticas.");
+      setSituaciones([]);
+      }
     }
-  }, [situacionSeleccionada]); 
+    fetchSituaciones();
+  },[datoSeleccionado]);
 
-
-  const guardarFechaFinal = () => {
+/*   const guardarFechaFinal = () => {
     const fechaFormato = dayjs(nuevaFechaFinal).format("DD/MM/YYYY"); 
     // buscar la situacion seleccionada y crea un nuevo array con la fecha final actualizada
     const nuevasSituaciones = situaciones.map((s) =>
@@ -66,15 +77,64 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
     // guardar nuevo array en localStorage
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
-  };
+  }; */
+  const borrarSituacion = async () =>{
+        try {
+          // uso el delete del back para borrar la situacion
+          await axios.delete(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
+          //creo la nueva lista sin la situacion
+          const nuevasSituaciones = situaciones.filter(s => s._id !== situacionSeleccionada._id);
+          //actualizo la lista
+          setSituaciones(nuevasSituaciones);
+          setSituacionSeleccionada(null);
+        } catch (error) {
+          alert("No se pudo borrar la situación.");
+          console.error(error);
+        }
+  }  
+  const guardarFechaFinal = async () => {
+  try {// el put para cambiar fecha Final
+    const response = await axios.patch(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
+    const nuevasSituaciones = situaciones.map((s) =>
+      s._id === situacionSeleccionada._id ? response.data : s
+    );
+    //actualizo el estado de las situaciones con lo nuevo
+    setSituaciones(nuevasSituaciones);
+    setSituacionSeleccionada(response.data);
+  } catch (error) {
+    console.error("Error al guardar la fecha final:", error);
+    alert("No se pudo modificar la fecha final");
+  }
+};
 
-  const agregarSituacion = (nuevaSituacion) => {
+  const agregarSituacion = async (nuevaSituacion)=>{
+    try{
+      const datos ={
+        ...nuevaSituacion,
+        // aca armo la situacion para mandarla al back, pasando las fechas al formato necesario 
+        fechaInicio: nuevaSituacion.fechaInicio.toISOString(),
+        fechaFinal: nuevaSituacion.fechaFinal ? nuevaSituacion.fechaFinal.toISOString() : null
+      }
+      // post de situaciones usando id para crear
+      const res = await axios.post(`http://localhost:3001/pacientes/${datoSeleccionado._id}/crearSituacion`, datos)
+      // recupero la situacion del back ya creada
+      const situacionNueva = res.data.situacion
+      // actualizo la lista con el nuevo estado
+      setSituaciones((prevSituaciones) => [...prevSituaciones, situacionNueva]);
+      setCrearSituacion(false);
+    }catch(error){
+    console.error("Error al crear la nueva situacion:", error);
+    alert("No se pudo crear la nueva situacion");
+}
+  }
+  
+/*   const agregarSituacion = (nuevaSituacion) => {
     const nuevasSituaciones = [...situaciones, nuevaSituacion];
     setSituaciones(nuevasSituaciones);
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setCrearSituacion(false);
   };
-
+  console.log("situacionSelec:", situacionSeleccionada) */
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
@@ -83,7 +143,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
         </Typography>
         <Stack direction="row" justifyContent="space-between" px={2}>
           <Button variant="outlined" onClick={onCerrarSituacion}>Volver</Button>
-          <Button variant="outlined" onClick={restaurarSituaciones}>Restaurar datos</Button>
+          {/* <Button variant="outlined" onClick={restaurarSituaciones}>Restaurar datos</Button> */}
         </Stack>
       </Box>
         <Stack
@@ -96,7 +156,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
             mb: 3,
           }}
         >
-          {situacionesFiltradas.length === 0 ? (
+          {situaciones.length === 0 ? (
             <Box sx={{ alignContent: "center", height: "100%" }}>
               <Stack sx={{ alignItems: "center" }}>
                 <Typography sx={{color: "#1976d2" }}>No cuenta con situaciones terapéuticas registradas</Typography>
@@ -104,9 +164,9 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
             </Box>
           ) : (
             <Stack>
-              {situacionesFiltradas.map((situacion) => (
+              {situaciones.map((situacion) => (
                 <Paper
-                  key={situacion.id}
+                  key={situacion._id}
                   elevation={3}
                   onClick={() => setSituacionSeleccionada(situacion)}
                   sx={{
@@ -123,13 +183,13 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
                   }}
                 >
                   <Typography variant="h6" fontWeight="bold">
-                    {situacion.nombre}
+                    {situacion.titulo}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Fecha Inicio: {situacion.fechaInicio}
+                    Fecha Inicio: {dayjs(situacion.fechaInicio).format("DD/MM/YYYY")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Fecha Fin: {situacion.fechaFinal}
+                    Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).format("DD/MM/YYYY") : "No asignada"}
                   </Typography>
                 </Paper>
               ))}
@@ -149,15 +209,13 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
           onClose={() => setCrearSituacion(null)}
         >
           <FormularioSituacionTerapeutica
-            nroAfiliado={datoSeleccionado?.nroAfiliado}
             onGuardar={agregarSituacion}
             onCancelar={() => setCrearSituacion(false)}
           />
         </Dialog>
-
-
+      {situacionSeleccionada && (
         <Dialog
-          open={!!situacionSeleccionada}
+          open={true}
           onClose={() => setSituacionSeleccionada(null)}
           maxWidth="sm"
           fullWidth
@@ -169,53 +227,51 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
           >
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Título</Typography>
-              <Typography>{situacionSeleccionada?.nombre}</Typography>
+              <Typography>{situacionSeleccionada.titulo}</Typography>
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Fecha Inicio</Typography>
-              <Typography>{situacionSeleccionada?.fechaInicio}</Typography>
+              <Typography>
+                {dayjs(situacionSeleccionada.fechaInicio).format("DD/MM/YYYY")}
+              </Typography>
             </Box>
-              <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
-                <Typography variant="subtitle2">Fecha Final</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {/* muestra la fecha asignada si existe */}
-                  Actual: {situacionSeleccionada?.fechaFinal || "No asignada"}
-                </Typography>
-                <input
-                  type="date"
-                  value={nuevaFechaFinal}
-                  /* actualizar estado */
-                  onChange={(e) => setNuevaFechaFinal(e.target.value)}
-                  style={{
-                    padding: "8px",
-                    borderRadius: "4px",
-                    border: "1px solid #ccc",
-                    marginTop: "8px"
-                  }}
-                />
-              </Box>
+            <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
+              <Typography variant="subtitle2">Fecha Final</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Actual:{" "}
+                {situacionSeleccionada.fechaFinal
+                  ? dayjs(situacionSeleccionada.fechaFinal).format("DD/MM/YYYY")
+                  : "No asignada"}
+              </Typography>
+              <input
+                type="date"
+                value={nuevaFechaFinal}
+                onChange={(e) => setNuevaFechaFinal(e.target.value)}
+                style={{
+                  padding: "8px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  marginTop: "8px",
+                }}
+              />
+            </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Descripción</Typography>
               <Typography whiteSpace="pre-line">
-                {situacionSeleccionada?.descripcion}
+                {situacionSeleccionada.descripcion}
               </Typography>
             </Box>
-            <DialogActions>
-            <BotonBajaSituacion
-              situacion={situacionSeleccionada}
-              onBorrado={(nuevasSituaciones) => {
-                setSituaciones(nuevasSituaciones);
-                setSituacionSeleccionada(null);
-              }}
-            />
-            {/* <Button onClick={() => setSituacionSeleccionada(null)}>Cerrar</Button> */}
+          </DialogContent>
+          <DialogActions>
+            {/* boton actualizado que solo ejecuta borrarsituacion */}
+            <BotonBajaSituacion onBorrado={borrarSituacion} />
+            {/* aca se bloquea el boton hasta ingresar fecha */}
             <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
               Modificar Fecha Final
             </Button>
           </DialogActions>
-
-          </DialogContent>
         </Dialog>
+      )}
       </Stack>
   );
 }

@@ -4,29 +4,35 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import axios from "axios";
 
 export default function FormularioCrearSituacion({ onGuardar, onCancelar, nroAfiliado }) {
-  const [nombre, setNombre] = useState("");
+  const [titulo, setTitulo] = useState("");
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFinal, setFechaFinal] = useState(null);
   const [descripcion, setdescripcion] = useState("");
 
   const handleSubmit = () => {
-    if (!nombre || !fechaInicio || !descripcion) {
+    if (!titulo || !fechaInicio || !descripcion) {
       alert("Por favor completa los campos obligatorios");
       return;
     }
-
-    const nuevaSituacion = {
+    // creo la nueva situacion para luego mandarla a situacionterap
+      const nuevaSituacion ={
+        titulo,
+        fechaInicio,
+        fechaFinal,
+        descripcion
+      }
+      onGuardar(nuevaSituacion)
+/*     const nuevaSituacion = {
       id: Date.now(),
-      nombre,
+      titulo,
       fechaInicio: fechaInicio.format("DD/MM/YY"),  
       fechaFinal: fechaFinal ? fechaFinal.format("DD/MM/YY") : "",
       nroAfiliado,
       descripcion
-    };
-
-    onGuardar(nuevaSituacion);
+    }; */
   };
   return (
     <Card
@@ -52,8 +58,8 @@ export default function FormularioCrearSituacion({ onGuardar, onCancelar, nroAfi
             label="Título"
             variant="outlined"
             fullWidth
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
             sx={{ backgroundColor: "#ffffff", borderRadius: "6px" }}
           />
 

@@ -1,16 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
-import historiasMock from "../data/historiasClinicas";
+//import historiasMock from "../data/historiasClinicas";
+import axios from "axios";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+
+dayjs.locale("es");
 
 export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
+  const [historias, setHistorias] = useState([])
   const [historiaSeleccionada, setHistoriaSeleccionada] = useState(null);
   const [verSoloMisNotas, setVerSoloMisNotas] = useState(false);
+  const [error, setError] = useState(null); // para verificacion de errores en el momento de carga
 
   // Simulo el prestador logueado
-  const usuarioActual = "Dr. Buenavida";
+  const usuarioActual = "Dra. Martínez";
+
+  useEffect(()=>{
+    // si no hay paciente seleccionado limpia
+    if(!datoSeleccionado?.nroAfiliado){
+      setHistorias([])
+      return;
+    }
+  
+
+  const fetchHistorias = async ()=>{
+    setError(null)
+
+    try{
+      const url = `http://localhost:3001/pacientes/${datoSeleccionado.nroAfiliado}/historiasClinicas`;
+      // para filtrar las notas por prestador
+      const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
+      // la peticion con el parametro de ver notas si esta activo
+      const response = await axios.get(url, { params });
+      setHistorias(response.data.historial);
+    } catch(err){
+      setError("Error al cargar las historias clínicas.");
+      setHistorias([]);
+    }
+  }
+   fetchHistorias();
+  }, [datoSeleccionado?.nroAfiliado, verSoloMisNotas]);
 
   // Estado para manejar las historias clínicas, inicializado desde localStorage o con el mock
-  const [historias, setHistorias] = useState(() => {
+/*   const [historias, setHistorias] = useState(() => {
     const guardadas = localStorage.getItem("historias");
     if (guardadas) {
       return JSON.parse(guardadas);
@@ -18,19 +51,23 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
       localStorage.setItem("historias", JSON.stringify(historiasMock));
       return historiasMock;
     }
-  });
-  // filtado de historias por nroafiliado y si se elige por las de el prestador logueado
+  }); */
+
+  //ahora se hace desde el back
+/*   // filtado de historias por nroafiliado y si se elige por las de el prestador logueado
   const historiasFiltradas = historias
     .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado)
     .filter((h) => !verSoloMisNotas || h.prestador === usuarioActual);
+ */
 
   // funcion temporal para restaurar el estado original del mock
-  const restaurarHistorias = () => {
+/*   const restaurarHistorias = () => {
     localStorage.setItem("historias", JSON.stringify(historiasMock));
     setHistorias(historiasMock);
     setHistoriaSeleccionada(null);
   };
-
+ */
+  
   return (
 <Stack sx={{ alignContent: "center", height: "100%" }}>
   <Box mwidth="90%" x="auto" mb={2} marginRight={5}>
@@ -39,7 +76,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
         </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
       <Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>
-      <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button>
+      {/* <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button> */}
     </Stack>
   </Box>
 
@@ -68,7 +105,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
             mb: 3,
           }}
         >
-          {historiasFiltradas.length === 0 ? (
+          {historias.length === 0 ? (
             <Box sx={{ alignContent: "center", height: "100%" }}>
               <Stack sx={{ alignItems: "center" }}>
                 <Typography sx={{ color: "#1976d2", fontSize: "18px" }}>No cuenta con historias clínicas registradas</Typography>
@@ -76,9 +113,9 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
             </Box>
           ) : (
             <Stack>
-              {historiasFiltradas.map((historia) => (
+              {historias.map((historia) => (
                 <Paper
-                  key={historia.id}
+                  key={historia._id}
                   elevation={3}
                   onClick={() => setHistoriaSeleccionada(historia)}
                   sx={{
@@ -98,7 +135,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
                     {historia.titulo}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Fecha: {historia.fecha}
+                    Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
                   </Typography>
                 </Paper>
               ))}
@@ -123,7 +160,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Fecha</Typography>
-              <Typography>{historiaSeleccionada?.fecha}</Typography>
+              <Typography>{dayjs(historiaSeleccionada?.fecha).format("DD/MM/YYYY")}</Typography>
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Prestador</Typography>

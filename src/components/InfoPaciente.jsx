@@ -6,6 +6,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
   const { datoSeleccionado } = useContext(DatosContext);
 
+
   return (
     <Stack sx={{height: "100%", width:'100%' }}>
       {!datoSeleccionado ? (
@@ -90,7 +91,7 @@ export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
                 InputProps={{ readOnly: true }}
               />
             </Stack>
-
+              
             <Stack px={3}  textAlign="center">
               <TextField
                 label="Teléfono"

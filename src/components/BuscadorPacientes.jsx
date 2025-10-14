@@ -1,8 +1,9 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { DatosContext } from "../context/datos";
 import { Box, TextField, Typography, IconButton, InputAdornment, Paper, Stack, ButtonBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import pacientes from '../data/pacientes';
+//import pacientes from '../data/pacientes'; los traigo del back
+import axios from 'axios';
 
 export function BuscadorPacientes({ onPacienteSeleccionado }) {
   const [busqueda, setBusqueda] = useState("");
@@ -10,6 +11,26 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
   const [busquedaRealizada, setBusquedaRealizada] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null);
   const { setDatoSeleccionado } = useContext(DatosContext);
+  const [todosLosPacientes, setTodosLosPacientes] = useState([]);
+
+  async function getPacientes() {
+    const response = await axios.get(`http://localhost:3001/pacientes`) // peticion con axios
+/*     console.log('backend response')
+    console.log(response) */
+    return response.data;
+  } 
+  useEffect(() => {
+    const fetchPacientes = async () => {
+      try {
+        const data = await getPacientes();
+        setTodosLosPacientes(data);
+      } catch (error) {
+        console.error("Error cargando pacientes:", error);
+      }
+    };
+
+    fetchPacientes();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -21,7 +42,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
       return;
     }
 
-    const pacientesFiltrados = pacientes.filter((paciente) => {
+    const pacientesFiltrados = todosLosPacientes.filter((paciente) => {
       return (
         paciente.dni.startsWith(textoBusqueda) ||
         paciente.telefono.startsWith(textoBusqueda) ||
@@ -34,7 +55,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
     pacientesFiltrados.forEach((paciente) => {
       const grupoBase = paciente.nroAfiliado.split("-")[0];
       if (!grupos.has(grupoBase)) {
-        const grupoCompleto = pacientes.filter((p) =>
+        const grupoCompleto = todosLosPacientes.filter((p) =>
           p.nroAfiliado.startsWith(grupoBase)
         );
         grupos.set(grupoBase, grupoCompleto);
