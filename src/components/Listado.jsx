@@ -87,10 +87,21 @@ export function Listado(props) {
     fetchData();
   }, [])
 
-  const handleAnalizar = (id) => {
+  const handleAnalizar = async (id) => {
     // Filtra la lista quitando el elemento seleccionado
-    setSolicitudes(solicitudes.filter((item) => item._id !== id));
-  };
+    //setSolicitudes(solicitudes.filter((item) => item._id !== id));
+    try{
+      const prestadorId = "6710b8e9a64f6f1bcb54a23f"
+      await axios.patch(`${BACKEND_URL}/solicitudes/${id}`, {
+  prestadorId: prestadorId // o props.prestadorId
+});
+      const response = await axios.get(`${BACKEND_URL}/solicitudes`);
+      setSolicitudes(response.data);
+      props.onSeleccionar(null, null);
+  }
+  catch (error) {
+    console.error(" Error al analizar solicitud:", error);
+  }};
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
