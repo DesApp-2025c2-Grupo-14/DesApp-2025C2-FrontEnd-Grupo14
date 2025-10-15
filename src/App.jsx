@@ -3,9 +3,6 @@ import { Box, Grid, Stack } from "@mui/material";
 import { BrowserRouter, Outlet } from "react-router-dom";
 import { AppRouter } from "./AppRouter";
 import { Menu } from './components/Menu';
-import { fill } from "lodash";
-import { red } from "@mui/material/colors";
-import { HistoriaClinica } from './components/HistoriaClinica';
 
 export function App() {
 
@@ -14,13 +11,11 @@ export function App() {
       <Stack 
         direction='row' 
         height='100%' 
-        width='100%'
-        
+        width='100%'        
         >
         <Box 
           width='15%'
-          sx={{
-            
+          sx={{           
             // px: { xs: 2, sm: 4, lm: 6},
             py: 4,
             bgcolor: '#021F59'
