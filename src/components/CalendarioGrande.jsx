@@ -47,7 +47,7 @@ export  function CalendarioGrande() {
     setOpenDialog(false);
     setSelectedturno(null);
   };
-
+  //Al presionar "Cancelar" en el formulario
   const handleCancel = () => {
     setOpenDialog(false);
      handleMenuClose();
