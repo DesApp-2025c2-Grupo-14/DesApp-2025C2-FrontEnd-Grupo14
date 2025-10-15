@@ -5,7 +5,11 @@ import { DetalleSolicitud } from '../components/DetalleSolicitud'
 import { Box, Card, CardMedia, Grid, Stack, Typography } from "@mui/material";
 
 export function Inbox(props) {
-    console.log(props)
+  const [seleccion, setSeleccion] = React.useState(null);
+  console.log(seleccion)
+  const handleSeleccion = (tipo, id) => {
+    setSeleccion({ tipo, id });
+  };
   return (
     <Stack width="100%" height="100vh"> {/* usar 100vh para asegurar altura total */}
       <Header seccion={props.seccion} usuario={props.usuario} />
@@ -15,8 +19,8 @@ export function Inbox(props) {
         width="100%"
         height="100%"
       >
-        <Listado />
-        <DetalleSolicitud solicitud="" tipo={null} />
+        <Listado onSeleccionar={handleSeleccion} />
+        <DetalleSolicitud seleccion={seleccion} solicitud="" tipo={null} />
       </Stack>
     </Stack>
   )

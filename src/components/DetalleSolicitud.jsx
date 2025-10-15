@@ -2,8 +2,42 @@ import React from 'react'
 import { Header } from './Header'
 import { Box, Stack, Divider, AppBar, Toolbar, Typography, Button, Drawer } from "@mui/material";
 import DescriptionIcon from '@mui/icons-material/Description';
-export function DetalleSolicitud(props) {
+import { PropaneSharp } from '@mui/icons-material';
+import axios from "axios";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+const BACKEND_URL = "http://localhost:3000";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+async function getDetalle(tipo, id) {
+  const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`)
+  console.log('backend response')
+  console.log(response)
+  return Promise.resolve(response.data);
+} 
+
+export function DetalleSolicitud(props) {
+    const [detalle, setDetalle] = React.useState(null);
+
+    React.useEffect( () => {
+        if (!props.seleccion) return;
+
+        const fetchDetalle = async () => {
+        try {
+            setDetalle(await getDetalle(props.seleccion.tipo, props.seleccion.id));
+        } catch (err) {
+            console.error(err);
+        }
+        };
+        console.log('hola')
+        // fetchDetalle();
+        fetchDetalle()
+    }, [props.seleccion]);
+
+    console.log(detalle)
     return (
         <Stack 
             direction='column' 
@@ -12,7 +46,7 @@ export function DetalleSolicitud(props) {
             alignItems='space-between'
         >
             <Header seccion={props.solicitud} usuario = '' />
-            {props.tipo !== null ? <Toolbar
+            {detalle && detalle.tipo !== null ? <Toolbar
                 sx={{
                     bgcolor:'#F9F9FF',
                     margin: 2,
@@ -41,7 +75,9 @@ export function DetalleSolicitud(props) {
                                 Fecha
                             </Typography>
                             <Toolbar>
-                                1 de Enero de 2026
+                                {detalle.fechaPrestacion && dayjs(detalle.fechaPrestacion)
+                                    .tz('America/Argentina/Buenos_Aires')
+                                    .format('DD/MM/YYYY HH:mm') || '--/--/---- --:--'}
                             </Toolbar>
                         </Stack>
                         <Stack direction='column' alignItems='center'>
@@ -49,7 +85,7 @@ export function DetalleSolicitud(props) {
                                 Lugar de atención
                             </Typography>
                             <Toolbar>
-                                Sanatorio Guemes
+                                {detalle.lugar || 'Sin especificar'}
                             </Toolbar>
                         </Stack>
                     </Stack>}
@@ -58,19 +94,19 @@ export function DetalleSolicitud(props) {
                             Paciente
                         </Typography>
                         <Toolbar>
-                                Pepe Argento
+                                {detalle.paciente.nombre}
                         </Toolbar>
                     </Stack>
                     
                     {
-                        props.tipo === 2 ?  
+                        detalle.tipo === 'Receta' ?  
                             <Stack direction='row' justifyContent='space-between'>
                                 <Stack direction='column' alignItems='center'>
                                     <Typography variant="h6" color="inherit">
                                         Medicamento
                                     </Typography>
                                     <Toolbar>
-                                        Sanatorio Guemes
+                                        {detalle.receta.medicamento}
                                     </Toolbar>
                                 </Stack>
                                 <Stack direction='column' alignItems='center'>
@@ -78,7 +114,7 @@ export function DetalleSolicitud(props) {
                                         Cantidad
                                     </Typography>
                                     <Toolbar>
-                                        Sanatorio Guemes
+                                        {detalle.receta.cantidad}
                                     </Toolbar>
                                 </Stack>
                             </Stack>
@@ -89,7 +125,7 @@ export function DetalleSolicitud(props) {
                                         Médico
                                     </Typography>
                                     <Toolbar>
-                                        Dr Dardo
+                                        {detalle.medico}
                                     </Toolbar>
                                 </Stack>
                                 <Stack direction='column' alignItems='center'>
@@ -97,7 +133,7 @@ export function DetalleSolicitud(props) {
                                         Especialidad
                                     </Typography>
                                     <Toolbar>
-                                        Urología
+                                       {detalle.especialidad}
                                     </Toolbar>
                                 </Stack>
                             </Stack>
@@ -105,26 +141,25 @@ export function DetalleSolicitud(props) {
                         
                     
                     {
-                        props.tipo === 1 &&
+                        detalle.tipo === 'Autorizacion' &&
                         <Stack width='100%' direction='column' alignItems='center'>
                             <Typography variant="h6" color="inherit">
                                 Dias de internación
                             </Typography>
                             <Toolbar>
-                                10 días
+                                {detalle.autorizacion.diasInternacion}
                             </Toolbar>
                         </Stack>                    
                     }
                     
                     {
-                        props.tipo === 2 &&
+                        detalle.tipo === 'Receta' &&
                         <Stack width='100%' direction='column' alignItems='center'>
                             <Typography variant="h6" color="inherit">
                                 Presentación
-        
                             </Typography>
                             <Toolbar>
-                                Urología
+                                {detalle.receta.presentacion}
                             </Toolbar>
                         </Stack>
                     }
@@ -152,23 +187,41 @@ export function DetalleSolicitud(props) {
                                  
                                 }}
                             >
-                                {"Hermosa mañana verdad" || "Sin observaciones."}
+                                {detalle.observaciones || "Sin observaciones."}
                             </Typography>
                             </Box>
                     </Stack>
                     {
-                        props.tipo === 0 &&
-                        <Stack width='100%' direction='column' alignItems='center'>
-                            <Typography variant="h6" color="inherit">
-                                Forma de pago
-                            </Typography>
-                            <Toolbar>
-                                Tarjeta
-                            </Toolbar>
+                        detalle.tipo === 'Reintegro' &&
+                        <Stack direction='row' justifyContent='center' spacing={2}>
+                            <Stack width='100%' direction='column' alignItems='center'>
+                                <Typography variant="h6" color="inherit">
+                                    Forma de pago
+                                </Typography>
+                                <Toolbar>
+                                    {detalle.reintegro.pago}
+                                </Toolbar>
+                            </Stack>
+                            <Stack width='100%' direction='column' alignItems='center'>
+                                <Typography variant="h6" color="inherit">
+                                    CBU
+                                </Typography>
+                                <Toolbar>
+                                    {detalle.reintegro.cbu || '-'}
+                                </Toolbar>
+                            </Stack>
+                            <Stack width='100%' direction='column' alignItems='center'>
+                                <Typography variant="h6" color="inherit">
+                                    Facturado A
+                                </Typography>
+                                <Toolbar>
+                                    {detalle.reintegro.facturadoA || '-'}
+                                </Toolbar>
+                            </Stack>
                         </Stack>
                     }
                     {
-                        props.tipo === 0 &&
+                        detalle.tipo === 'Reintegro' &&
                         <Button>
                             Ver factura
                         </Button>
