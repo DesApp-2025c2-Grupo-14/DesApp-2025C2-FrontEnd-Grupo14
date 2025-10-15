@@ -28,7 +28,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
     setError(null)
 
     try{
-      const url = `http://localhost:3001/pacientes/${datoSeleccionado.nroAfiliado}/historiasClinicas`;
+      const url = `http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/historiasClinicas`;
       // para filtrar las notas por prestador
       const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
       // la peticion con el parametro de ver notas si esta activo

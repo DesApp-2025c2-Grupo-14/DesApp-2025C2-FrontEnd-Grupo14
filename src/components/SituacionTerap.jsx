@@ -54,7 +54,7 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-        const response = await axios.get(`http://localhost:3001/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
+        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -81,7 +81,7 @@ useEffect(() => {
   const borrarSituacion = async () =>{
         try {
           // uso el delete del back para borrar la situacion
-          await axios.delete(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
+          await axios.delete(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
           //creo la nueva lista sin la situacion
           const nuevasSituaciones = situaciones.filter(s => s._id !== situacionSeleccionada._id);
           //actualizo la lista
@@ -94,7 +94,7 @@ useEffect(() => {
   }  
   const guardarFechaFinal = async () => {
   try {// el put para cambiar fecha Final
-    const response = await axios.patch(`http://localhost:3001/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
+    const response = await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
     const nuevasSituaciones = situaciones.map((s) =>
       s._id === situacionSeleccionada._id ? response.data : s
     );
@@ -116,7 +116,7 @@ useEffect(() => {
         fechaFinal: nuevaSituacion.fechaFinal ? nuevaSituacion.fechaFinal.toISOString() : null
       }
       // post de situaciones usando id para crear
-      const res = await axios.post(`http://localhost:3001/pacientes/${datoSeleccionado._id}/crearSituacion`, datos)
+      const res = await axios.post(`http://localhost:3000/pacientes/${datoSeleccionado._id}/crearSituacion`, datos)
       // recupero la situacion del back ya creada
       const situacionNueva = res.data.situacion
       // actualizo la lista con el nuevo estado

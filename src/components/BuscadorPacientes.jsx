@@ -14,7 +14,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
   const [todosLosPacientes, setTodosLosPacientes] = useState([]);
 
   async function getPacientes() {
-    const response = await axios.get(`http://localhost:3001/pacientes`) // peticion con axios
+    const response = await axios.get(`http://localhost:3000/pacientes`) // peticion con axios
 /*     console.log('backend response')
     console.log(response) */
     return response.data;
