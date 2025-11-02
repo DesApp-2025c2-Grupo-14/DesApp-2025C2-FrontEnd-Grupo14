@@ -33,7 +33,7 @@ useEffect(() => {
 
 
   useEffect(()=>{
-    if(!datoSeleccionado?.nroAfiliado){
+    if(!datoSeleccionado?._id){
       setSituaciones([]);
       return;
     }
@@ -41,7 +41,7 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
+        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`);
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -53,21 +53,21 @@ useEffect(() => {
 
   const borrarSituacion = async () =>{
         try {
-          // uso el delete del back para borrar la situacion
-          await axios.delete(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
+          // uso el patch del back para borrar la situacion de la vista
+          await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
           //creo la nueva lista sin la situacion
           const nuevasSituaciones = situaciones.filter(s => s._id !== situacionSeleccionada._id);
           //actualizo la lista
           setSituaciones(nuevasSituaciones);
           setSituacionSeleccionada(null);
           // Snackbar confirmacion
-          setMensajeSnackbar("Situación eliminada con éxito");
+          setMensajeSnackbar("Situación dada de baja con éxito");
           setTipoSnackbar("success");
           setOpenSnackbar(true);
         } catch (error) {
           console.error("Error al borrar la situación:", error);
           // Snackbar error
-          setMensajeSnackbar("No se pudo eliminar la situación terapéutica.");
+          setMensajeSnackbar("No se pudo dar de baja la situación terapéutica.");
           setTipoSnackbar("error");
           setOpenSnackbar(true);
         }
@@ -160,27 +160,32 @@ useEffect(() => {
                   elevation={3}
                   onClick={() => setSituacionSeleccionada(situacion)}
                   sx={{
-                    p: 3,
+                    p: 4,
                     borderRadius: 3,
                     bgcolor: "white",
+                    boxShadow: 3,
                     width: "90%",
                     textAlign: "center",
                     cursor: "pointer",
+                    transition: "background-color 0.5s ease", // para mostrar mejor el cambio de color
                     "&:hover": {
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: "#c7b8b87c",
                     },
-                    mb: 2
+                    mb: 3
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h5" fontWeight="bold" >
                     {situacion.titulo}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     {/* .utc para evitar desfaces de zona horaria y que muestre correctamente la fecha*/}
                     Fecha Inicio: {dayjs(situacion.fechaInicio).utc().format("DD/MM/YYYY")}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).utc().format("DD/MM/YYYY") : "No asignada"}
+                  </Typography>
+                  <Typography variant="body1" color="text.primary" >
+                    Descripción: {situacion.descripcion}
                   </Typography>
                 </Paper>
               ))}
@@ -258,6 +263,7 @@ useEffect(() => {
           <DialogActions>
             {/* boton actualizado que solo ejecuta borrarsituacion */}
             <BotonBajaSituacion onBorrado={borrarSituacion} />
+
             {/* aca se bloquea el boton hasta ingresar fecha */}
             <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
               Modificar Fecha Final
