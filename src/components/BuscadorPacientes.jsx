@@ -2,11 +2,13 @@ import { useState, useContext, useEffect } from 'react';
 import { DatosContext } from "../context/datos";
 import { Box, TextField, Typography, IconButton, InputAdornment, Paper, Stack, ButtonBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useParams,} from "react-router-dom";
 //import pacientes from '../data/pacientes'; los traigo del back
 import axios from 'axios';
 
-export function BuscadorPacientes({ onPacienteSeleccionado }) {
-  const [busqueda, setBusqueda] = useState("");
+export function BuscadorPacientes() {
+  const { nroAfiliado } = useParams(); 
+  const [busqueda, setBusqueda] = useState(nroAfiliado);
   const [resultados, setResultados] = useState([]);
   const [busquedaRealizada, setBusquedaRealizada] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null);
@@ -50,6 +52,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
       );
     });
 
+
     const grupos = new Map();
 
     pacientesFiltrados.forEach((paciente) => {
@@ -74,6 +77,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
     });
 
     setResultados(resultadosUnicos);
+    handleSearch;
   };
 
   return (
@@ -113,7 +117,6 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
               onClick={() => {
                 setDatoSeleccionado(paciente);
                 setSeleccionado(i);
-                if (onPacienteSeleccionado) onPacienteSeleccionado();
               }}
               key={i}
               sx={{
