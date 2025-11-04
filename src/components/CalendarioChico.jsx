@@ -14,7 +14,7 @@ function fakeFetch(date, { signal }) {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       const daysInMonth = date.daysInMonth();
-      const daysToHighlight = [1, 2, 3].map(() => getRandomNumber(1, daysInMonth));
+      const daysToHighlight = [1, 2, 3,].map(() => getRandomNumber(1, daysInMonth));
 
       resolve({ daysToHighlight });
     }, 500);
@@ -53,10 +53,11 @@ function ServerDay(props) {
   );
 }
 
-export function CalendarioChico() {
+export function CalendarioChico(props) {
   const requestAbortController = React.useRef(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [highlightedDays, setHighlightedDays] = React.useState([1, 2, 15]);
+  const daysToHighlight1 = props.turnos.hora
 
   const fetchHighlightedDays = (date) => {
     const controller = new AbortController();
@@ -93,13 +94,15 @@ export function CalendarioChico() {
     setIsLoading(true);
     setHighlightedDays([]);
     fetchHighlightedDays(date);
+
   };
 
   return (
 
       <Box sx={{width:"100%"}}>
         <DateCalendar
-          defaultValue={initialValue}
+          value={props.fechaSeleccionada}
+          onChange={(nuevaFecha)=>props.setFechaSeleccionada(nuevaFecha)}
           loading={isLoading}
           onMonthChange={handleMonthChange}
           showDaysOutsideCurrentMonth fixedWeekNumber={6}

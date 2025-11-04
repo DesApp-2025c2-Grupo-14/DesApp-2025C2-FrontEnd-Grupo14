@@ -15,7 +15,7 @@ const turnos = [
   { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena", nroAfiliado: "4" },
 ];
 
-export  function CalendarioGrande() {
+export  function CalendarioGrande(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState(null);
 
