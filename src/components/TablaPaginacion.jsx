@@ -26,7 +26,7 @@ export default function TablaPaginacion() {
   const [pageSize, setPageSize] = React.useState(3);
 
   return (
-    <Paper sx={{ height: 400, width: '100%' }}>
+    <Paper sx={{ height: 780, width: '100%' }}>
       <DataGrid
         rows={rows}
         columns={columns}
