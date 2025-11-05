@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
+import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button, Snackbar, Alert } from "@mui/material";
 //import situacionesMock from "../data/situacionesTerapeuticas";
-import { BotonCrearSituacion } from "./BotonCrearSituacion";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
 import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
-import dayjs from 'dayjs';
 import axios from "axios";
+
+dayjs.extend(utc);
+
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [situacionSeleccionada, setSituacionSeleccionada] = useState(null);
@@ -14,39 +17,23 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
-  console.log("situacion", situacionSeleccionada)
-/*   // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
-  const [situaciones, setSituaciones] = useState(() => {
-    const guardadas = localStorage.getItem("situaciones");
-    if (guardadas) {
-      return JSON.parse(guardadas);
-    } else {
-      localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
-      return situacionesMock;
-    }
-  }); */
-
-/*   // filtado de situaciones por nroafiliado 
-  const situacionesFiltradas = situaciones
-    .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado) */
-
-/*   // funcion temporal para restaurar el estado original del mock
-  const restaurarSituaciones = () => {
-    localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
-    setSituaciones(situacionesMock);
-    setSituacionSeleccionada(null);
-  }; */
+  //para snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [mensajeSnackbar, setMensajeSnackbar] = useState("");
+  const [tipoSnackbar, setTipoSnackbar] = useState("success");
 
 useEffect(() => {
   if (situacionSeleccionada) {
     const fechaFinal = situacionSeleccionada.fechaFinal;
-    setNuevaFechaFinal(fechaFinal || "");
+    //setNuevaFechaFinal(fechaFinal || "");
+    // si existe fechafinal la formateo al formato necesario, eliminado hora, si no hay fecha lo dejo vacio
+    setNuevaFechaFinal(fechaFinal ? dayjs(fechaFinal).utc().format("YYYY-MM-DD") : "");
   }
 }, [situacionSeleccionada]);
 
 
   useEffect(()=>{
-    if(!datoSeleccionado?.nroAfiliado){
+    if(!datoSeleccionado?._id){
       setSituaciones([]);
       return;
     }
@@ -54,7 +41,7 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
+        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`);
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -64,46 +51,49 @@ useEffect(() => {
     fetchSituaciones();
   },[datoSeleccionado]);
 
-/*   const guardarFechaFinal = () => {
-    const fechaFormato = dayjs(nuevaFechaFinal).format("DD/MM/YYYY"); 
-    // buscar la situacion seleccionada y crea un nuevo array con la fecha final actualizada
-    const nuevasSituaciones = situaciones.map((s) =>
-      s.id === situacionSeleccionada.id
-        ? { ...s, fechaFinal: fechaFormato }
-        : s
-    );
-    // actualizar estado de situaciones
-    setSituaciones(nuevasSituaciones);
-    // guardar nuevo array en localStorage
-    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
-    setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
-  }; */
   const borrarSituacion = async () =>{
         try {
-          // uso el delete del back para borrar la situacion
-          await axios.delete(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
+          // uso el patch del back para borrar la situacion de la vista
+          await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/eliminarSituacion`);
           //creo la nueva lista sin la situacion
           const nuevasSituaciones = situaciones.filter(s => s._id !== situacionSeleccionada._id);
           //actualizo la lista
           setSituaciones(nuevasSituaciones);
           setSituacionSeleccionada(null);
+          // Snackbar confirmacion
+          setMensajeSnackbar("Situación dada de baja con éxito");
+          setTipoSnackbar("success");
+          setOpenSnackbar(true);
         } catch (error) {
-          alert("No se pudo borrar la situación.");
-          console.error(error);
+          console.error("Error al borrar la situación:", error);
+          // Snackbar error
+          setMensajeSnackbar("No se pudo dar de baja la situación terapéutica.");
+          setTipoSnackbar("error");
+          setOpenSnackbar(true);
         }
   }  
   const guardarFechaFinal = async () => {
-  try {// el put para cambiar fecha Final
-    const response = await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
+  try {
+    // formateo la nueva fecha al formato estandar
+    const fechaFinalEstandar = dayjs(nuevaFechaFinal).startOf('day').format('YYYY-MM-DD');
+    // el put para cambiar fecha Final
+    const response = await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: fechaFinalEstandar });
     const nuevasSituaciones = situaciones.map((s) =>
       s._id === situacionSeleccionada._id ? response.data : s
     );
     //actualizo el estado de las situaciones con lo nuevo
     setSituaciones(nuevasSituaciones);
     setSituacionSeleccionada(response.data);
+    // Snackbar confirmacion
+    setMensajeSnackbar("Fecha final modificada con éxito");
+    setTipoSnackbar("success");
+    setOpenSnackbar(true);
   } catch (error) {
     console.error("Error al guardar la fecha final:", error);
-    alert("No se pudo modificar la fecha final");
+    // Snackbar error
+    setMensajeSnackbar("No se pudo modificar la fecha final.");
+    setTipoSnackbar("error");
+    setOpenSnackbar(true);
   }
 };
 
@@ -112,8 +102,8 @@ useEffect(() => {
       const datos ={
         ...nuevaSituacion,
         // aca armo la situacion para mandarla al back, pasando las fechas al formato necesario 
-        fechaInicio: nuevaSituacion.fechaInicio.toISOString(),
-        fechaFinal: nuevaSituacion.fechaFinal ? nuevaSituacion.fechaFinal.toISOString() : null
+        fechaInicio: dayjs(nuevaSituacion.fechaInicio).startOf('day').format('YYYY-MM-DD'),
+        fechaFinal: nuevaSituacion.fechaFinal ? dayjs(nuevaSituacion.fechaFinal).startOf('day').format('YYYY-MM-DD') : null
       }
       // post de situaciones usando id para crear
       const res = await axios.post(`http://localhost:3000/pacientes/${datoSeleccionado._id}/crearSituacion`, datos)
@@ -122,19 +112,19 @@ useEffect(() => {
       // actualizo la lista con el nuevo estado
       setSituaciones((prevSituaciones) => [...prevSituaciones, situacionNueva]);
       setCrearSituacion(false);
+      // Snackbar confirmacion
+      setMensajeSnackbar("Situación creada con éxito");
+      setTipoSnackbar("success");
+      setOpenSnackbar(true);
     }catch(error){
     console.error("Error al crear la nueva situacion:", error);
-    alert("No se pudo crear la nueva situacion");
+    // Snackbar error
+    setMensajeSnackbar("No se pudo crear la nueva situacion");
+    setTipoSnackbar("error");
+    setOpenSnackbar(true);
 }
   }
   
-/*   const agregarSituacion = (nuevaSituacion) => {
-    const nuevasSituaciones = [...situaciones, nuevaSituacion];
-    setSituaciones(nuevasSituaciones);
-    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
-    setCrearSituacion(false);
-  };
-  console.log("situacionSelec:", situacionSeleccionada) */
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
@@ -170,26 +160,32 @@ useEffect(() => {
                   elevation={3}
                   onClick={() => setSituacionSeleccionada(situacion)}
                   sx={{
-                    p: 3,
+                    p: 4,
                     borderRadius: 3,
                     bgcolor: "white",
+                    boxShadow: 3,
                     width: "90%",
                     textAlign: "center",
                     cursor: "pointer",
+                    transition: "background-color 0.5s ease", // para mostrar mejor el cambio de color
                     "&:hover": {
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: "#c7b8b87c",
                     },
-                    mb: 2
+                    mb: 3
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h5" fontWeight="bold" >
                     {situacion.titulo}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Fecha Inicio: {dayjs(situacion.fechaInicio).format("DD/MM/YYYY")}
+                  <Typography variant="body1" color="text.primary">
+                    {/* .utc para evitar desfaces de zona horaria y que muestre correctamente la fecha*/}
+                    Fecha Inicio: {dayjs(situacion.fechaInicio).utc().format("DD/MM/YYYY")}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).format("DD/MM/YYYY") : "No asignada"}
+                  <Typography variant="body1" color="text.primary">
+                    Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).utc().format("DD/MM/YYYY") : "No asignada"}
+                  </Typography>
+                  <Typography variant="body1" color="text.primary" >
+                    Descripción: {situacion.descripcion}
                   </Typography>
                 </Paper>
               ))}
@@ -232,7 +228,7 @@ useEffect(() => {
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Fecha Inicio</Typography>
               <Typography>
-                {dayjs(situacionSeleccionada.fechaInicio).format("DD/MM/YYYY")}
+                {dayjs(situacionSeleccionada.fechaInicio).utc().format("DD/MM/YYYY")}
               </Typography>
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
@@ -240,12 +236,14 @@ useEffect(() => {
               <Typography variant="body2" color="text.secondary">
                 Actual:{" "}
                 {situacionSeleccionada.fechaFinal
-                  ? dayjs(situacionSeleccionada.fechaFinal).format("DD/MM/YYYY")
+                  ? dayjs(situacionSeleccionada.fechaFinal).utc().format("DD/MM/YYYY")
                   : "No asignada"}
               </Typography>
               <input
                 type="date"
                 value={nuevaFechaFinal}
+                // este min evita seleccionar una fecha anterior a la de inicio
+                min={situacionSeleccionada.fechaInicio ? dayjs(situacionSeleccionada.fechaInicio).format("YYYY-MM-DD") : undefined}
                 onChange={(e) => setNuevaFechaFinal(e.target.value)}
                 style={{
                   padding: "8px",
@@ -265,6 +263,7 @@ useEffect(() => {
           <DialogActions>
             {/* boton actualizado que solo ejecuta borrarsituacion */}
             <BotonBajaSituacion onBorrado={borrarSituacion} />
+
             {/* aca se bloquea el boton hasta ingresar fecha */}
             <Button onClick={guardarFechaFinal} disabled={!nuevaFechaFinal}>
               Modificar Fecha Final
@@ -272,6 +271,21 @@ useEffect(() => {
           </DialogActions>
         </Dialog>
       )}
+      {/* componente snackbar usado para mostrar mensajes de confirmacion o error */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={1000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={tipoSnackbar}
+          sx={{ width: "100%" }}
+        >
+          {mensajeSnackbar}
+        </Alert>
+      </Snackbar>
       </Stack>
   );
 }

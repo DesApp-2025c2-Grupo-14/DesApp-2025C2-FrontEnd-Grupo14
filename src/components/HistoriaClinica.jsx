@@ -22,7 +22,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
     const fetchHistorias = async ()=>{
       setError(null)
       try{
-        const url = nroAfiliado ? `http://localhost:3000/pacientes/${nroAfiliado}/historiasClinicas` :`http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/historiasClinicas`;
+        const url = nroAfiliado ? `http://localhost:3000/pacientes/${nroAfiliado}/historiasClinicas` :`http://localhost:3000/pacientes/${datoSeleccionado._id}/historiasClinicas`;
         // para filtrar las notas por prestador
         const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
         // la peticion con el parametro de ver notas si esta activo
@@ -122,17 +122,21 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
                     width: "90%",
                     textAlign: "center",
                     cursor: "pointer",
+                    transition: "background-color 0.5s ease",
                     "&:hover": {
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: "#c7b8b87c",
                     },
                     mb: 2
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h5" fontWeight="bold">
                     {historia.titulo}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
+                  </Typography>
+                  <Typography variant="body1" color="text.primary" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
+                    Notas: {historia.notas}
                   </Typography>
                 </Paper>
               ))}
