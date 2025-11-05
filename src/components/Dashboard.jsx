@@ -18,7 +18,11 @@ const StyledText = styled("text")(({ theme }) => ({
 
 function PieCenterLabel({ children }) {
   const { width, left, top, height } = useDrawingArea();
-  return <StyledText x={left + width / 2} y={top + height / 2}>{children}</StyledText>;
+  return (
+    <StyledText x={left + width / 2} y={top + height / 2}>
+      {children}
+    </StyledText>
+  );
 }
 
 export default function Dashboard({
@@ -28,18 +32,26 @@ export default function Dashboard({
   chartWidth = 300,
   chartHeight = 300,
   centerLabel = "Resumen",
-  showLegend = true,    // ahora true por defecto
+  showLegend = true,
   sx = {},
 }) {
-  const { loading, error, items, pieData, isEmpty } = useEstadisticasPorTipo(prestadorId, tipo);
+ 
+  const { items, pieData, isEmpty } = useEstadisticasPorTipo(prestadorId, tipo);
 
   if (!prestadorId) return <Box sx={{ p: 2 }}>Falta <b>prestadorId</b>.</Box>;
   if (!tipo)        return <Box sx={{ p: 2 }}>Falta <b>tipo</b>.</Box>;
-  if (loading)      return <Box sx={{ p: 2 }}>Cargando estadísticas…</Box>;
-  if (error)        return <Box sx={{ p: 2, color: "red" }}>Error: {error.message}</Box>;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", gap: 3, ...sx }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        gap: 3,
+        ...sx,
+      }}
+    >
       <Box sx={{ textAlign: "center" }}>
         <h2>Dashboard</h2>
       </Box>
@@ -58,7 +70,12 @@ export default function Dashboard({
         }}
       >
         {items.map((card, index) => (
-          <OutlinedCard key={index} title={card.title} value={card.value} height={cardHeight} />
+          <OutlinedCard
+            key={index}
+            title={card.title}
+            value={card.value}
+            height={cardHeight}
+          />
         ))}
       </Box>
 
@@ -79,10 +96,15 @@ export default function Dashboard({
           series={[{ data: pieData, innerRadius: 100 }]}
           width={Math.max(chartWidth, 280)}
           height={Math.max(chartHeight, 300)}
-          margin={{ top: 10, bottom: showLegend && !isEmpty ? 70 : 10, left: 10, right: 10 }}
+          margin={{
+            top: 10,
+            bottom: showLegend && !isEmpty ? 70 : 10,
+            left: 10,
+            right: 10,
+          }}
           slotProps={{
             legend: {
-              hidden: !(showLegend && !isEmpty), // ocultamos si está vacío
+              hidden: !(showLegend && !isEmpty),
               direction: "row",
               position: { vertical: "bottom", horizontal: "middle" },
               itemMarkWidth: 14,

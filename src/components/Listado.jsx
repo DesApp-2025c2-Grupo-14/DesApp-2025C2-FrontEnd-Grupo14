@@ -10,9 +10,9 @@ import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import { BasicCard } from "./Card";
 import axios from "axios";
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 const BACKEND_URL = "http://localhost:3000";
 dayjs.extend(utc);
@@ -22,26 +22,19 @@ function TabPanel(props) {
 
   return (
     <Box
-      sx={
-        {
-          // flexGrow:0,
-          height: 'inherit',
-          width: '100%',
-          overflow: 'auto'
-        }
-      }
-      direction='column'
+      sx={{
+        // flexGrow:0,
+        height: "inherit",
+        width: "100%",
+        overflow: "auto",
+      }}
+      direction="column"
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
-      
     >
-      {value === index && (
-        <Box sx={{width: '100%',}}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ width: "100%" }}>{children}</Box>}
     </Box>
     // {value === index && (
     //     <Box sx={{height: '10%'}}>
@@ -64,17 +57,24 @@ function a11yProps(index) {
 }
 
 async function getSolicitudes() {
-  const response = await axios.get(`${BACKEND_URL}/solicitudes`)
-  console.log('backend response')
-  console.log(response)
+  const response = await axios.get(`${BACKEND_URL}/solicitudes`);
+  console.log("backend response");
+  console.log(response);
   return Promise.resolve(response.data);
-} 
+}
 
 export function Listado(props) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-  const [solicitudes, setSolicitudes] = React.useState ([])
+  const [solicitudes, setSolicitudes] = React.useState([]);
+  const [prestadorActual, setPrestadorActual] = React.useState(null);
 
+  React.useEffect(() => {
+    axios
+      .get("http://localhost:3000/solicitudes/prestador")
+      .then(({ data }) => setPrestadorActual(data.id))
+      .catch((error) => console.error("Error al obtener prestadorId:", error));
+  }, []);
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -85,23 +85,24 @@ export function Listado(props) {
     };
 
     fetchData();
-  }, [])
+  }, []);
 
   const handleAnalizar = async (id) => {
     // Filtra la lista quitando el elemento seleccionado
     //setSolicitudes(solicitudes.filter((item) => item._id !== id));
-    try{
-      const prestadorId = "6710b8e9a64f6f1bcb54a23f"
+    try {
+      const prestadorId = prestadorActual;
       await axios.patch(`${BACKEND_URL}/solicitudes/${id}`, {
-  prestadorId: prestadorId // o props.prestadorId
-});
+        prestadorId: prestadorId, // o props.prestadorId
+        estado: "En analisis"
+      });
       const response = await axios.get(`${BACKEND_URL}/solicitudes`);
       setSolicitudes(response.data);
       props.onSeleccionar(null, null);
-  }
-  catch (error) {
-    console.error(" Error al analizar solicitud:", error);
-  }};
+    } catch (error) {
+      console.error(" Error al analizar solicitud:", error);
+    }
+  };
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -112,17 +113,25 @@ export function Listado(props) {
       .map((s) => (
         <BasicCard
           key={s._id}
-          nombreSolicitud={(s.tipo === 'Autorizacion' ? 'Autorización' : s.tipo) + ' - ' + s.paciente.nombre}
+          nombreSolicitud={
+            (s.tipo === "Autorizacion" ? "Autorización" : s.tipo) +
+            " - " +
+            s.paciente.nombre
+          }
           descripcion={s.observaciones}
-          fecha={s.fechaPrestacion ? dayjs(s.fechaPrestacion)
-                                      .tz('America/Argentina/Buenos_Aires')
-                                      .format('DD/MM/YYYY HH:mm') 
-                                    : '--/--/---- --:--'}
+          fecha={
+            s.fechaPrestacion
+              ? dayjs(s.fechaPrestacion)
+                  .tz("America/Argentina/Buenos_Aires")
+                  .format("DD/MM/YYYY HH:mm")
+              : "--/--/---- --:--"
+          }
           selected={selectedId === s._id}
           onSelect={() => {
-            setSelectedId(s._id) 
-            props.onSeleccionar(s.tipo, s._id)}}
-          onAnalizar = {()=>handleAnalizar(s._id)}
+            setSelectedId(s._id);
+            props.onSeleccionar(s.tipo, s._id);
+          }}
+          onAnalizar={() => handleAnalizar(s._id)}
         />
       ));
   };
@@ -130,14 +139,19 @@ export function Listado(props) {
   return (
     <Toolbar
       sx={{
-        bgcolor:'#aec3f3',
-        overflow: 'auto',
-        width:'40%',
+        bgcolor: "#aec3f3",
+        overflow: "auto",
+        width: "40%",
         margin: 2,
-        borderRadius: 3
-      }} 
-    > 
-      <Stack direction='column' alignItems='center' justifyContent='space-between' sx={{width : '100%'}}>
+        borderRadius: 3,
+      }}
+    >
+      <Stack
+        direction="column"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ width: "100%" }}
+      >
         <AppBar position="absolute" sx={{ bgcolor: "#2E4CA6" }}>
           <Tabs
             value={value}
@@ -155,23 +169,33 @@ export function Listado(props) {
           </Tabs>
         </AppBar>
 
-        <Stack direction='row' sx={{ width:'100%', flex: 1,maxHeight: '80vh', overflowY: "auto"}}>
+        <Stack
+          direction="row"
+          sx={{ width: "100%", flex: 1, maxHeight: "80vh", overflowY: "auto" }}
+        >
           <TabPanel value={value} index={0} dir={theme.direction}>
             {solicitudes.map((p) => (
               <BasicCard
                 key={p._id}
-                nombreSolicitud={(p.tipo === 'Autorizacion' ? 'Autorización' : p.tipo) + ' - ' + p.paciente.nombre}
+                nombreSolicitud={
+                  (p.tipo === "Autorizacion" ? "Autorización" : p.tipo) +
+                  " - " +
+                  p.paciente.nombre
+                }
                 descripcion={p.observaciones}
-                fecha={p.fechaPrestacion ? dayjs(p.fechaPrestacion)
-                                            .tz('America/Argentina/Buenos_Aires')
-                                            .format('DD/MM/YYYY HH:mm') 
-                                          : '--/--/---- --:--'}
+                fecha={
+                  p.fechaPrestacion
+                    ? dayjs(p.fechaPrestacion)
+                        .tz("America/Argentina/Buenos_Aires")
+                        .format("DD/MM/YYYY HH:mm")
+                    : "--/--/---- --:--"
+                }
                 selected={selectedId === p._id}
                 onSelect={() => {
-                  setSelectedId(p._id)
-                  props.onSeleccionar(p.tipo, p._id)
+                  setSelectedId(p._id);
+                  props.onSeleccionar(p.tipo, p._id);
                 }}
-                onAnalizar = {()=>handleAnalizar(p._id)}
+                onAnalizar={() => handleAnalizar(p._id)}
               />
             ))}
           </TabPanel>

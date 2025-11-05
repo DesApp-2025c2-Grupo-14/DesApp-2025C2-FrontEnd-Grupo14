@@ -4,77 +4,61 @@ import axios from "axios";
 
 const BACKEND_URL = "http://localhost:3000";
 
-function acumularEstados(lista) {
-  const acc = { pendientes: 0, enAnalisis: 0, aprobadas: 0, rechazadas: 0, observadas: 0 };
-  for (const s of lista) {
-    const e = String(s.estado ?? "").toLowerCase();
-    if (e.includes("pendien")) acc.pendientes++;
-    else if (e.includes("anal")) acc.enAnalisis++;
-    else if (e.includes("aprob")) acc.aprobadas++;
-    else if (e.includes("rechaz")) acc.rechazadas++;
-    else if (e.includes("observ")) acc.observadas++;
-  }
-  return acc;
+function normalizar(data = {}) {
+  const total = Number(data.total) || 0;
+  const aprobadas = Number(data.aprobadas) || 0;
+  const rechazadas = Number(data.rechazadas) || 0;
+  const observadas = Number(data.observadas) || 0;
+  const enAnalisis = Math.max(0, total - aprobadas - rechazadas - observadas);
+
+  return { total, aprobadas, rechazadas, observadas, enAnalisis };
 }
 
 export function useEstadisticasPorTipo(prestadorId, tipo) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
-  const [raw, setRaw]         = useState([]);
+  const [stats, setStats] = useState(normalizar());
 
   useEffect(() => {
-    if (!prestadorId || !tipo) return;
-    const controller = new AbortController();
-
-    async function run() {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data } = await axios.get(`${BACKEND_URL}/solicitudes/mis-solicitudes`, {
-          params: { id: prestadorId, tipo },
-          signal: controller.signal,
-        });
-        setRaw(Array.isArray(data) ? data : []);
-      } catch (err) {
-
-        if (err?.response?.status === 404) {
-          setRaw([]);
-          setError(null);
-        } else if (err.name !== "CanceledError" && err.code !== "ERR_CANCELED") {
-          setError(err);
-        }
-      } finally {
-        setLoading(false);
-      }
+    if (!prestadorId || !tipo) {
+      setStats(normalizar());
+      return;
     }
 
-    run();
-    return () => controller.abort();
+    axios
+      .get(`${BACKEND_URL}/solicitudes/dashboard`, {
+        params: { prestadorId, tipo },
+      })
+      .then((res) => setStats(normalizar(res.data)))
+      .catch(() => setStats(normalizar())); // ante error, todo en 0
   }, [prestadorId, tipo]);
 
-  const resumen = useMemo(() => acumularEstados(raw), [raw]);
-  const total = resumen.pendientes + resumen.enAnalisis + resumen.aprobadas + resumen.rechazadas + resumen.observadas;
-  const isEmpty = total === 0;
+  const isEmpty =
+    !stats.total &&
+    !stats.aprobadas &&
+    !stats.rechazadas &&
+    !stats.observadas &&
+    !stats.enAnalisis;
 
-  const items = useMemo(() => ([
-    { title: "En análisis", value: resumen.enAnalisis },
-    { title: "Aprobadas",   value: resumen.aprobadas },
-    { title: "Rechazadas",  value: resumen.rechazadas },
-    { title: "Observadas",  value: resumen.observadas },
-  ]), [resumen]);
+  const items = useMemo(
+    () => [
+      { title: "En análisis", value: stats.enAnalisis },
+      { title: "Aprobadas", value: stats.aprobadas },
+      { title: "Rechazadas", value: stats.rechazadas },
+      { title: "Observadas", value: stats.observadas },
+    ],
+    [stats]
+  );
 
-  // Si no hay datos, devolvemos un "dummy" para que el Pie no falle visualmente
   const pieData = useMemo(() => {
     if (isEmpty) {
       return [{ label: "Sin datos", value: 1, color: "#E0E0E0" }];
     }
     return [
-      { label: "Aprobadas",   value: resumen.aprobadas,   color: "#4caf50" },
-      { label: "Rechazadas",  value: resumen.rechazadas,  color: "#f44336" },
-      { label: "Observadas",  value: resumen.observadas,  color: "#ff9800" },
-      { label: "En análisis", value: resumen.enAnalisis,  color: "#2196f3" },
+      { label: "Aprobadas", value: stats.aprobadas, color: "#4caf50" },
+      { label: "Rechazadas", value: stats.rechazadas, color: "#f44336" },
+      { label: "Observadas", value: stats.observadas, color: "#ff9800" },
+      { label: "En análisis", value: stats.enAnalisis, color: "#2196f3" },
     ];
-  }, [isEmpty, resumen]);
+  }, [stats, isEmpty]);
 
-  return { loading, error, items, pieData, isEmpty };
+  return { items, pieData, stats, isEmpty };
 }
