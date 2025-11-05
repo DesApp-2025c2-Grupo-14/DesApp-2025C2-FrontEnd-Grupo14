@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
-<<<<<<< HEAD
-//import situacionesMock from "../data/situacionesTerapeuticas";
-=======
 import situacionesMock from "../data/situacionesTerapeuticas";
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
 import { BotonCrearSituacion } from "./BotonCrearSituacion";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
 import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
@@ -12,22 +8,13 @@ import dayjs from 'dayjs';
 import axios from "axios";
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
-<<<<<<< HEAD
-  const [situacionSeleccionada, setSituacionSeleccionada] = useState(null);
-  const [situaciones, setSituaciones] = useState([]);
-=======
   const [situacionSeleccionada, setSituacionSeleccionada] = useState();
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
   console.log("situacion", situacionSeleccionada)
-<<<<<<< HEAD
-/*   // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
-=======
    // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const [situaciones, setSituaciones] = useState(() => {
     const guardadas = localStorage.getItem("situaciones");
     if (guardadas) {
@@ -36,15 +23,6 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
       localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
       return situacionesMock;
     }
-<<<<<<< HEAD
-  }); */
-
-/*   // filtado de situaciones por nroafiliado 
-  const situacionesFiltradas = situaciones
-    .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado) */
-
-/*   // funcion temporal para restaurar el estado original del mock
-=======
   }); 
 
    // filtado de situaciones por nroafiliado 
@@ -52,16 +30,11 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
     .filter((h) => h._id === datoSeleccionado?._id) 
 
   // funcion temporal para restaurar el estado original del mock
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const restaurarSituaciones = () => {
     localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
     setSituaciones(situacionesMock);
     setSituacionSeleccionada(null);
-<<<<<<< HEAD
-  }; */
-=======
   }; 
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
 
 useEffect(() => {
   if (situacionSeleccionada) {
@@ -72,11 +45,7 @@ useEffect(() => {
 
 
   useEffect(()=>{
-<<<<<<< HEAD
-    if(!datoSeleccionado?.nroAfiliado){
-=======
     if(!datoSeleccionado?._id){
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
       setSituaciones([]);
       return;
     }
@@ -84,11 +53,7 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-<<<<<<< HEAD
-        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado.nroAfiliado}/situacionesTerapeuticas`);
-=======
         const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`);
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -98,12 +63,8 @@ useEffect(() => {
     fetchSituaciones();
   },[datoSeleccionado]);
 
-<<<<<<< HEAD
-/*   const guardarFechaFinal = () => {
-=======
   /*
   const guardarFechaFinal = () => {
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
     const fechaFormato = dayjs(nuevaFechaFinal).format("DD/MM/YYYY"); 
     // buscar la situacion seleccionada y crea un nuevo array con la fecha final actualizada
     const nuevasSituaciones = situaciones.map((s) =>
@@ -116,12 +77,8 @@ useEffect(() => {
     // guardar nuevo array en localStorage
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
-<<<<<<< HEAD
-  }; */
-=======
   };
   */ 
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const borrarSituacion = async () =>{
         try {
           // uso el delete del back para borrar la situacion
@@ -136,10 +93,7 @@ useEffect(() => {
           console.error(error);
         }
   }  
-<<<<<<< HEAD
-=======
   
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const guardarFechaFinal = async () => {
   try {// el put para cambiar fecha Final
     const response = await axios.patch(`http://localhost:3000/pacientes/${situacionSeleccionada._id}/situacion`,{ fechaFinal: nuevaFechaFinal });
@@ -152,15 +106,9 @@ useEffect(() => {
   } catch (error) {
     console.error("Error al guardar la fecha final:", error);
     alert("No se pudo modificar la fecha final");
-<<<<<<< HEAD
-  }
-};
-
-=======
     }
   };
   
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   const agregarSituacion = async (nuevaSituacion)=>{
     try{
       const datos ={
@@ -179,28 +127,17 @@ useEffect(() => {
     }catch(error){
     console.error("Error al crear la nueva situacion:", error);
     alert("No se pudo crear la nueva situacion");
-<<<<<<< HEAD
-}
-  }
-  
-/*   const agregarSituacion = (nuevaSituacion) => {
-=======
       }
     }
   /*
     const agregarSituacion = (nuevaSituacion) => {
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
     const nuevasSituaciones = [...situaciones, nuevaSituacion];
     setSituaciones(nuevasSituaciones);
     localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
     setCrearSituacion(false);
   };
-<<<<<<< HEAD
-  console.log("situacionSelec:", situacionSeleccionada) */
-=======
   */
   console.log("situacionSelec:", situacionSeleccionada) 
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
@@ -270,11 +207,7 @@ useEffect(() => {
               Crear Situación
             </Button>
           </Box>
-<<<<<<< HEAD
-       <Dialog
-=======
         <Dialog
->>>>>>> bab8602 (Agrego solicitudes con detallo y graficos)
           open={!!crearSituacion}
           onClose={() => setCrearSituacion(null)}
         >
