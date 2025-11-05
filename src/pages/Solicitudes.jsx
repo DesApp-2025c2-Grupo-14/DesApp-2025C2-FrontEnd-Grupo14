@@ -7,6 +7,7 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import * as React from "react";
 import TabDash from "../components/TabDash";
+import axios from "axios";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -32,9 +33,18 @@ CustomTabPanel.propTypes = {
 
 export function Solicitudes() {
   const [value, setValue] = React.useState("1");
+  const [prestadorId, setPrestadorId] = React.useState(null);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  React.useEffect(() => {
+    axios
+      .get("http://localhost:3000/solicitudes/prestador")
+      .then(({ data }) => setPrestadorId(data.id))
+      .catch((error) =>
+        console.error("Error al obtener prestadorId:", error)
+      );
+  }, []);
 
   return (
     <Stack direction="column" width="100%" height="100%" bgcolor="#F2F2F2">
@@ -63,7 +73,7 @@ export function Solicitudes() {
               }}
             >
               <TabDash
-                prestadorId="69093749f69e144ef1ab308c"
+                prestadorId={prestadorId}
                 tipo="Reintegro"
               />
             </TabPanel>
@@ -77,7 +87,7 @@ export function Solicitudes() {
               }}
             >
               <TabDash
-                prestadorId="69093749f69e144ef1ab308c"
+                prestadorId={prestadorId}
                 tipo="Autorizacion"
               />
             </TabPanel>
@@ -91,7 +101,7 @@ export function Solicitudes() {
               }}
             >
               <TabDash
-                prestadorId="69093749f69e144ef1ab308c"
+                prestadorId={prestadorId}
                 tipo="Receta"
               />
             </TabPanel>
