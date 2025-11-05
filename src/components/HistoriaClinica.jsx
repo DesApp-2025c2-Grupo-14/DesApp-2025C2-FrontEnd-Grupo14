@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 //import historiasMock from "../data/historiasClinicas";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -11,36 +12,29 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
   const [historias, setHistorias] = useState([])
   const [historiaSeleccionada, setHistoriaSeleccionada] = useState(null);
   const [verSoloMisNotas, setVerSoloMisNotas] = useState(false);
+  const navigate = useNavigate();
   const [error, setError] = useState(null); // para verificacion de errores en el momento de carga
-
+  const { nroAfiliado } = useParams(); // guarda el valor que viene de :idPaciente de la ruta
   // Simulo el prestador logueado
   const usuarioActual = "Dra. Martínez";
 
   useEffect(()=>{
-    // si no hay paciente seleccionado limpia
-    if(!datoSeleccionado?._id){
-      setHistorias([])
-      return;
+    const fetchHistorias = async ()=>{
+      setError(null)
+      try{
+        const url = nroAfiliado ? `http://localhost:3000/pacientes/${nroAfiliado}/historiasClinicas` :`http://localhost:3000/pacientes/${datoSeleccionado._id}/historiasClinicas`;
+        // para filtrar las notas por prestador
+        const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
+        // la peticion con el parametro de ver notas si esta activo
+        const response = await axios.get(url, { params });
+        setHistorias(response.data.historial);
+      } catch(err){
+        setError("Error al cargar las historias clínicas.");
+        setHistorias([]);
+      }
     }
-  
-
-  const fetchHistorias = async ()=>{
-    setError(null)
-
-    try{
-      const url = `http://localhost:3000/pacientes/${datoSeleccionado._id}/historiasClinicas`;
-      // para filtrar las notas por prestador
-      const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
-      // la peticion con el parametro de ver notas si esta activo
-      const response = await axios.get(url, { params });
-      setHistorias(response.data.historial);
-    } catch(err){
-      setError("Error al cargar las historias clínicas.");
-      setHistorias([]);
-    }
-  }
-   fetchHistorias();
-  }, [datoSeleccionado?._id, verSoloMisNotas]);
+    fetchHistorias();
+  }, [datoSeleccionado?.nroAfiliado, verSoloMisNotas]);
 
   // Estado para manejar las historias clínicas, inicializado desde localStorage o con el mock
 /*   const [historias, setHistorias] = useState(() => {
@@ -75,7 +69,10 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
           Historial Clínico
         </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
-      <Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>
+      {nroAfiliado == true?
+        (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>):
+        (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>)        
+      }
       {/* <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button> */}
     </Stack>
   </Box>

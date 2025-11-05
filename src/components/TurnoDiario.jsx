@@ -1,6 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material";
+import Dayjs  from "dayjs";
 
-export function TurnoDiario() {
+export function TurnoDiario({turno}) {
+  const horaInicio = Dayjs(turno.fechaHora);
+  const horaFinal = horaInicio.add(1,"hour");
+
   return(
     <Box>
       <Stack direction= "row">
@@ -13,8 +17,8 @@ export function TurnoDiario() {
                   marginTop:"5px"
                 }}></Box>
         <Box sx={{marginInline :"10px"}}>
-          <Typography >8:00 - 9:00</Typography>
-          <Typography variant="h6">Solis, Eduardo</Typography>
+          <Typography variant="h6">{turno.pacienteId?.nombre} {turno.pacienteId.apellido}</Typography>
+          <Typography >{horaInicio.format("HH:mm")} - {horaFinal.format("HH:mm") }</Typography>
         </Box>
       </Stack>
     </Box>

@@ -1,24 +1,28 @@
 import { useState } from "react";
 import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useNavigate } from "react-router-dom";
+
 
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 
 // Ejemplo de turnoos
 const turnos = [
-  { dia: "Lunes", hora: 9, paciente: "Perez, Luis" },
-  { dia: "Miércoles", hora: 15, paciente: "Lopez, Damian" },
-  { dia: "Jueves", hora: 10, paciente: "Velasquez, Edric" },
-  { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena" },
+  { dia: "Lunes", hora: 9, paciente: "Perez, Luis", nroAfiliado: "1" },
+  { dia: "Miércoles", hora: 15, paciente: "Gonzales, Maria", nroAfiliado: "10001-01" },
+  { dia: "Jueves", hora: 10, paciente: "Velasquez, Edric", nroAfiliado: "3" },
+  { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena", nroAfiliado: "4" },
 ];
 
-export  function CalendarioGrande() {
+export  function CalendarioGrande(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState(null);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [nota, setNota] = useState("");
+
+  const navigate = useNavigate();
 
   const handleMenuOpen = (turno, data) => {
     setAnchorEl(turno.currentTarget);
@@ -32,9 +36,13 @@ export  function CalendarioGrande() {
 
 
   const handleHistorial = () => {
-    alert(`Ver historial medico de ${selectedturno.paciente}`);
-    handleMenuClose();
-  };
+  if (selectedturno && selectedturno.nroAfiliado) {
+    navigate(`/historial/${selectedturno.nroAfiliado}`);
+  } else {
+    alert("No se encontró el ID del paciente en el turno seleccionado");
+  }
+  handleMenuClose();
+};
 
   // Al presionar "Crear"
   const handleCrear = () => {
@@ -130,13 +138,25 @@ export  function CalendarioGrande() {
       </Menu>
 
       {/* Crear nota*/}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog
+       open={openDialog}
+       onClose={() => setOpenDialog(false)}
+       fullWidth
+       sx= {{width :"100vw"}}
+       >
         <DialogTitle>Crear Nota</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          p: 2
+          }}>
           <TextField
             label="Nota"
+            multiline
+            minRows={10}
+            fullWidth
             onChange={(e) => setNota(e.target.value)}
-            sx={{ mt: 1 }}
           />
         </DialogContent>
         <DialogActions>

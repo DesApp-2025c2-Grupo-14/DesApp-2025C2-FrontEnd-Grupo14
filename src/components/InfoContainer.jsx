@@ -4,8 +4,8 @@ import { HistoriaClinica } from "./HistoriaClinica";
 import { SituacionTerapeutica } from "./SituacionTerap"; // Asegurate de tener este componente
 import { DatosContext } from "../context/datos";
 
-export function InfoContainer() {
-  const [vista, setVista] = useState("info");
+export function InfoContainer(props) {
+  const [vista, setVista] = useState(props.vista);
   const { datoSeleccionado } = useContext(DatosContext);
 
   return (
