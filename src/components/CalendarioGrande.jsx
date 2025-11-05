@@ -1,7 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from "react-router-dom";
+import FormularioCrearHistoria from "./FormularioCrearHistoria";
 
 
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -9,18 +11,20 @@ const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 
 // Ejemplo de turnoos
 const turnos = [
-  { dia: "Lunes", hora: 9, paciente: "Perez, Luis", nroAfiliado: "1" },
-  { dia: "Miércoles", hora: 15, paciente: "Gonzales, Maria", nroAfiliado: "10001-01" },
-  { dia: "Jueves", hora: 10, paciente: "Velasquez, Edric", nroAfiliado: "3" },
-  { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena", nroAfiliado: "4" },
+  { dia: "Lunes", hora: 9, paciente: "Perez, Luis", _id: "1" },
+  { dia: "Miércoles", hora: 15, paciente: "Gonzales, Maria", _id: "690abe31012b0e1dda9d6b27" },
+  { dia: "Jueves", hora: 10, paciente: "Velasquez, Edric", _id: "3" },
+  { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena", _id: "4" },
 ];
 
 export  function CalendarioGrande(props) {
+  /*TERMINAR
+  const turnosAll = props.turnos
+  */
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState(null);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [nota, setNota] = useState("");
 
   const navigate = useNavigate();
 
@@ -36,8 +40,8 @@ export  function CalendarioGrande(props) {
 
 
   const handleHistorial = () => {
-  if (selectedturno && selectedturno.nroAfiliado) {
-    navigate(`/historial/${selectedturno.nroAfiliado}`);
+  if (selectedturno && selectedturno._id) {
+    navigate(`/historial/${selectedturno._id}`);
   } else {
     alert("No se encontró el ID del paciente en el turno seleccionado");
   }
@@ -61,8 +65,24 @@ export  function CalendarioGrande(props) {
      handleMenuClose();
   };
 
-  return (
-    <Box sx={{ p: 2, overflowX: "auto" }}>
+  const agregarNota= async (nuevaHistoria)=>{
+    if (!selectedturno) {
+    console.error("No hay turno seleccionado");
+    return;
+  }
+    try{
+      const datos ={
+        ...nuevaHistoria,fecha:selectedturno.fechaHora
+      }
+      // post de situaciones usando id para crear
+      await axios.post(`http://localhost:3000/pacientes/${selectedturno.pacienteId._id}/crearHistoria`, datos)
+    }catch(error){
+    console.error("Error al crear la nueva situacion:", error);
+    }
+  }
+    
+    return (
+      <Box sx={{ p: 2, overflowX: "auto" }}>
       <Grid container>
         <Grid item xs={1}></Grid>
         {days.map((dia) => (
@@ -142,29 +162,9 @@ export  function CalendarioGrande(props) {
        open={openDialog}
        onClose={() => setOpenDialog(false)}
        fullWidth
-       sx= {{width :"100vw"}}
+       sx= {{width :"100vw", backgroundColor:"transparent"}}
        >
-        <DialogTitle>Crear Nota</DialogTitle>
-        <DialogContent sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          p: 2
-          }}>
-          <TextField
-            label="Nota"
-            multiline
-            minRows={10}
-            fullWidth
-            onChange={(e) => setNota(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleCancel(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleSave}>
-            Guardar
-          </Button>
-        </DialogActions>
+        <FormularioCrearHistoria onGuardar = {agregarNota}/>
       </Dialog>
     </Box>
   );

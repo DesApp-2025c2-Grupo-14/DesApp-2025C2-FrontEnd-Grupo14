@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 //import historiasMock from "../data/historiasClinicas";
@@ -14,7 +15,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
   const [verSoloMisNotas, setVerSoloMisNotas] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState(null); // para verificacion de errores en el momento de carga
-  const { nroAfiliado } = useParams(); // guarda el valor que viene de :idPaciente de la ruta
+  const { dato } = useParams(); // guarda el valor que viene de :idPaciente de la ruta
   // Simulo el prestador logueado
   const usuarioActual = "Dra. Martínez";
 
@@ -22,7 +23,10 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
     const fetchHistorias = async ()=>{
       setError(null)
       try{
-        const url = nroAfiliado ? `http://localhost:3000/pacientes/${nroAfiliado}/historiasClinicas` :`http://localhost:3000/pacientes/${datoSeleccionado._id}/historiasClinicas`;
+        const idPaciente = dato || datoSeleccionado._id;
+        if (!idPaciente) return;
+
+        const url = `http://localhost:3000/pacientes/${idPaciente}/historiasClinicas`;
         // para filtrar las notas por prestador
         const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
         // la peticion con el parametro de ver notas si esta activo
@@ -34,7 +38,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
       }
     }
     fetchHistorias();
-  }, [datoSeleccionado?.nroAfiliado, verSoloMisNotas]);
+  }, [dato,datoSeleccionado._id, verSoloMisNotas]);
 
   // Estado para manejar las historias clínicas, inicializado desde localStorage o con el mock
 /*   const [historias, setHistorias] = useState(() => {
@@ -69,9 +73,9 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
           Historial Clínico
         </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
-      {nroAfiliado == true?
-        (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>):
-        (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>)        
+      {dato ?
+        (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>):        
+        (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>)
       }
       {/* <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button> */}
     </Stack>
@@ -122,21 +126,17 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
                     width: "90%",
                     textAlign: "center",
                     cursor: "pointer",
-                    transition: "background-color 0.5s ease",
                     "&:hover": {
-                      backgroundColor: "#c7b8b87c",
+                      backgroundColor: "#f5f5f5",
                     },
                     mb: 2
                   }}
                 >
-                  <Typography variant="h5" fontWeight="bold">
+                  <Typography variant="h6" fontWeight="bold">
                     {historia.titulo}
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
+                  <Typography variant="caption" color="text.secondary">
                     Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary" sx={{ maxWidth: '100%', overflowWrap: 'break-word' }}>
-                    Notas: {historia.notas}
                   </Typography>
                 </Paper>
               ))}

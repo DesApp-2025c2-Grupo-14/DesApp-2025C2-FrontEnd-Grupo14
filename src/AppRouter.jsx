@@ -13,7 +13,7 @@ export function AppRouter() {
       <Route path="/bandeja-de-entrada" element={<Inbox seccion="Bandeja de entrada" usuario="Pepe Argento" />}/>
       <Route path="/mis-solicitudes" element={<Solicitudes />} />
       <Route path="/pacientes" element={<Pacientes vista ="info"/>} />
-      <Route path="historial/:nroAfiliado" element={<Pacientes vista ="historial"/>} />
+      <Route path="historial/:dato" element={<Pacientes vista ="historial"/>} />
       <Route path="/calendario" element={<Calendario />} />
     </Routes>
   );

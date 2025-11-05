@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Stack } from "@mui/material";
 import { DatosProvider  } from "../context/datos";
 import { BuscadorPacientes } from "../components/BuscadorPacientes";
