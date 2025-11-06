@@ -2,10 +2,13 @@ import { useState, useContext, useEffect } from 'react';
 import { DatosContext } from "../context/datos";
 import { Box, TextField, Typography, IconButton, InputAdornment, Paper, Stack, ButtonBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useParams,} from "react-router-dom";
+
 //import pacientes from '../data/pacientes'; los traigo del back
 import axios from 'axios';
 
-export function BuscadorPacientes({ onPacienteSeleccionado }) {
+export function BuscadorPacientes() {
+  const { dato } = useParams(); 
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
   const [busquedaRealizada, setBusquedaRealizada] = useState(false);
@@ -13,24 +16,41 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
   const { setDatoSeleccionado } = useContext(DatosContext);
   const [todosLosPacientes, setTodosLosPacientes] = useState([]);
 
-  async function getPacientes() {
-    const response = await axios.get(`http://localhost:3000/pacientes`) // peticion con axios
-/*     console.log('backend response')
-    console.log(response) */
-    return response.data;
-  } 
   useEffect(() => {
+    async function getPacientes() {
+      const response = await axios.get(`http://localhost:3000/pacientes`) // peticion con axios
+     /*console.log('backend response')
+      console.log(response) */
+      return response.data;
+    } 
+
     const fetchPacientes = async () => {
       try {
         const data = await getPacientes();
         setTodosLosPacientes(data);
+        const id = dato || seleccionado?._id
+
+        // Si entramos desde /historial/:id, obtener el paciente y su grupo familiar
+        if (id) {
+          const pacienteActual = data.find(p => p._id === id);
+          if (pacienteActual) {
+            setBusqueda(pacienteActual.nroAfiliado); // muestra el nroAfiliado en el input
+            const grupoBase = pacienteActual.nroAfiliado.split("-")[0];
+            const grupoCompleto = data.filter(p =>
+              p.nroAfiliado.startsWith(grupoBase)
+            );
+            setResultados(grupoCompleto);
+            setBusquedaRealizada(true);
+            setDatoSeleccionado(pacienteActual);
+          }
+        }
       } catch (error) {
         console.error("Error cargando pacientes:", error);
       }
     };
 
     fetchPacientes();
-  }, []);
+  }, [dato,seleccionado]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -49,6 +69,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
         paciente.nroAfiliado.startsWith(textoBusqueda)
       );
     });
+
 
     const grupos = new Map();
 
@@ -74,6 +95,7 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
     });
 
     setResultados(resultadosUnicos);
+    handleSearch;
   };
 
   return (
@@ -113,7 +135,6 @@ export function BuscadorPacientes({ onPacienteSeleccionado }) {
               onClick={() => {
                 setDatoSeleccionado(paciente);
                 setSeleccionado(i);
-                if (onPacienteSeleccionado) onPacienteSeleccionado();
               }}
               key={i}
               sx={{
