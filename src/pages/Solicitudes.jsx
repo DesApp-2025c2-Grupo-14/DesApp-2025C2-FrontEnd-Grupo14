@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import { Box, Stack, Typography, Paper, Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { KpiCard } from "../components/KpiCard";
-import { KpiChart } from "../components/KpiChart";
-import { DetalleSolicitud } from "../components/DetalleSolicitud";
-import { BuscadorSolicitudes } from "../components/BuscadorSolicitudes";
-=======
 import { Box, Stack } from "@mui/material";
 import { Header } from "../components/Header";
 import PropTypes from "prop-types";
@@ -17,7 +8,6 @@ import TabPanel from "@mui/lab/TabPanel";
 import * as React from "react";
 import TabDash from "../components/TabDash";
 import axios from "axios";
->>>>>>> dev
 
 export function Solicitudes() {
   const [seleccion, setSeleccion] = useState(null);
@@ -232,8 +222,6 @@ export function Solicitudes() {
   );
 }
 
-<<<<<<< HEAD
-=======
 CustomTabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
@@ -320,4 +308,3 @@ export function Solicitudes() {
     </Stack>
   );
 }
->>>>>>> dev
