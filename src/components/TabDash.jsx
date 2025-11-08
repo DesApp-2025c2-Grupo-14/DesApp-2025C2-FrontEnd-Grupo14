@@ -3,11 +3,27 @@ import * as React from "react";
 import { Box, Stack } from "@mui/material";
 import TablaPaginacion from "./TablaPaginacion";
 import Dashboard from "./Dashboard";
+import { DetalleSolicitud } from "./DetalleSolicitud";
 
-export default function TabDash({ prestadorId, tipo }) {
+export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
+  const [prestadorId, setPrestadorId] = React.useState(propPrestadorId || null);
+  const [seleccion, setSeleccion] = React.useState(null);
+
+  // 🔹 Si no viene el prestadorId por props, traigo uno del backend
+  React.useEffect(() => {
+    if (!propPrestadorId) {
+      fetch("http://localhost:3000/prestadores")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.length > 0) setPrestadorId(data[0]._id); // usa el primero del seed
+        })
+        .catch((err) => console.error("Error al obtener prestadores:", err));
+    }
+  }, [propPrestadorId]);
+
   return (
     <Stack
-      direction={{ xs: "column", md: "row" }} // móvil apila, desktop lado a lado
+      direction={{ xs: "column", md: "row" }}
       sx={{
         width: "100%",
         height: "100%",
@@ -28,11 +44,11 @@ export default function TabDash({ prestadorId, tipo }) {
         }}
       >
         <Box sx={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-          <TablaPaginacion />
+          <TablaPaginacion tipo={tipo} onSelectSolicitud={setSeleccion} />
         </Box>
       </Box>
 
-      {/* --- DERECHA: DASHBOARD (30%) --- */}
+      {/* --- DERECHA: DASHBOARD O DETALLE (30%) --- */}
       <Box
         sx={{
           flex: { xs: "1 1 auto", md: "0 0 30%" },
@@ -45,15 +61,22 @@ export default function TabDash({ prestadorId, tipo }) {
           backgroundColor: "#fff",
         }}
       >
-        <Dashboard
-          prestadorId={prestadorId}
-          tipo={tipo}
-          showLegend={true}
-          chartWidth={320}
-          chartHeight={420}
-          cardHeight={100}
-        />
+        {seleccion ? (
+          <DetalleSolicitud seleccion={seleccion} solicitud={tipo} />
+        ) : prestadorId ? (
+          <Dashboard
+            prestadorId={prestadorId}
+            tipo={tipo}
+            showLegend={true}
+            chartWidth={320}
+            chartHeight={420}
+            cardHeight={100}
+          />
+        ) : (
+          <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
+        )}
       </Box>
     </Stack>
   );
 }
+
