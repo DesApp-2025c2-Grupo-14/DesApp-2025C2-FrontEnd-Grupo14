@@ -9,17 +9,20 @@ import {
   Typography,
   Divider,
   Stack,
+  TextField,
 } from "@mui/material";
+import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
 
 export default function TablaPaginacion({ tipo }) {
   const [pageSize, setPageSize] = React.useState(5);
   const [solicitudSeleccionada, setSolicitudSeleccionada] = React.useState(null);
+  const [motivo, setMotivo] = React.useState("");
 
   // ⚙️ ID del prestador (por ahora hardcodeado)
   const prestadorId = "690d7050cf8cd29515065ad6";
 
-  const { solicitudes, loading, error } = useSolicitudesPrestador(prestadorId);
+  const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(prestadorId);
 
   // 📋 Definición de columnas
   const columns = [
@@ -45,11 +48,34 @@ export default function TablaPaginacion({ tipo }) {
     {
       field: "Acciones",
       headerName: "Acciones",
-      flex: 1.5,
-      renderCell: () => (
-        <Button variant="contained" size="small" color="primary">
-          Editar
-        </Button>
+      flex: 2,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="contained"
+            color="success"
+            size="small"
+            onClick={() => handleEstado(params.row.id, "Aprobado")}
+          >
+            Aprobar
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => handleEstado(params.row.id, "Rechazado")}
+          >
+            Rechazar
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            onClick={() => handleEstado(params.row.id, "Observado")}
+          >
+            Observar
+          </Button>
+        </Stack>
       ),
     },
   ];
@@ -59,15 +85,31 @@ export default function TablaPaginacion({ tipo }) {
     id: s._id || index,
     Integrante: `${s.pacienteId?.nombre || ""} ${s.pacienteId?.apellido || ""}`,
     Lugar: s.prestadorId?.lugaresAtencion?.[0]?.nombre || "—",
-    FormaPago: s.tipo || "—", // por ahora usamos tipo como forma de pago
+    FormaPago: s.tipo || "—", // temporal
     Estado: s.estado || "—",
+    Motivo: s.motivo || "",
   }));
+
+  // ⚙️ Función para actualizar estado
+  const handleEstado = async (id, nuevoEstado) => {
+    const motivoTexto = prompt(`Ingrese el motivo para ${nuevoEstado}:`) || "";
+    try {
+      await axios.patch(`http://localhost:3000/solicitudes/${id}`, {
+        estado: nuevoEstado,
+        motivo: motivoTexto,
+        prestadorId,
+      });
+      alert(`Solicitud ${nuevoEstado.toLowerCase()} correctamente.`);
+      refetch(); // 🔄 vuelve a cargar los datos
+    } catch (err) {
+      console.error("Error al actualizar estado:", err);
+      alert("Error al cambiar el estado de la solicitud.");
+    }
+  };
 
   if (loading) {
     return (
-      <Box
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
         <CircularProgress />
       </Box>
     );
@@ -125,6 +167,11 @@ export default function TablaPaginacion({ tipo }) {
               <Typography>
                 <strong>Estado:</strong> {solicitudSeleccionada.Estado}
               </Typography>
+              {solicitudSeleccionada.Motivo && (
+                <Typography>
+                  <strong>Motivo:</strong> {solicitudSeleccionada.Motivo}
+                </Typography>
+              )}
             </Stack>
           ) : (
             <Typography>No hay información para mostrar.</Typography>
@@ -139,4 +186,5 @@ export default function TablaPaginacion({ tipo }) {
     </>
   );
 }
+
 

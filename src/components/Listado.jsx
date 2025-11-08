@@ -56,7 +56,6 @@ function a11yProps(index) {
   };
 }
 async function getSolicitudes() {
-<<<<<<< HEAD
   try {
     const response = await axios.get(`${BACKEND_URL}/solicitudes`);
     console.log("✅ Solicitudes obtenidas del backend:", response.data);
@@ -65,24 +64,13 @@ async function getSolicitudes() {
     console.error("Error al traer solicitudes:", error);
     return [];
   }
-=======
-  const response = await axios.get(`${BACKEND_URL}/solicitudes`);
-  console.log("backend response");
-  console.log(response);
-  return Promise.resolve(response.data);
->>>>>>> dev
 }
 
 export function Listado(props) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
   const [solicitudes, setSolicitudes] = React.useState([]);
-<<<<<<< HEAD
   const [selectedId, setSelectedId] = React.useState(null);
-=======
-  const [prestadorActual, setPrestadorActual] = React.useState(null);
-
->>>>>>> dev
   React.useEffect(() => {
     axios
       .get("http://localhost:3000/solicitudes/prestador")
@@ -97,25 +85,6 @@ export function Listado(props) {
     fetchData();
   }, []);
 
-<<<<<<< HEAD
-=======
-  const handleAnalizar = async (id) => {
-    // Filtra la lista quitando el elemento seleccionado
-    //setSolicitudes(solicitudes.filter((item) => item._id !== id));
-    try {
-      const prestadorId = prestadorActual;
-      await axios.patch(`${BACKEND_URL}/solicitudes/${id}`, {
-        prestadorId: prestadorId, // o props.prestadorId
-        estado: "En analisis"
-      });
-      const response = await axios.get(`${BACKEND_URL}/solicitudes`);
-      setSolicitudes(response.data);
-      props.onSeleccionar(null, null);
-    } catch (error) {
-      console.error(" Error al analizar solicitud:", error);
-    }
-  };
->>>>>>> dev
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -128,11 +97,7 @@ export function Listado(props) {
           nombreSolicitud={
             (s.tipo === "Autorizacion" ? "Autorización" : s.tipo) +
             " - " +
-<<<<<<< HEAD
             (s.nombre || "Paciente no encontrado")
-=======
-            s.paciente.nombre
->>>>>>> dev
           }
           descripcion={s.observaciones}
           fecha={
@@ -147,11 +112,7 @@ export function Listado(props) {
             setSelectedId(s._id);
             props.onSeleccionar(s.tipo, s._id);
           }}
-<<<<<<< HEAD
           onAnalizar={() => console.log("Analizar solicitud", s._id)}
-=======
-          onAnalizar={() => handleAnalizar(s._id)}
->>>>>>> dev
         />
       ));
 
@@ -190,7 +151,6 @@ export function Listado(props) {
 
         <Stack
           direction="row"
-<<<<<<< HEAD
           sx={{
             width: "100%",
             flex: 1,
@@ -228,35 +188,6 @@ export function Listado(props) {
             ) : (
               <p>No hay solicitudes para mostrar.</p>
             )}
-=======
-          sx={{ width: "100%", flex: 1, maxHeight: "80vh", overflowY: "auto" }}
-        >
-          <TabPanel value={value} index={0} dir={theme.direction}>
-            {solicitudes.map((p) => (
-              <BasicCard
-                key={p._id}
-                nombreSolicitud={
-                  (p.tipo === "Autorizacion" ? "Autorización" : p.tipo) +
-                  " - " +
-                  p.paciente.nombre
-                }
-                descripcion={p.observaciones}
-                fecha={
-                  p.fechaPrestacion
-                    ? dayjs(p.fechaPrestacion)
-                        .tz("America/Argentina/Buenos_Aires")
-                        .format("DD/MM/YYYY HH:mm")
-                    : "--/--/---- --:--"
-                }
-                selected={selectedId === p._id}
-                onSelect={() => {
-                  setSelectedId(p._id);
-                  props.onSeleccionar(p.tipo, p._id);
-                }}
-                onAnalizar={() => handleAnalizar(p._id)}
-              />
-            ))}
->>>>>>> dev
           </TabPanel>
 
           {/* 🔹 Pestaña: Reintegros */}
