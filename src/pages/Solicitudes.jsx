@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { Box, Stack, Typography, Paper, Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { KpiCard } from "../components/KpiCard";
-import { KpiChart } from "../components/KpiChart";
-import { DetalleSolicitud } from "../components/DetalleSolicitud";
-import { BuscadorSolicitudes } from "../components/BuscadorSolicitudes";
+import { Box, Stack } from "@mui/material";
+import { Header } from "../components/Header";
+import PropTypes from "prop-types";
+import Tab from "@mui/material/Tab";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import * as React from "react";
+import TabDash from "../components/TabDash";
+import axios from "axios";
 
 export function Solicitudes() {
   const [seleccion, setSeleccion] = useState(null);
@@ -219,3 +222,89 @@ export function Solicitudes() {
   );
 }
 
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+export function Solicitudes() {
+  const [value, setValue] = React.useState("1");
+  const [prestadorId, setPrestadorId] = React.useState(null);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+  React.useEffect(() => {
+    axios
+      .get("http://localhost:3000/solicitudes/prestador")
+      .then(({ data }) => setPrestadorId(data.id))
+      .catch((error) =>
+        console.error("Error al obtener prestadorId:", error)
+      );
+  }, []);
+
+  return (
+    <Stack direction="column" width="100%" height="100%" bgcolor="#F2F2F2">
+      <Header seccion="Pacientes" usuario="Ariel Nuñez" />
+      <Box>
+        <Box sx={{ width: "100%", typography: "body1" }}>
+          <TabContext value={value}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <TabList
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+                centered
+              >
+                <Tab label="Reintegros" value="1" />
+                <Tab label="Autorizaciones" value="2" />
+                <Tab label="Recetas" value="3" />
+              </TabList>
+            </Box>
+
+            <TabPanel
+              value="1"
+              sx={{
+                p: 0,
+                height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
+                paddingRight: 7,
+              }}
+            >
+              <TabDash
+                prestadorId={prestadorId}
+                tipo="Reintegro"
+              />
+            </TabPanel>
+
+            <TabPanel
+              value="2"
+              sx={{
+                p: 0,
+                height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
+                paddingRight: 7,
+              }}
+            >
+              <TabDash
+                prestadorId={prestadorId}
+                tipo="Autorizacion"
+              />
+            </TabPanel>
+
+            <TabPanel
+              value="3"
+              sx={{
+                p: 0,
+                height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
+                paddingRight: 7,
+              }}
+            >
+              <TabDash
+                prestadorId={prestadorId}
+                tipo="Receta"
+              />
+            </TabPanel>
+          </TabContext>
+        </Box>
+      </Box>
+    </Stack>
+  );
+}

@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
-import situacionesMock from "../data/situacionesTerapeuticas";
-import { BotonCrearSituacion } from "./BotonCrearSituacion";
-=======
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button, Snackbar, Alert } from "@mui/material";
 //import situacionesMock from "../data/situacionesTerapeuticas";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
->>>>>>> dev
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
 import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
 import axios from "axios";
@@ -22,35 +16,10 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
-<<<<<<< HEAD
-  console.log("situacion", situacionSeleccionada)
-   // Estado para manejar las situaciones, inicializado desde localStorage o con el mock
-  const [situaciones, setSituaciones] = useState(() => {
-    const guardadas = localStorage.getItem("situaciones");
-    if (guardadas) {
-      return JSON.parse(guardadas);
-    } else {
-      localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
-      return situacionesMock;
-    }
-  }); 
-
-   // filtado de situaciones por nroafiliado 
-  const situacionesFiltradas = situaciones
-    .filter((h) => h._id === datoSeleccionado?._id) 
-
-  // funcion temporal para restaurar el estado original del mock
-  const restaurarSituaciones = () => {
-    localStorage.setItem("situaciones", JSON.stringify(situacionesMock));
-    setSituaciones(situacionesMock);
-    setSituacionSeleccionada(null);
-  }; 
-=======
   //para snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
->>>>>>> dev
 
 useEffect(() => {
   if (situacionSeleccionada) {
@@ -81,25 +50,6 @@ useEffect(() => {
     fetchSituaciones();
   },[datoSeleccionado]);
 
-<<<<<<< HEAD
-  /*
-  const guardarFechaFinal = () => {
-    const fechaFormato = dayjs(nuevaFechaFinal).format("DD/MM/YYYY"); 
-    // buscar la situacion seleccionada y crea un nuevo array con la fecha final actualizada
-    const nuevasSituaciones = situaciones.map((s) =>
-      s.id === situacionSeleccionada.id
-        ? { ...s, fechaFinal: fechaFormato }
-        : s
-    );
-    // actualizar estado de situaciones
-    setSituaciones(nuevasSituaciones);
-    // guardar nuevo array en localStorage
-    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
-    setSituacionSeleccionada({ ...situacionSeleccionada, fechaFinal: fechaFormato });
-  };
-  */ 
-=======
->>>>>>> dev
   const borrarSituacion = async () =>{
         try {
           // uso el patch del back para borrar la situacion de la vista
@@ -140,12 +90,6 @@ useEffect(() => {
     setOpenSnackbar(true);
   } catch (error) {
     console.error("Error al guardar la fecha final:", error);
-<<<<<<< HEAD
-    alert("No se pudo modificar la fecha final");
-    }
-  };
-  
-=======
     // Snackbar error
     setMensajeSnackbar("No se pudo modificar la fecha final.");
     setTipoSnackbar("error");
@@ -153,7 +97,6 @@ useEffect(() => {
   }
 };
 
->>>>>>> dev
   const agregarSituacion = async (nuevaSituacion)=>{
     try{
       const datos ={
@@ -175,20 +118,6 @@ useEffect(() => {
       setOpenSnackbar(true);
     }catch(error){
     console.error("Error al crear la nueva situacion:", error);
-<<<<<<< HEAD
-    alert("No se pudo crear la nueva situacion");
-      }
-    }
-  /*
-    const agregarSituacion = (nuevaSituacion) => {
-    const nuevasSituaciones = [...situaciones, nuevaSituacion];
-    setSituaciones(nuevasSituaciones);
-    localStorage.setItem("situaciones", JSON.stringify(nuevasSituaciones));
-    setCrearSituacion(false);
-  };
-  */
-  console.log("situacionSelec:", situacionSeleccionada) 
-=======
     // Snackbar error
     setMensajeSnackbar("No se pudo crear la nueva situacion");
     setTipoSnackbar("error");
@@ -196,7 +125,6 @@ useEffect(() => {
 }
   }
   
->>>>>>> dev
   return (
     <Stack m={3} sx={{ alignContent: "center", height: "100%" }}>
       <Box width="90%" mx="auto" mb={2}>
