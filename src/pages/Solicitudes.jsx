@@ -9,6 +9,7 @@ import * as React from "react";
 import TabDash from "../components/TabDash";
 import axios from "axios";
 
+/*
 export function Solicitudes() {
   const [seleccion, setSeleccion] = useState(null);
   const [tipoSeleccionado, setTipoSeleccionado] = useState("Reintegros");
@@ -149,7 +150,7 @@ export function Solicitudes() {
         </Button>
       </Stack>
       <Stack direction="row" spacing={2} sx={{ flex: 1, minHeight: 0 }}>
-        {/* TABLA */}
+        {/* TABLA }
         <Paper
           elevation={1}
           sx={{
@@ -227,7 +228,7 @@ CustomTabPanel.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
 };
-
+*/
 export function Solicitudes() {
   const [value, setValue] = React.useState("1");
   const [prestadorId, setPrestadorId] = React.useState(null);
@@ -265,7 +266,7 @@ export function Solicitudes() {
               value="1"
               sx={{
                 p: 0,
-                height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
+                height: "calc(100vh - 180px)", 
                 paddingRight: 7,
               }}
             >
@@ -279,7 +280,7 @@ export function Solicitudes() {
               value="2"
               sx={{
                 p: 0,
-                height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
+                height: "calc(100vh - 180px)", 
                 paddingRight: 7,
               }}
             >

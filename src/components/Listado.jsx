@@ -17,13 +17,12 @@ import timezone from "dayjs/plugin/timezone";
 const BACKEND_URL = "http://localhost:3000";
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
     <Box
       sx={{
-        // flexGrow:0,
         height: "inherit",
         width: "100%",
         overflow: "auto",
@@ -33,14 +32,10 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
+      {...other}
     >
       {value === index && <Box sx={{ width: "100%" }}>{children}</Box>}
     </Box>
-    // {value === index && (
-    //     <Box sx={{height: '10%'}}>
-    //       {children}
-    //     </Box>
-    //   )}
   );
 }
 
@@ -55,17 +50,23 @@ function a11yProps(index) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
+
 async function getSolicitudes() {
-  const response = await axios.get(`${BACKEND_URL}/solicitudes`);
-  console.log("backend response");
-  console.log(response);
-  return Promise.resolve(response.data);
+  try {
+    const response = await axios.get(`${BACKEND_URL}/solicitudes`);
+    console.log("✅ Solicitudes obtenidas del backend:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al traer solicitudes:", error);
+    return [];
+  }
 }
 
 export function Listado(props) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
   const [solicitudes, setSolicitudes] = React.useState([]);
+  const [selectedId, setSelectedId] = React.useState(null);
   const [prestadorActual, setPrestadorActual] = React.useState(null);
 
   React.useEffect(() => {
@@ -74,6 +75,7 @@ export function Listado(props) {
       .then(({ data }) => setPrestadorActual(data.id))
       .catch((error) => console.error("Error al obtener prestadorId:", error));
   }, []);
+
   React.useEffect(() => {
     const fetchData = async () => {
       const data = await getSolicitudes();
@@ -83,24 +85,24 @@ export function Listado(props) {
   }, []);
 
   const handleAnalizar = async (id) => {
-    // Filtra la lista quitando el elemento seleccionado
-    //setSolicitudes(solicitudes.filter((item) => item._id !== id));
     try {
       const prestadorId = prestadorActual;
       await axios.patch(`${BACKEND_URL}/solicitudes/${id}`, {
-        prestadorId: prestadorId, // o props.prestadorId
-        estado: "En analisis"
+        prestadorId: prestadorId,
+        estado: "En analisis",
       });
       const response = await axios.get(`${BACKEND_URL}/solicitudes`);
       setSolicitudes(response.data);
       props.onSeleccionar(null, null);
     } catch (error) {
-      console.error(" Error al analizar solicitud:", error);
+      console.error("Error al analizar solicitud:", error);
     }
   };
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   const renderSolicitudesPorTipo = (tipo) =>
     solicitudes
       .filter((s) => s.tipo === tipo)
@@ -110,7 +112,7 @@ export function Listado(props) {
           nombreSolicitud={
             (s.tipo === "Autorizacion" ? "Autorización" : s.tipo) +
             " - " +
-            s.paciente.nombre
+            (s.paciente?.nombre || "Sin paciente")
           }
           descripcion={s.observaciones}
           fecha={
@@ -167,43 +169,44 @@ export function Listado(props) {
           sx={{ width: "100%", flex: 1, maxHeight: "80vh", overflowY: "auto" }}
         >
           <TabPanel value={value} index={0} dir={theme.direction}>
-            {solicitudes.map((p) => (
-              <BasicCard
-                key={p._id}
-                nombreSolicitud={
-                  (p.tipo === "Autorizacion" ? "Autorización" : p.tipo) +
-                  " - " +
-                  p.paciente.nombre
-                }
-                descripcion={p.observaciones}
-                fecha={
-                  p.fechaPrestacion
-                    ? dayjs(p.fechaPrestacion)
-                        .tz("America/Argentina/Buenos_Aires")
-                        .format("DD/MM/YYYY HH:mm")
-                    : "--/--/---- --:--"
-                }
-                selected={selectedId === p._id}
-                onSelect={() => {
-                  setSelectedId(p._id);
-                  props.onSeleccionar(p.tipo, p._id);
-                }}
-                onAnalizar={() => handleAnalizar(p._id)}
-              />
-            ))}
+            {solicitudes.length > 0 ? (
+              solicitudes.map((p) => (
+                <BasicCard
+                  key={p._id}
+                  nombreSolicitud={
+                    (p.tipo === "Autorizacion" ? "Autorización" : p.tipo) +
+                    " - " +
+                    (p.paciente?.nombre || "Sin paciente")
+                  }
+                  descripcion={p.observaciones}
+                  fecha={
+                    p.fechaPrestacion
+                      ? dayjs(p.fechaPrestacion)
+                          .tz("America/Argentina/Buenos_Aires")
+                          .format("DD/MM/YYYY HH:mm")
+                      : "--/--/---- --:--"
+                  }
+                  selected={selectedId === p._id}
+                  onSelect={() => {
+                    setSelectedId(p._id);
+                    props.onSeleccionar(p.tipo, p._id);
+                  }}
+                  onAnalizar={() => handleAnalizar(p._id)}
+                />
+              ))
+            ) : (
+              <p>No hay solicitudes para mostrar.</p>
+            )}
           </TabPanel>
 
-          {/* 🔹 Pestaña: Reintegros */}
           <TabPanel value={value} index={1} dir={theme.direction}>
             {renderSolicitudesPorTipo("Reintegro")}
           </TabPanel>
 
-          {/* 🔹 Pestaña: Autorizaciones */}
           <TabPanel value={value} index={2} dir={theme.direction}>
             {renderSolicitudesPorTipo("Autorizacion")}
           </TabPanel>
 
-          {/* 🔹 Pestaña: Recetas */}
           <TabPanel value={value} index={3} dir={theme.direction}>
             {renderSolicitudesPorTipo("Receta")}
           </TabPanel>
@@ -212,5 +215,6 @@ export function Listado(props) {
     </Toolbar>
   );
 }
+
 
 

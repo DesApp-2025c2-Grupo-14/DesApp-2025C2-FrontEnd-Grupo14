@@ -16,7 +16,7 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
-  //para snackbar
+  //snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");

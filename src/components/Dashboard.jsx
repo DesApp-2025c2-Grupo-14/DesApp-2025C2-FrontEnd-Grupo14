@@ -1,4 +1,3 @@
-// components/Dashboard.jsx
 import * as React from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
@@ -6,7 +5,7 @@ import OutlinedCard from "./CardDashboard";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
-import { useEstadisticasPorTipo } from "../hooks/useEstadisticasPorTipo";
+import { useEstadisticasPorTipo } from "../hooks/useSolicitudesPrestador";
 
 const StyledText = styled("text")(({ theme }) => ({
   fill: theme.palette.text.primary,
@@ -27,78 +26,116 @@ function PieCenterLabel({ children }) {
 
 export default function Dashboard({
   prestadorId,
-  tipo,                 // 'Receta' | 'Autorizacion' | 'Reintegro'
-  cardHeight = 120,
-  chartWidth = 300,
-  chartHeight = 300,
+  tipo,
+  cardHeight = 100,
   centerLabel = "Resumen",
   showLegend = true,
+  actualizar,
   sx = {},
 }) {
- 
-  const { items, pieData, isEmpty } = useEstadisticasPorTipo(prestadorId, tipo);
+  const { items, pieData, isEmpty, refetch } = useEstadisticasPorTipo(
+    prestadorId,
+    tipo
+  );
 
-  if (!prestadorId) return <Box sx={{ p: 2 }}>Falta <b>prestadorId</b>.</Box>;
-  if (!tipo)        return <Box sx={{ p: 2 }}>Falta <b>tipo</b>.</Box>;
+  // 🔄 Refetch cada 10 segundos
+  React.useEffect(() => {
+    if (!prestadorId || !tipo) return;
+    const interval = setInterval(refetch, 10000);
+    return () => clearInterval(interval);
+  }, [prestadorId, tipo]);
+
+  // 🔁 Refetch al actualizar
+  React.useEffect(() => {
+    if (actualizar) refetch();
+  }, [actualizar]);
+
+  if (!prestadorId)
+    return (
+      <Box sx={{ p: 2 }}>
+        Falta <b>prestadorId</b>.
+      </Box>
+    );
+  if (!tipo)
+    return (
+      <Box sx={{ p: 2 }}>
+        Falta <b>tipo</b>.
+      </Box>
+    );
 
   return (
     <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      width: 350, // 📏 ancho fijo del Dashboard
+      height: "100%",
+      gap: 2,
+      overflow: "hidden",
+      p: 2,
+      boxSizing: "border-box",
+      mx: "auto", // centra el contenido horizontalmente
+      ...sx,
+    }}
+  >
+    <Box sx={{ textAlign: "center", mb: 1 }}>
+      <h2 style={{ margin: 0, fontSize: "1.2rem" }}>Dashboard</h2>
+    </Box>
+
+    {/* --- CARDS --- */}
+    <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 2,
         width: "100%",
-        height: "100%",
-        gap: 3,
-        ...sx,
+        flexShrink: 0,
       }}
     >
-      <Box sx={{ textAlign: "center" }}>
-        <h2>Dashboard</h2>
-      </Box>
+      {items.map((card, index) => (
+        <OutlinedCard
+          key={index}
+          title={card.title}
+          value={card.value}
+          height={"80px"}
+        />
+      ))}
+    </Box>
 
-      {/* 2 cards por fila SIEMPRE */}
+    {/* --- GRÁFICO --- */}
+    <Box
+      sx={{
+        flex: 1,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        overflow: "hidden",
+        minHeight: 220,
+      }}
+    >
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)",
-          gap: 2,
           width: "100%",
-          boxSizing: "border-box",
-          px: 2,
-          maxHeight: 280,
-          overflow: "auto",
-        }}
-      >
-        {items.map((card, index) => (
-          <OutlinedCard
-            key={index}
-            title={card.title}
-            value={card.value}
-            height={cardHeight}
-          />
-        ))}
-      </Box>
-
-      {/* Pie centrado */}
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 220,
+          maxWidth: 320,
+          aspectRatio: "1 / 1",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: "100%",
-          minWidth: 0,
-          overflow: "visible",
         }}
       >
         <PieChart
-          series={[{ data: pieData, innerRadius: 100 }]}
-          width={Math.max(chartWidth, 280)}
-          height={Math.max(chartHeight, 300)}
+          series={[
+            {
+              data: pieData,
+              innerRadius: 90,
+            },
+          ]}
+          width={undefined}
+          height={undefined}
           margin={{
             top: 10,
-            bottom: showLegend && !isEmpty ? 70 : 10,
+            bottom: showLegend && !isEmpty ? 60 : 10,
             left: 10,
             right: 10,
           }}
@@ -117,6 +154,7 @@ export default function Dashboard({
         </PieChart>
       </Box>
     </Box>
+  </Box>
   );
 }
 
@@ -124,9 +162,10 @@ Dashboard.propTypes = {
   prestadorId: PropTypes.string.isRequired,
   tipo: PropTypes.oneOf(["Receta", "Autorizacion", "Reintegro"]).isRequired,
   cardHeight: PropTypes.number,
-  chartWidth: PropTypes.number,
-  chartHeight: PropTypes.number,
   centerLabel: PropTypes.string,
   showLegend: PropTypes.bool,
+  actualizar: PropTypes.any,
   sx: PropTypes.object,
 };
+
+

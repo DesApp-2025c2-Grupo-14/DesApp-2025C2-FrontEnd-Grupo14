@@ -112,8 +112,8 @@ export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
             </Button>
 
             <Button variant="contained"
-             sx={{ borderRadius: 3, px: 3 }}
-             onClick={onAbrirSituacion}
+              sx={{ borderRadius: 3, px: 3 }}
+              onClick={onAbrirSituacion}
              >
               <Typography>Situaciones terapéuticas</Typography>
             </Button>
