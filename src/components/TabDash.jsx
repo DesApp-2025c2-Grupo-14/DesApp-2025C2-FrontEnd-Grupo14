@@ -42,11 +42,14 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
             }}
           >
             <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
-              <TablaPaginacion
+              {prestadorId ?(<TablaPaginacion
+                prestadorId={prestadorId}
                 tipo={tipo}
                 onSelectSolicitud={setSeleccion}
                 onUpdate={() => setActualizar((prev) => !prev)} // Recarga de pagina
-              />
+              />) : (
+                    <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
+                  )}
             </Box>
           </Box>
           <Box
@@ -71,6 +74,7 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
                   chartWidth={320}
                   chartHeight={420}
                   cardHeight={100}
+                  actualizar={actualizar}
                 />
                   ) : (
                     <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>

@@ -10,26 +10,25 @@ function normalizar(data = {}) {
   const rechazadas = Number(data.rechazadas) || 0;
   const observadas = Number(data.observadas) || 0;
   const enAnalisis = Math.max(0, total - aprobadas - rechazadas - observadas);
-
   return { total, aprobadas, rechazadas, observadas, enAnalisis };
 }
 
-export function useEstadisticasPorTipo(prestadorId, tipo) {
+export function useEstadisticasPorTipo(prestadorId, tipo, reloadKey = false) {
   const [stats, setStats] = useState(normalizar());
 
-  useEffect(() => {
+  const fetchStats = () => {
     if (!prestadorId || !tipo) {
       setStats(normalizar());
       return;
     }
 
     axios
-      .get(`${BACKEND_URL}/solicitudes/dashboard`, {
-        params: { prestadorId, tipo },
-      })
+      .get(`${BACKEND_URL}/solicitudes/dashboard`, { params: { prestadorId, tipo } })
       .then((res) => setStats(normalizar(res.data)))
-      .catch(() => setStats(normalizar())); // ante error, todo en 0
-  }, [prestadorId, tipo]);
+      .catch(() => setStats(normalizar()));
+  };
+
+  useEffect(fetchStats, [prestadorId, tipo, reloadKey]); // 👈 se ejecuta cuando cambia reloadKey
 
   const isEmpty =
     !stats.total &&
@@ -60,5 +59,5 @@ export function useEstadisticasPorTipo(prestadorId, tipo) {
     ];
   }, [stats, isEmpty]);
 
-  return { items, pieData, stats, isEmpty };
+  return { items, pieData, stats, isEmpty, refetch: fetchStats };
 }

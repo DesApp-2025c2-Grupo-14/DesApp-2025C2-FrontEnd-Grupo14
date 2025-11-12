@@ -5,7 +5,7 @@ import OutlinedCard from "./CardDashboard";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
-import { useEstadisticasPorTipo } from "../hooks/useSolicitudesPrestador";
+import { useEstadisticasPorTipo } from "../hooks/useEstadisticasPorTipo";
 
 const StyledText = styled("text")(({ theme }) => ({
   fill: theme.palette.text.primary,
@@ -33,22 +33,28 @@ export default function Dashboard({
   actualizar,
   sx = {},
 }) {
+
+  const [recarga, setRecarga] = React.useState(false)
+
+  React.useEffect(() => {
+    if (actualizar) setRecarga(true);
+  }, [actualizar]);
+
   const { items, pieData, isEmpty, refetch } = useEstadisticasPorTipo(
     prestadorId,
-    tipo
+    tipo,
+    actualizar
   );
 
   // 🔄 Refetch cada 10 segundos
-  React.useEffect(() => {
-    if (!prestadorId || !tipo) return;
-    const interval = setInterval(refetch, 10000);
-    return () => clearInterval(interval);
-  }, [prestadorId, tipo]);
+  // React.useEffect(() => {
+  //   if (!prestadorId || !tipo) return;
+  //   const interval = setInterval(refetch, 10000);
+  //   return () => clearInterval(interval);
+  // }, [prestadorId, tipo]);
 
-  // 🔁 Refetch al actualizar
-  React.useEffect(() => {
-    if (actualizar) refetch();
-  }, [actualizar]);
+  // // 🔁 Refetch al actualizar
+  
 
   if (!prestadorId)
     return (

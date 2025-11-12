@@ -6,13 +6,12 @@ export const useSolicitudesPrestador = (prestadorId, tipo = null) => {
     const [solicitudes, setSolicitudes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    console.log(tipo)
     const fetchSolicitudes = async () => {
         try {
         setLoading(true);
-        const url = tipo
-            ? `http://localhost:3000/prestadores/${prestadorId}/solicitudes?tipo=${tipo}`
-            : `http://localhost:3000/prestadores/${prestadorId}/solicitudes`;
+        const url = `http://localhost:3000/solicitudes/mis-solicitudes?id=${prestadorId}&tipo=${tipo}`
+
         const response = await axios.get(url);
         setSolicitudes(response.data);
         setError(null);
