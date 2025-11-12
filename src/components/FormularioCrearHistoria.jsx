@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 dayjs.locale("es");
 
-export default function FormularioCrearHistoria({ onGuardar }) {
+export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
   const [titulo, setTitulo] = useState("");
   const [nota, setNota] = useState("");
   const [error, setError] = useState({});
@@ -23,10 +23,11 @@ export default function FormularioCrearHistoria({ onGuardar }) {
     if (Object.keys(nuevosErrores).length > 0) return;
     const nuevaHistoria ={
       titulo,
-      prestador: "Dr.Dario",
-      nota ,
+      prestador: "Dra. Martínez",
+      notas :nota ,
     }
     onGuardar(nuevaHistoria)
+    cerrar()
   };
   return (
     <Card

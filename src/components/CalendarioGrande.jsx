@@ -1,28 +1,36 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from "react-router-dom";
 import FormularioCrearHistoria from "./FormularioCrearHistoria";
+import  dayjs  from "dayjs";
+import "dayjs/locale/es";
+
+dayjs.locale("es");
 
 
-const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const days = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 
-// Ejemplo de turnoos
-const turnos = [
-  { dia: "Lunes", hora: 9, paciente: "Perez, Luis", _id: "1" },
-  { dia: "Miércoles", hora: 15, paciente: "Gonzales, Maria", _id: "690abe31012b0e1dda9d6b27" },
-  { dia: "Jueves", hora: 10, paciente: "Velasquez, Edric", _id: "3" },
-  { dia: "Viernes", hora: 13, paciente: "Gimenez, Lorena", _id: "4" },
-];
-
 export  function CalendarioGrande(props) {
-  /*TERMINAR
-  const turnosAll = props.turnos
-  */
+  const [turnosHoy,setTurnosHoy] = useState([])
+  
+    useEffect(() => {
+      const hoy = dayjs(props.fechaSeleccionada);
+      const inicioDelDia = hoy.startOf("day");
+      const finDelDia = hoy.endOf("day");
+  
+      const turnosfiltrados = props.turnos.filter(t => {
+        const fechaTurno = dayjs(t.fechaHora);
+        return fechaTurno.isAfter(inicioDelDia) && fechaTurno.isBefore(finDelDia);
+      });
+      setTurnosHoy(turnosfiltrados)
+    }, [props.fechaSeleccionada, props.turnos]);
+ 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedturno, setSelectedturno] = useState(null);
+  const [selectedturno, setSelectedturno] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -31,27 +39,23 @@ export  function CalendarioGrande(props) {
   const handleMenuOpen = (turno, data) => {
     setAnchorEl(turno.currentTarget);
     setSelectedturno(data);
+    console.log(data)
   };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedturno(null);
-  };
-
 
   const handleHistorial = () => {
   if (selectedturno && selectedturno._id) {
-    navigate(`/historial/${selectedturno._id}`);
+    navigate(`/historial/${selectedturno.pacienteId._id}`);
   } else {
     alert("No se encontró el ID del paciente en el turno seleccionado");
   }
-  handleMenuClose();
+  setAnchorEl(null);
 };
 
   // Al presionar "Crear"
-  const handleCrear = () => {
+  const handleCrear = (data) => {
     setOpenDialog(true);
-    handleMenuClose();
+    setSelectedturno(data);
+    setAnchorEl(null);
   };
 
   // Al presionar "Guardar" en el formulario
@@ -62,7 +66,7 @@ export  function CalendarioGrande(props) {
   //Al presionar "Cancelar" en el formulario
   const handleCancel = () => {
     setOpenDialog(false);
-     handleMenuClose();
+    setAnchorEl(null);
   };
 
   const agregarNota= async (nuevaHistoria)=>{
@@ -72,7 +76,8 @@ export  function CalendarioGrande(props) {
   }
     try{
       const datos ={
-        ...nuevaHistoria,fecha:selectedturno.fechaHora
+        ...nuevaHistoria,
+        fecha:selectedturno.fechaHora
       }
       // post de situaciones usando id para crear
       await axios.post(`http://localhost:3000/pacientes/${selectedturno.pacienteId._id}/crearHistoria`, datos)
@@ -106,7 +111,7 @@ export  function CalendarioGrande(props) {
 
           {/* Celdas días,si se encuentra un turno en el dia,se crea la ficha del turno*/}
           {days.map((dia) => {
-            const turno = turnos.find((e) => e.dia === dia && e.hora === hora);
+            const turno = turnosHoy.find((e) => dayjs(e.fechaHora).format("dddd") === dia && dayjs(e.fechaHora).hour() === hora);
             return (
               <Grid
                 item
@@ -130,10 +135,10 @@ export  function CalendarioGrande(props) {
                   >
                     <Stack direction="column" sx={{marginLeft:"10px"}}>
                       <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                        {`${turno.hora}:00`}
+                        {`${dayjs(turno.fechaHora).hour()}:00`}
                       </Typography>                    
                       <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                        {turno.paciente}
+                        {`${turno.pacienteId.nombre} ${turno.pacienteId.apellido}`}
                       </Typography>
                     </Stack>
                     <Button sx={{minWidth: "20px", width: "30px", height: "30px"}} onClick={(e) => handleMenuOpen(e, turno)}>
@@ -149,11 +154,11 @@ export  function CalendarioGrande(props) {
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
+        onClose={()=>setAnchorEl(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <MenuItem onClick={handleCrear}>Crear Nota</MenuItem>
+        <MenuItem onClick={() => handleCrear(selectedturno)}>Crear Nota</MenuItem>
         <MenuItem onClick={handleHistorial}>Ver Historial</MenuItem>
       </Menu>
 
@@ -164,7 +169,7 @@ export  function CalendarioGrande(props) {
        fullWidth
        sx= {{width :"100vw", backgroundColor:"transparent"}}
        >
-        <FormularioCrearHistoria onGuardar = {agregarNota}/>
+        <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave}/>
       </Dialog>
     </Box>
   );

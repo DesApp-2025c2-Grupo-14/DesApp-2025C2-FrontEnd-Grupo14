@@ -20,7 +20,7 @@ export function Calendario() {
        async function getTurnos() {
         try {
           const response = await axios.get("http://localhost:3000/turnos");
-          console.log(response.data);
+          console.log("Turnos cargados :",response.data);
           setTurnos(response.data);
         } catch (error) {
           console.error("Error cargando turnos:", error);

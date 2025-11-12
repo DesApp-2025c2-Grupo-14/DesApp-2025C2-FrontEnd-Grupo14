@@ -16,7 +16,7 @@ export function TurnosDiarios(props) {
       return fechaTurno.isAfter(inicioDelDia) && fechaTurno.isBefore(finDelDia);
     });
     setTurnosHoy(turnosfiltrados)
-    console.log("Turnos de hoy:", turnosHoy);
+    console.log("Turnos de hoy:", turnosfiltrados);
   }, [props.fechaSeleccionada, props.turnos]);
   
 
