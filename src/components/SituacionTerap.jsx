@@ -11,13 +11,12 @@ dayjs.extend(utc);
 
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
-  const [situacionSeleccionada, setSituacionSeleccionada] = useState(null);
-  const [situaciones, setSituaciones] = useState([]);
+  const [situacionSeleccionada, setSituacionSeleccionada] = useState();
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
 
-  //para snackbar
+  //snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
@@ -72,6 +71,7 @@ useEffect(() => {
           setOpenSnackbar(true);
         }
   }  
+  
   const guardarFechaFinal = async () => {
   try {
     // formateo la nueva fecha al formato estandar
@@ -200,7 +200,7 @@ useEffect(() => {
               Crear Situación
             </Button>
           </Box>
-       <Dialog
+        <Dialog
           open={!!crearSituacion}
           onClose={() => setCrearSituacion(null)}
         >
