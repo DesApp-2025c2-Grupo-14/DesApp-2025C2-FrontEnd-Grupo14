@@ -6,26 +6,6 @@ import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { DayCalendarSkeleton } from '@mui/x-date-pickers/DayCalendarSkeleton';
 
-function getRandomNumber(min, max) {
-  return Math.round(Math.random() * (max - min) + min);
-}
-
-function fakeFetch(date, { signal }) {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      const daysInMonth = date.daysInMonth();
-      const daysToHighlight = [1, 2, 3,].map(() => getRandomNumber(1, daysInMonth));
-
-      resolve({ daysToHighlight });
-    }, 500);
-
-    signal.onabort = () => {
-      clearTimeout(timeout);
-      reject(new DOMException('aborted', 'AbortError'));
-    };
-  });
-}
-
 const initialValue = dayjs('2022-04-17');
 
 function ServerDay(props) {
@@ -54,58 +34,52 @@ function ServerDay(props) {
 }
 
 export function CalendarioChico(props) {
-  const requestAbortController = React.useRef(null);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [highlightedDays, setHighlightedDays] = React.useState([1, 2, 15]);
-  const daysToHighlight1 = props.turnos.hora
+  const [highlightedDays, setHighlightedDays] = React.useState([]);
 
-  const fetchHighlightedDays = (date) => {
-    const controller = new AbortController();
-    fakeFetch(date, {
-      signal: controller.signal,
-    })
-      .then(({ daysToHighlight }) => {
-        setHighlightedDays(daysToHighlight);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        // ignore the error if it's caused by `controller.abort`
-        if (error.name !== 'AbortError') {
-          throw error;
-        }
-      });
+  const calcularDiasConTurnos = (date) => {
+    if (!date || !dayjs(date).isValid()) return;
+    const mesActual = date.month();
+    const añoActual = date.year();
 
-    requestAbortController.current = controller;
+    // filtrar los turnos del mes visible
+    const diasConTurno = props.turnos
+      .map((turno) => dayjs(turno.fechaHora))
+      .filter((d) => d.month() === mesActual && d.year() === añoActual)
+      .map((d) => d.date()) ||  []; // devolver solo el número de día
+
+    setHighlightedDays(diasConTurno);
   };
 
   React.useEffect(() => {
-    fetchHighlightedDays(initialValue);
-    // abort request on unmount
-    return () => requestAbortController.current?.abort();
-  }, []);
+    const fecha = props.fechaSeleccionada && dayjs(props.fechaSeleccionada).isValid()
+      ? props.fechaSeleccionada
+      : dayjs();
+    calcularDiasConTurnos(fecha);
+  }, [props.turnos, props.fechaSeleccionada])
 
   const handleMonthChange = (date) => {
-    if (requestAbortController.current) {
-      // make sure that you are aborting useless requests
-      // because it is possible to switch between months pretty quickly
-      requestAbortController.current.abort();
-    }
-
     setIsLoading(true);
-    setHighlightedDays([]);
-    fetchHighlightedDays(date);
-
+    if (date && dayjs(date).isValid()) {
+      calcularDiasConTurnos(date);
+    }
+    setIsLoading(false);
   };
+
+  const fechaCalendario = props.fechaSeleccionada && dayjs(props.fechaSeleccionada).isValid()
+      ? props.fechaSeleccionada
+      : dayjs();
 
   return (
 
       <Box sx={{width:"100%"}}>
         <DateCalendar
-          value={props.fechaSeleccionada}
+          value={fechaCalendario}
           onChange={(nuevaFecha)=>props.setFechaSeleccionada(nuevaFecha)}
           loading={isLoading}
           onMonthChange={handleMonthChange}
-          showDaysOutsideCurrentMonth fixedWeekNumber={6}
+          showDaysOutsideCurrentMonth
+          fixedWeekNumber={6}
           renderLoading={() => <DayCalendarSkeleton />}
           slots={{
             day: ServerDay,
