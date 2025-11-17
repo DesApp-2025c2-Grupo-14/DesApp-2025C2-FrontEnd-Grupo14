@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+import dayjs  from "dayjs";
 // 🔹 Este hook trae las solicitudes del prestador desde el backend
-export const useSolicitudesPrestador = (prestadorId, tipo = null) => {
+export const useSolicitudesPrestador = (prestadorId, tipo = null, rango) => {
     const [solicitudes, setSolicitudes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     console.log(tipo)
+    console.log(rango[0].toISOString())
     const fetchSolicitudes = async () => {
         try {
         setLoading(true);
-        const url = `http://localhost:3000/solicitudes/mis-solicitudes?id=${prestadorId}&tipo=${tipo}`
+        const url = `http://localhost:3000/solicitudes/mis-solicitudes`
 
-        const response = await axios.get(url);
+        const response = await axios.get(url, {params: {
+            id: prestadorId,
+            tipo: tipo,
+            desde: rango[0].toISOString(),
+            hasta: rango[1].toISOString()
+        }});
         setSolicitudes(response.data);
         setError(null);
         } catch (err) {
@@ -25,7 +31,7 @@ export const useSolicitudesPrestador = (prestadorId, tipo = null) => {
 
     useEffect(() => {
         if (prestadorId) fetchSolicitudes();
-    }, [prestadorId, tipo]);
+    }, [prestadorId, tipo, rango]);
 
     return { solicitudes, loading, error, refetch: fetchSolicitudes };
 };

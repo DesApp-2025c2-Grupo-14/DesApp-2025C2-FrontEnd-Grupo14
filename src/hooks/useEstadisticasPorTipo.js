@@ -13,7 +13,7 @@ function normalizar(data = {}) {
   return { total, aprobadas, rechazadas, observadas, enAnalisis };
 }
 
-export function useEstadisticasPorTipo(prestadorId, tipo, reloadKey = false) {
+export function useEstadisticasPorTipo(prestadorId, tipo, reloadKey = false, rango) {
   const [stats, setStats] = useState(normalizar());
 
   const fetchStats = () => {
@@ -23,12 +23,12 @@ export function useEstadisticasPorTipo(prestadorId, tipo, reloadKey = false) {
     }
 
     axios
-      .get(`${BACKEND_URL}/solicitudes/dashboard`, { params: { prestadorId, tipo } })
+      .get(`${BACKEND_URL}/solicitudes/dashboard`, { params: { prestadorId, tipo, desde: rango[0].toISOString(), hasta: rango[1].toISOString() } })
       .then((res) => setStats(normalizar(res.data)))
       .catch(() => setStats(normalizar()));
   };
 
-  useEffect(fetchStats, [prestadorId, tipo, reloadKey]); // 👈 se ejecuta cuando cambia reloadKey
+  useEffect(fetchStats, [prestadorId, tipo, reloadKey, rango]); // 👈 se ejecuta cuando cambia reloadKey
 
   const isEmpty =
     !stats.total &&
