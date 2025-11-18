@@ -1,13 +1,23 @@
 // src/components/TabDash.jsx
 import * as React from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack,Select, MenuItem, Button } from "@mui/material";
+import { es } from "date-fns/locale";
 import TablaPaginacion from "./TablaPaginacion";
 import Dashboard from "./Dashboard";
-
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import dayjs from "dayjs"
 export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
+    const [filtro, setFiltro] = React.useState(1);
     const [prestadorId, setPrestadorId] = React.useState(propPrestadorId || null);
     const [seleccion, setSeleccion] = React.useState(null);
     const [actualizar, setActualizar] = React.useState(false);
+    const [rangoPersonalizado, setRangoPersonalizado] = React.useState([null, null]);
+    const [rangoAplicado, setRangoAplicado] = React.useState([dayjs().startOf('day').toDate(), dayjs().endOf('day').toDate()]);
+
+    const handlerFiltro = () => {
+        setRangoAplicado([...rangoPersonalizado]);
+      };
 
     React.useEffect(() => {
       if (!propPrestadorId) {
@@ -22,65 +32,130 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
 
       return (
         <Stack
-          direction={{ xs: "column", md: "row" }}
+          direction="column"
           sx={{
-            width: "100%",
-            height: "100%",
-            alignItems: "stretch",
-            gap: 2,
-            px: 2,
-            py: 2,
-          }}
+              width: "100%",
+              height: "100%",
+
+              // px: 2,
+              // py: 2,
+            }}
         >
-          <Box
-            sx={{
-              flex: { xs: "1 1 auto", md: "0 0 70%" },
-              minWidth: 0,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: 0,
-            }}
-          >
-            <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
-              {prestadorId ?(<TablaPaginacion
-                prestadorId={prestadorId}
-                tipo={tipo}
-                onSelectSolicitud={setSeleccion}
-                onUpdate={() => setActualizar((prev) => !prev)} // Recarga de pagina
-              />) : (
-                    <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
-                  )}
+          <Box sx={{ display: "flex",  alignItems: "center"}}>
+              <Select
+                value={filtro}
+                sx={{
+                  ".MuiOutlinedInput-notchedOutline": { border: "none" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { border: "none" },
+                }}
+                onChange={(e) => setFiltro(e.target.value)}
+              >
+                <MenuItem value={1} onClick={() => setRangoAplicado([dayjs().startOf('day').toDate(),dayjs().endOf('day').toDate()])} >Hoy</MenuItem>
+                <MenuItem value={2} onClick={() => setRangoAplicado([dayjs().startOf('week').toDate(),dayjs().endOf('week').toDate()])}>Esta semana</MenuItem>
+                <MenuItem value={3} onClick={() => setRangoAplicado([dayjs().subtract(1, 'month').startOf('month').toDate(),dayjs().subtract(1, 'month').endOf('month').toDate()])}>Último mes</MenuItem>
+                <MenuItem value={4}>Otro</MenuItem>
+              </Select>
+              {filtro === 4 && (
+                <Box
+                  sx={{ display: "flex", gap: 2, py: 2, alignItems:"center"}}
+                >
+                  <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+                    <DatePicker
+                      label="Desde"
+                      value={rangoPersonalizado[0]}
+                      onChange={(newValue) => setRangoPersonalizado([newValue, rangoPersonalizado[1]])}
+                      renderInput={(params) => <TextField {...params} />}
+                      inputFormat="dd/MM/yyyy"
+                      sx={{width: 150}}
+                      // sx={
+                      //   {
+                      //     bgcolor: '#021F59',
+                      //   }
+                      // }
+                    />
+                    <DatePicker
+                      label="Hasta"
+                      value={rangoPersonalizado[1]}
+                      onChange={(newValue) => setRangoPersonalizado([rangoPersonalizado[0], newValue])}
+                      renderInput={(params) => <TextField {...params} />}
+                      inputFormat="dd/MM/yyyy"
+                      sx={{width: 150}}
+                    />
+                    <Button onClick={handlerFiltro} variant="contained" color="primary" sx={{width: 80, height: 40}}>
+                      Aplicar
+                    </Button>
+                  </LocalizationProvider>
+                </Box>
+              )}
             </Box>
-          </Box>
-          <Box
+        
+          <Stack
+            direction={{ xs: "column", md: "row" }}
             sx={{
-              flex: { xs: "1 1 100%", md: "0 0 %30" }, // ← ancho fijo en desktop, full ancho en móvil
-              minWidth: { xs: "100%", md: 360 },
-              maxWidth: { md: 400 }, // opcional: límite máximo de ancho
-              display: "flex",
-              flexDirection: "column",
-              minHeight: 0,
-              borderRadius: 4,
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
-              backgroundColor: "#fff",
-              overflow: "hidden", // evita que el contenido se desborde
+              width: "100%",
+              height: "100%",
+              alignItems: "stretch",
+              gap: 2,
+              // px: 2,
+              // py: 2,
             }}
           >
-            {prestadorId ? (
-              <Dashboard
+            
+            <Box
+              sx={{
+                flex: { xs: "1 1 auto", md: "0 0 70%" },
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 0,
+                maxHeight: '100%'
+              }}
+            >
+              
+              <Box sx={{ flex: 1, minHeight: 0, height: "inherit", overflow: "hidden" }}>
+                {prestadorId ?(<TablaPaginacion
                   prestadorId={prestadorId}
                   tipo={tipo}
-                  showLegend={true}
-                  chartWidth={320}
-                  chartHeight={420}
-                  cardHeight={100}
-                  actualizar={actualizar}
-                />
-                  ) : (
-                    <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
-                  )
-            }
-          </Box>
+                  onSelectSolicitud={setSeleccion}
+                  onUpdate={() => setActualizar((prev) => !prev)} // Recarga de pagina
+                  rangoAplicado={rangoAplicado}
+                />) : (
+                      <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
+                    )}
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                flex: { xs: "1 1 100%", md: "0 0 %30" }, // ← ancho fijo en desktop, full ancho en móvil
+                minWidth: { xs: "100%", md: 360 },
+                // maxWidth: { md: 400 }, // opcional: límite máximo de ancho
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 0,
+                height: '100%',
+                borderRadius: 4,
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
+                backgroundColor: "#fff",
+                overflow: "hidden", // evita que el contenido se desborde
+              }}
+            >
+              {prestadorId ? (
+                <Dashboard
+                    prestadorId={prestadorId}
+                    tipo={tipo}
+                    showLegend={true}
+                    chartWidth={320}
+                    chartHeight={420}
+                    cardHeight={100}
+                    actualizar={actualizar}
+                    rangoAplicado={rangoAplicado}
+                  />
+                    ) : (
+                      <Box sx={{ p: 3, textAlign: "center" }}>Cargando prestador...</Box>
+                    )
+              }
+            </Box>
+          </Stack>
         </Stack>
       );
   }
