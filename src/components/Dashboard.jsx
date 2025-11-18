@@ -33,7 +33,6 @@ export default function Dashboard({
   actualizar,
   sx = {},
 }) {
-
   const [recarga, setRecarga] = React.useState(false)
 
   React.useEffect(() => {
