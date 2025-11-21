@@ -17,17 +17,24 @@ const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 export  function CalendarioGrande(props) {
   const [turnosHoy,setTurnosHoy] = useState([])
   
-    useEffect(() => {
-      const hoy = dayjs(props.fechaSeleccionada);
-      const inicioDelDia = hoy.startOf("day");
-      const finDelDia = hoy.endOf("day");
+  useEffect(() => {
+  const fechaBase = dayjs(props.fechaSeleccionada);
   
-      const turnosfiltrados = props.turnos.filter(t => {
-        const fechaTurno = dayjs(t.fechaHora);
-        return fechaTurno.isAfter(inicioDelDia) && fechaTurno.isBefore(finDelDia);
-      });
-      setTurnosHoy(turnosfiltrados)
-    }, [props.fechaSeleccionada, props.turnos]);
+  const diaDeSemana = fechaBase.day();
+  const inicioSemana =
+    diaDeSemana === 0
+      ? fechaBase.subtract(6, "day").startOf("day") // si es domingo, ir al lunes anterior
+      : fechaBase.startOf("day").subtract(diaDeSemana - 1, "day"); // retrocede hasta lunes
+  
+  const finSemana = inicioSemana.add(5, "day").endOf("day"); // sábado al final del día
+
+  const turnosFiltrados = props.turnos.filter((t) => {
+    const fechaTurno = dayjs(t.fechaHora);
+    return fechaTurno.isAfter(inicioSemana) && fechaTurno.isBefore(finSemana);
+  });
+
+  setTurnosHoy(turnosFiltrados);
+}, [props.fechaSeleccionada, props.turnos]);
  
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState([]);

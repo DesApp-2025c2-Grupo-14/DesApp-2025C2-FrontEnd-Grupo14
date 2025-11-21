@@ -247,8 +247,14 @@ export function Solicitudes() {
   return (
     <Stack direction="column" width="100%" height="100%" bgcolor="#F2F2F2">
       <Header seccion="Mis solicitudes" usuario="Ariel Nuñez" />
-      <Box>
-        <Box sx={{ width: "100%", typography: "body1" }}>
+      <Box
+        sx={{
+                px: 2,
+                height: "100%", 
+                // paddingRight: 7,
+              }}
+        >
+        <Box sx={{ width: "100%", typography: "body1", height: "100%" }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <TabList
@@ -267,7 +273,7 @@ export function Solicitudes() {
               sx={{
                 p: 0,
                 height: "calc(100vh - 180px)", 
-                paddingRight: 7,
+                // paddingRight: 7,
               }}
             >
               <TabDash
@@ -281,7 +287,7 @@ export function Solicitudes() {
               sx={{
                 p: 0,
                 height: "calc(100vh - 180px)", 
-                paddingRight: 7,
+                // paddingRight: 7,
               }}
             >
               <TabDash
@@ -295,7 +301,7 @@ export function Solicitudes() {
               sx={{
                 p: 0,
                 height: "calc(100vh - 180px)", // ajustá según alto de tu header/tabs
-                paddingRight: 7,
+                // paddingRight: 7,
               }}
             >
               <TabDash

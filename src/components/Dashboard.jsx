@@ -31,6 +31,7 @@ export default function Dashboard({
   centerLabel = "Resumen",
   showLegend = true,
   actualizar,
+  rangoAplicado,
   sx = {},
 }) {
   const [recarga, setRecarga] = React.useState(false)
@@ -42,7 +43,8 @@ export default function Dashboard({
   const { items, pieData, isEmpty, refetch } = useEstadisticasPorTipo(
     prestadorId,
     tipo,
-    actualizar
+    actualizar,
+    rangoAplicado
   );
 
   // 🔄 Refetch cada 10 segundos
@@ -73,13 +75,13 @@ export default function Dashboard({
     sx={{
       display: "flex",
       flexDirection: "column",
-      width: 350, // 📏 ancho fijo del Dashboard
+      width: '100%', // 📏 ancho fijo del Dashboard
       height: "100%",
       gap: 2,
       overflow: "hidden",
       p: 2,
       boxSizing: "border-box",
-      mx: "auto", // centra el contenido horizontalmente
+      justifyContent: "center",
       ...sx,
     }}
   >
@@ -92,7 +94,7 @@ export default function Dashboard({
       sx={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: 2,
+        gridGap: '20px 25px',
         width: "100%",
         flexShrink: 0,
       }}
@@ -102,7 +104,8 @@ export default function Dashboard({
           key={index}
           title={card.title}
           value={card.value}
-          height={"80px"}
+          height={"100%"}
+          width={"40%"}
         />
       ))}
     </Box>

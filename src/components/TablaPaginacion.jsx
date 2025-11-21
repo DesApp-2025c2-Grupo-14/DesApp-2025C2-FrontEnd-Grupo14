@@ -2,27 +2,25 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
+
 import {Paper,CircularProgress,Box,Button,Modal,Typography,Divider,Stack,Toolbar,Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Snackbar,
-  Alert} from "@mui/material";
+  Select,
+  MenuItem} from "@mui/material";
 import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
-import { DetalleSolicitud } from "./DetalleSolicitud";
-
-export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, onUpdate }) {
-      const [pageSize, setPageSize] = React.useState(5);
+import dayjs from "dayjs"
+export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, onUpdate, rangoAplicado }) {
+      
       const [solicitudSeleccionada, setSolicitudSeleccionada] = React.useState(null);
       const [open, setOpen] = React.useState(false);
       const [nuevoEstado, setNuevoEstado] = React.useState("");
       const [motivo, setMotivo] = React.useState("");
       const [solicitudId, setSolicitudId] = React.useState(null);
-      const [openSnackbar, setOpenSnackbar] = useState(false);
-      const [mensajeSnackbar, setMensajeSnackbar] = useState("");
-      const [tipoSnackbar, setTipoSnackbar] = useState("success");
+      
       //console.log(prestadorId)
       //const prestadorId = "69125ea6764b18417d396818";
     
@@ -63,7 +61,9 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
         }
       };
 
-      const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(prestadorId, tipo);
+      
+
+      const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(prestadorId, tipo, rangoAplicado);
       console.log(solicitudes)
       const solicitudesFiltradas = React.useMemo(() => {
         if (!tipo) return solicitudes;
@@ -71,18 +71,18 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
       }, [solicitudes, tipo]);
       
       const columns = [
-        { field: "Integrante", headerName: "Integrante", flex: 1.2 },
-        { field: "Lugar", headerName: "Lugar de atención", flex: 1.2 },
-        { field: "Medico", headerName: "Médico", flex: 1 },
-        { field: "Especialidad", headerName: "Especialidad", flex: 1 },
-        { field: "FechaPrestacion", headerName: "Fecha de prestación", flex: 1 },
-        { field: "Observaciones", headerName: "Observaciones", flex: 1 },
-        { field: "Estado", headerName: "Estado", flex: 1 },
+        { field: "Paciente", headerName: "Paciente", flex: 1.2, headerAlign: 'center' },
+        { field: "Lugar", headerName: "Lugar de atención", flex: 1.2, headerAlign: 'center' },
+        { field: "Especialidad", headerName: "Especialidad", flex: 1, headerAlign: 'center' },
+        { field: "FechaPrestacion", headerName: "Fecha de prestación", flex: 1, headerAlign: 'center' },
+        { field: "Observaciones", headerName: "Observaciones", flex: 1, headerAlign: 'center' },
+        { field: "Estado", headerName: "Estado", flex: 1, headerAlign: 'center' },
         //{ field: "Motivo", headerName: "Motivo", flex: 1 },
         {
           field: "Detalle",
           headerName: "Detalle",
           flex: 0.8,
+          headerAlign: 'center',
           renderCell: (params) => (
             <Button
               variant="outlined"
@@ -100,6 +100,7 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
           field: "Acciones",
           headerName: "Acciones",
           flex: 1.2,
+          headerAlign: 'center',
           renderCell: (params) => (<>
             <Box sx={{ display: "flex", gap: 0.5 }}>
               <Button
@@ -185,7 +186,7 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
       const rows = solicitudesFiltradas.map((s, index) => ({
         id: s._id || index,
         tipo: s.tipo,
-        Integrante: `${s.paciente?.nombre || ""} ${s.paciente?.apellido || ""}`.trim(),
+        Paciente: `${s.paciente?.nombre || ""} ${s.paciente?.apellido || ""}`.trim(),
         Lugar: s.lugar || "—",
         Estado: s.estado,
         FechaPrestacion: s.fechaPrestacion
@@ -222,7 +223,7 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
           alert("Error al cambiar el estado de la solicitud.");
         }
       };
-
+      console.log(dayjs().startOf('day').toDate())
       if (loading)
         return (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
@@ -234,24 +235,24 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
         
   return (
     <>
-      <Paper sx={{ width: "100%", p: 1.5, overflow: "visible", display: "flex", flexDirection: "column" }}>
-        <Box sx={{ width: "100%" }}>
+      <Paper sx={{ width: "100%", height: "100%", overflow: "visible", display: "flex", flexDirection: "column" }}>
+        <Stack direction="column" sx={{ width: "100%", height: "100%"}}>
+          
           <DataGrid
-            autoHeight
+            
             rows={rows}
             columns={columns}
-            pageSize={pageSize}
+            pageSize={15}
             onPageSizeChange={(newSize) => setPageSize(newSize)}
-            rowsPerPageOptions={[3, 5, 10]}
-            pagination
             sx={{
+              height: '100%',
               border: 0,
               cursor: "pointer",
               "& .MuiDataGrid-columnHeaders": { fontWeight: "bold", fontSize: "0.85rem" },
-              "& .MuiDataGrid-cell": { padding: "2px 4px", fontSize: "0.85rem" },
+              "& .MuiDataGrid-cell": { padding: "2px 4px", fontSize: "0.85rem", display: "flex", justifyContent: "center" },
             }}
           />
-        </Box>
+        </Stack>
       </Paper>
       <Modal
         open={!!solicitudSeleccionada}
@@ -277,7 +278,7 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
                   <strong>Fecha:</strong> {solicitudSeleccionada.FechaPrestacion}
                 </Typography>
                 <Typography>
-                  <strong>Integrante:</strong> {solicitudSeleccionada.Integrante}
+                  <strong>Paciente:</strong> {solicitudSeleccionada.Paciente}
                 </Typography>
                 <Typography>
                   <strong>Lugar:</strong> {solicitudSeleccionada.Lugar}
@@ -294,9 +295,6 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
                 } */}
                 { solicitudSeleccionada.tipo === "Reintegro" &&
                   (<>
-                    <Typography>
-                      <strong>Médico:</strong> {solicitudSeleccionada.Medico}
-                    </Typography>
                     <Typography>
                       <strong>Especialidad:</strong> {solicitudSeleccionada.Especialidad}
                     </Typography>
