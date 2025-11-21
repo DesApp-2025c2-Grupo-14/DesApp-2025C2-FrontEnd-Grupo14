@@ -8,8 +8,13 @@ import {Paper,CircularProgress,Box,Button,Modal,Typography,Divider,Stack,Toolbar
   DialogContent,
   DialogActions,
   TextField,
+<<<<<<< HEAD
+  Snackbar,
+  Alert} from "@mui/material";
+=======
   Select,
   MenuItem} from "@mui/material";
+>>>>>>> f5a0a8501493c41a7139f57c6e0434f4e25c4be9
 import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
 import dayjs from "dayjs"
@@ -20,7 +25,9 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
       const [nuevoEstado, setNuevoEstado] = React.useState("");
       const [motivo, setMotivo] = React.useState("");
       const [solicitudId, setSolicitudId] = React.useState(null);
-      
+      const [openSnackbar, setOpenSnackbar] = useState(false);
+      const [mensajeSnackbar, setMensajeSnackbar] = useState("");
+      const [tipoSnackbar, setTipoSnackbar] = useState("success");
       //console.log(prestadorId)
       //const prestadorId = "69125ea6764b18417d396818";
     
