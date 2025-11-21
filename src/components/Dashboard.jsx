@@ -34,7 +34,6 @@ export default function Dashboard({
   rangoAplicado,
   sx = {},
 }) {
-
   const [recarga, setRecarga] = React.useState(false)
 
   React.useEffect(() => {

@@ -1,5 +1,6 @@
 // src/components/TablaPaginacion.jsx
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
 import {Paper,CircularProgress,Box,Button,Modal,Typography,Divider,Stack,Toolbar,Dialog,
@@ -22,6 +23,10 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
       
       //console.log(prestadorId)
       //const prestadorId = "69125ea6764b18417d396818";
+    
+      //snackbar
+
+
       const handleOpen = (id, estado) => {
         setSolicitudId(id);
         setNuevoEstado(estado);
@@ -41,13 +46,16 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
             motivo,
             prestadorId,
           });
-
-          alert(`Solicitud ${nuevoEstado.toLowerCase()} correctamente.`);
+          setMensajeSnackbar("Solicitud actualizada correctamente");
+          setTipoSnackbar("success");
+          setOpenSnackbar(true);
           await refetch();
           onUpdate?.();
         } catch (err) {
           console.error("Error al actualizar estado:", err);
-          alert("Error al cambiar el estado de la solicitud.");
+          setMensajeSnackbar("La solicitud no se pudo actualizar");
+          setTipoSnackbar("error");
+          setOpenSnackbar(true);
         } finally {
           handleClose();
         }
@@ -380,6 +388,20 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
           </Box>
         </Paper>
       </Modal>
+      <Snackbar
+              open={openSnackbar}
+              autoHideDuration={5000}
+              onClose={() => setOpenSnackbar(false)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity={tipoSnackbar}
+                sx={{ width: "100%" }}
+              >
+                {mensajeSnackbar}
+              </Alert>
+            </Snackbar>
     </>
   );
 }

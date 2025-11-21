@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button, Snackbar, Alert } from "@mui/material";
-//import situacionesMock from "../data/situacionesTerapeuticas";
+//import situaciones from "../data/situacionesTerapeuticas";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
@@ -11,6 +11,7 @@ dayjs.extend(utc);
 
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
+  const [situaciones, setSituaciones] = useState([]);
   const [situacionSeleccionada, setSituacionSeleccionada] = useState();
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
@@ -201,8 +202,8 @@ useEffect(() => {
             </Button>
           </Box>
         <Dialog
-          open={!!crearSituacion}
-          onClose={() => setCrearSituacion(null)}
+          open={crearSituacion}
+          onClose={() => setCrearSituacion(false)}
         >
           <FormularioSituacionTerapeutica
             onGuardar={agregarSituacion}
