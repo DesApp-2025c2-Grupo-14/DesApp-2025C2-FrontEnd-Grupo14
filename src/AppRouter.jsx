@@ -1,22 +1,20 @@
 import { Route, Routes } from "react-router-dom";
 import { Inbox } from "./pages/Inbox";
-import { Box } from "@mui/material";
-import { grey } from "@mui/material/colors";
 import { Pacientes } from "./pages/Pacientes";
 import { Calendario } from "./pages/Calendario";
 import { Solicitudes } from "./pages/Solicitudes";
-import  { Login }  from "./components/login";
+import { Inicio } from "./pages/Inicio";
 
-export function AppRouter() {
+export function AppRouter({ prestador }) {
   return (
     <Routes>
-      <Route path="/inicio" element={<Login />} />
-      <Route path="/" element={<Inbox seccion="Bandeja de entrada" usuario="Pepe Argento" />}/>
-      <Route path="/bandeja-de-entrada" element={<Inbox seccion="Bandeja de entrada" usuario="Pepe Argento" />}/>
-      <Route path="/mis-solicitudes" element={<Solicitudes />} />
-      <Route path="/pacientes" element={<Pacientes vista ="info"/>} />
-      <Route path="historial/:dato" element={<Pacientes vista ="historial"/>} />
-      <Route path="/calendario" element={<Calendario />} />
+      <Route path="/" element={<Inicio prestador={prestador} />} />
+
+      <Route path="/bandeja-de-entrada" element={<Inbox seccion="Bandeja de entrada" />} />
+      <Route path="/mis-solicitudes" element={<Solicitudes  prestador={prestador}/>} />
+      <Route path="/pacientes" element={<Pacientes vista="info" prestador={prestador}/>} />
+      <Route path="/historial/:dato" element={<Pacientes vista="historial" prestador={prestador}/>} />
+      <Route path="/calendario" element={<Calendario prestador={prestador}/>} />
     </Routes>
   );
 }

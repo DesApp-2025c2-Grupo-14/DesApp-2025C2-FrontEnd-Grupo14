@@ -1,31 +1,43 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom"; 
 
 export function Login({ onLoginSuccess }) {
     const [cuit, setCuit] = useState("");
     const [error, setError] = useState("");
+
+    const navigate = useNavigate(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
 
         if (!cuit.trim()) {
-        setError("Ingresá un CUIT válido");
-        return;
-        }
-
-        try {
-        const res = await fetch(`http://localhost:3000/prestadores/login/${cuit}`);
-
-        if (!res.ok) {
-            setError("CUIT no encontrado");
+            setError("Ingresá un CUIT válido");
             return;
         }
 
-        const data = await res.json();
-        onLoginSuccess(data); // pasamos los datos al App
+        // El cuit de los centros medicos debera comenzar con 30 como para diferenciarlos
+        const esCentroMedico = cuit.startsWith("30");
+        const endpoint = esCentroMedico
+            ? `http://localhost:3000/centroMedico/login/${cuit}`
+            : `http://localhost:3000/prestadores/login/${cuit}`;
+
+        try {
+            const res = await fetch(endpoint);
+
+            if (!res.ok) {
+                setError("CUIT no encontrado");
+                return;
+            }
+
+            const data = await res.json();
+            onLoginSuccess(data); 
+
+            navigate("/");
+
         } catch (err) {
-        setError("Error al conectar con el servidor");
+            setError("Error al conectar con el servidor");
         }
     };
 
@@ -71,5 +83,6 @@ export function Login({ onLoginSuccess }) {
         </Box>
     );
 }
+
 
 

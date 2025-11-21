@@ -48,7 +48,6 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
             motivo,
             prestadorId,
           });
-
           setMensajeSnackbar("Solicitud actualizada correctamente");
           setTipoSnackbar("success");
           setOpenSnackbar(true);
