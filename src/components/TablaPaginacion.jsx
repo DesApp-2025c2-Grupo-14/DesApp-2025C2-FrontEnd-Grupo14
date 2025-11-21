@@ -8,13 +8,8 @@ import {Paper,CircularProgress,Box,Button,Modal,Typography,Divider,Stack,Toolbar
   DialogContent,
   DialogActions,
   TextField,
-<<<<<<< HEAD
   Snackbar,
   Alert} from "@mui/material";
-=======
-  Select,
-  MenuItem} from "@mui/material";
->>>>>>> f5a0a8501493c41a7139f57c6e0434f4e25c4be9
 import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
 import dayjs from "dayjs"
