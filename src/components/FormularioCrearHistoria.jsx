@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import {Card, CardContent, Typography, TextField, Button, Box, Stack} from "@mui/material";
+import { BotonCrearHistoria } from "./BotonCrearHistoria";
 import dayjs from "dayjs";
 import 'dayjs/locale/es';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 dayjs.locale("es");
 
 export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
@@ -32,11 +30,9 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
   return (
     <Card
       sx={{
-        maxWidth: 500,
-        margin: "0 auto",
+        width:"100%",
         backgroundColor: "#e0e0e0",
-        borderRadius: "12px",
-        boxShadow: 3,
+        borderRadius: "12px"
       }}
     >
       <CardContent>
@@ -52,7 +48,6 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
           <TextField
             label="Título"
             variant="outlined"
-            fullWidth
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
             error={!!error.titulo}
@@ -74,24 +69,7 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
         </Stack>
 
         <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              px: 4,
-              "&:hover": {
-                backgroundColor: "#125a9c",
-              },
-            }}
-            onClick={() => {
-              handleSubmit();
-            }}
-          >
-            Guardar
-          </Button>
+          <BotonCrearHistoria onGuardar={handleSubmit} />
         </Box>
       </CardContent>
     </Card>

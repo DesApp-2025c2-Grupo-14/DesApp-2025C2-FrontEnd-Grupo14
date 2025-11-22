@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField} from "@mui/material";
+import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, Snackbar, Alert} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from "react-router-dom";
 import FormularioCrearHistoria from "./FormularioCrearHistoria";
@@ -17,6 +17,11 @@ const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 export  function CalendarioGrande(props) {
   const [turnosHoy,setTurnosHoy] = useState([])
   
+  //snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [mensajeSnackbar, setMensajeSnackbar] = useState("");
+  const [tipoSnackbar, setTipoSnackbar] = useState("success");
+    
   useEffect(() => {
   const fechaBase = dayjs(props.fechaSeleccionada);
   
@@ -88,8 +93,15 @@ export  function CalendarioGrande(props) {
       }
       // post de situaciones usando id para crear
       await axios.post(`http://localhost:3000/pacientes/${selectedturno.pacienteId._id}/crearHistoria`, datos)
+      // Snackbar confirmacion
+      setMensajeSnackbar("Nota creada con éxito");
+      setTipoSnackbar("success");
+      setOpenSnackbar(true);
     }catch(error){
     console.error("Error al crear la nueva situacion:", error);
+    setMensajeSnackbar("No se pudo crear la nota.");
+    setTipoSnackbar("error");
+    setOpenSnackbar(true);
     }
   }
     
@@ -178,6 +190,21 @@ export  function CalendarioGrande(props) {
        >
         <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave}/>
       </Dialog>
+      <Snackbar
+              open={openSnackbar}
+              autoHideDuration={3000}
+              onClose={() => setOpenSnackbar(false)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity={tipoSnackbar}
+                sx={{
+                 width: "100%", backgroundColor:"yellowgreen"   }}
+              >
+                {mensajeSnackbar}
+              </Alert>
+            </Snackbar>
     </Box>
   );
 }
