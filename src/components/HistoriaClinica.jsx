@@ -3,9 +3,12 @@ import { useEffect, useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
 //import historiasMock from "../data/historiasClinicas";
 import { useParams, useNavigate } from "react-router-dom";
+import FiltroFecha from "./filtroFechas.jsx";
 import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+
+
 
 dayjs.locale("es");
 
@@ -16,9 +19,15 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
   const navigate = useNavigate();
   const [error, setError] = useState(null); // para verificacion de errores en el momento de carga
   const { dato } = useParams(); // guarda el valor que viene de :idPaciente de la ruta
+  const [filtroFecha, setFiltroFecha] = useState({ desde: null, hasta: null }); // estado para el filtro de fechas
+
+
   // Simulo el prestador logueado
   const usuarioActual = "Dra. Martínez";
 
+  const handleFiltro = (nuevoFiltro) => {
+    setFiltroFecha(nuevoFiltro);
+  };
   useEffect(()=>{
     const fetchHistorias = async ()=>{
       setError(null)
@@ -28,43 +37,24 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
 
         const url = `http://localhost:3000/pacientes/${idPaciente}/historiasClinicas`;
         // para filtrar las notas por prestador
-        const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
+        //const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
+        const params = {
+          prestador: verSoloMisNotas ? usuarioActual : undefined,
+          desde: filtroFecha.desde || undefined,
+          hasta: filtroFecha.hasta || undefined,
+        };
+
         // la peticion con el parametro de ver notas si esta activo
         const response = await axios.get(url, { params });
         setHistorias(response.data.historial);
+
       } catch(err){
         setError("Error al cargar las historias clínicas.");
         setHistorias([]);
       }
     }
     fetchHistorias();
-  }, [dato,datoSeleccionado._id, verSoloMisNotas]);
-
-  // Estado para manejar las historias clínicas, inicializado desde localStorage o con el mock
-/*   const [historias, setHistorias] = useState(() => {
-    const guardadas = localStorage.getItem("historias");
-    if (guardadas) {
-      return JSON.parse(guardadas);
-    } else {
-      localStorage.setItem("historias", JSON.stringify(historiasMock));
-      return historiasMock;
-    }
-  }); */
-
-  //ahora se hace desde el back
-/*   // filtado de historias por nroafiliado y si se elige por las de el prestador logueado
-  const historiasFiltradas = historias
-    .filter((h) => h.nroAfiliado === datoSeleccionado?.nroAfiliado)
-    .filter((h) => !verSoloMisNotas || h.prestador === usuarioActual);
- */
-
-  // funcion temporal para restaurar el estado original del mock
-/*   const restaurarHistorias = () => {
-    localStorage.setItem("historias", JSON.stringify(historiasMock));
-    setHistorias(historiasMock);
-    setHistoriaSeleccionada(null);
-  };
- */
+  }, [dato,datoSeleccionado._id, verSoloMisNotas, filtroFecha ]);
   
   return (
 <Stack sx={{ alignContent: "center", height: "100%" }}>
@@ -77,24 +67,30 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
         (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>):        
         (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>)
       }
-      {/* <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button> */}
     </Stack>
   </Box>
-
       <Stack height="100%" width="90%" m="auto" marginBottom={3} borderRadius={3} p={4}>
-        <Box mb={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Box
-          sx={{display: "flex",alignItems: "center",backgroundColor: "white",
-            padding: "4px 8px",borderRadius: 1,fontSize: "0.875rem",width: "fit-content"
-    }} >
-            <Typography sx={{ mr: 1 }}>Ver mis notas</Typography>
-          <Checkbox
-            size="small"
-            checked={verSoloMisNotas}
-            onChange={(e) => setVerSoloMisNotas(e.target.checked)}
-          />
-        </Box>
-      </Box>
+        <Box
+    mb={2}
+    sx={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: "white",
+      padding: "6px 10px",
+      borderRadius: 1,
+    }}
+  >
+      <FiltroFecha modo="historiaClinica" onChange={handleFiltro} />
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Typography sx={{ mr: 1 }}>Ver mis notas</Typography>
+      <Checkbox
+        size="small"
+        checked={verSoloMisNotas}
+        onChange={(e) => setVerSoloMisNotas(e.target.checked)}
+      />
+    </Box>
+  </Box>
 
         <Stack
           spacing={2}
@@ -132,11 +128,14 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
                     mb: 2
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h5" fontWeight="bold" >
                     {historia.titulo}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
+                  </Typography>
+                  <Typography variant="body1" color="text.primary">
+                    Notas: {historia.notas}
                   </Typography>
                 </Paper>
               ))}

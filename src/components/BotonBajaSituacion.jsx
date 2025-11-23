@@ -18,7 +18,7 @@ export function BotonBajaSituacion({ onBorrado }) {
         open={abierto}
         onClose={() => setAbierto(false)}
       >
-        <DialogTitle>Confirmar Dar de baja</DialogTitle>
+        <DialogTitle>Confirmar dar de baja</DialogTitle>
         <DialogContent>
           <DialogContentText>
             ¿Estás seguro de que querés dar de baja la situación terapéutica?
@@ -31,7 +31,7 @@ export function BotonBajaSituacion({ onBorrado }) {
           </Button>
           {/* aca uso la funcion de borrado del padre*/}
           <Button onClick={handleBorrado} color="error" variant="contained">
-            Eliminar
+            Dar de baja
           </Button>
         </DialogActions>
       </Dialog>

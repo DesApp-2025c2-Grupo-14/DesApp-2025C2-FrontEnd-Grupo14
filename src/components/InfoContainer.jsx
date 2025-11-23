@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { InfoPaciente } from "./InfoPaciente";
 import { HistoriaClinica } from "./HistoriaClinica";
-import { SituacionTerapeutica } from "./SituacionTerap"; // Asegurate de tener este componente
+import { SituacionTerapeutica } from "./SituacionTerap"; 
 import { DatosContext } from "../context/datos";
 
 export function InfoContainer(props) {

@@ -4,7 +4,9 @@ import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogAction
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
-import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
+//import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
+import FiltroFecha from "./filtroFechas.jsx";
+import { BotonCrearSituacion } from "./BotonCrearSituacion";
 import axios from "axios";
 
 dayjs.extend(utc);
@@ -15,12 +17,32 @@ export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
+  const [situaciones, setSituaciones] = useState([]);
+  const [filtroFechas, setFiltroFechas] = useState({ desde: null, hasta: null });
+
 
   //snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
+ 
 
+const handleFiltro = async ({ desde, hasta }) => {
+  setFiltroFechas({ desde, hasta }); 
+
+  if (!datoSeleccionado?._id) return;
+
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`,
+      { params: { ...(desde && { desde }), ...(hasta && { hasta }) } }
+    );
+    setSituaciones(response.data.situaciones);
+  } catch {
+    setError("No se pudo filtrar las situaciones.");
+    setSituaciones([]);
+  }
+};
 useEffect(() => {
   if (situacionSeleccionada) {
     const fechaFinal = situacionSeleccionada.fechaFinal;
@@ -40,7 +62,10 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`);
+        const response = await axios.get(
+      `http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`,
+      { params: { ...(filtroFechas.desde && { desde: filtroFechas.desde }),
+                  ...(filtroFechas.hasta && { hasta: filtroFechas.hasta }) } });
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -133,7 +158,7 @@ useEffect(() => {
         </Typography>
         <Stack direction="row" justifyContent="space-between" px={2}>
           <Button variant="outlined" onClick={onCerrarSituacion}>Volver</Button>
-          {/* <Button variant="outlined" onClick={restaurarSituaciones}>Restaurar datos</Button> */}
+          <FiltroFecha onChange={handleFiltro} />
         </Stack>
       </Box>
         <Stack
@@ -193,22 +218,8 @@ useEffect(() => {
           )}
         </Stack>
           <Box width="100%" mx="auto" mt="auto" sx={{ display: "flex", justifyContent: "center" }}>
-            <Button 
-              onClick={() => setCrearSituacion(true)} 
-              variant="contained"
-            >
-              Crear Situación
-            </Button>
+              <BotonCrearSituacion onGuardar={agregarSituacion} />
           </Box>
-        <Dialog
-          open={!!crearSituacion}
-          onClose={() => setCrearSituacion(null)}
-        >
-          <FormularioSituacionTerapeutica
-            onGuardar={agregarSituacion}
-            onCancelar={() => setCrearSituacion(false)}
-          />
-        </Dialog>
       {situacionSeleccionada && (
         <Dialog
           open={true}
