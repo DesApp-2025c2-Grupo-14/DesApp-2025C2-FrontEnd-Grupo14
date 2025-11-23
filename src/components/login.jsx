@@ -17,14 +17,8 @@ export function Login({ onLoginSuccess }) {
             return;
         }
 
-        // El cuit de los centros medicos debera comenzar con 30 como para diferenciarlos
-        const esCentroMedico = cuit.startsWith("30");
-        const endpoint = esCentroMedico
-            ? `http://localhost:3000/centroMedico/login/${cuit}`
-            : `http://localhost:3000/prestadores/login/${cuit}`;
-
         try {
-            const res = await fetch(endpoint);
+            const res = await fetch(`http://localhost:3000/prestadores/login/${cuit}`);
 
             if (!res.ok) {
                 setError("CUIT no encontrado");

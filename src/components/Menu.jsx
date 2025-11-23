@@ -20,18 +20,10 @@ export function Menu({ onLogout }) {
       spacing='auto'
       alignItems='center'
     >
-      <NavLink 
-        to="/" 
-        style={{ textDecoration: "none" }}
-      >
-        <Icon 
-          icon={<HomeRoundedIcon sx={{color:'#F2F2F2'}} fontSize="large" />} 
-          color='#F2F2F2' 
-          bgColor='#2E4CA6' 
-          selectedColor={null} 
-          label='Inicio'
-        />
-      </NavLink>
+
+      <Nav items={[
+        {icon:<HomeRoundedIcon sx={{color:'#F2F2F2'}} fontSize="large" />, label:'Inicio', url: '/'}
+      ]} />
 
       <Nav items={[
         {icon:<InboxRoundedIcon sx={{color:'#F2F2F2'}}/>, label:'Bandeja de entrada', url: '/bandeja-de-entrada'},
@@ -49,7 +41,7 @@ export function Menu({ onLogout }) {
       />
 
       {/* Logout */}
-      <div onClick={onLogout} style={{ cursor: "pointer" }}>
+      <div onClick={onLogout} style={{ cursor: "pointer", width:"100%", display: "flex", justifyContent: "center"}}>
         <Icon 
           icon={<LogoutRoundedIcon sx={{color:'#F2F2F2'}}/>} 
           color='#F2F2F2' 

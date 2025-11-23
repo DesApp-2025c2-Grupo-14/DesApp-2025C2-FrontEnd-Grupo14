@@ -10,7 +10,7 @@ export function AppRouter({ prestador }) {
     <Routes>
       <Route path="/" element={<Inicio prestador={prestador} />} />
 
-      <Route path="/bandeja-de-entrada" element={<Inbox seccion="Bandeja de entrada" />} />
+      <Route path="/bandeja-de-entrada" element={<Inbox seccion="Bandeja de entrada" prestador={prestador}/>} />
       <Route path="/mis-solicitudes" element={<Solicitudes  prestador={prestador}/>} />
       <Route path="/pacientes" element={<Pacientes vista="info" prestador={prestador}/>} />
       <Route path="/historial/:dato" element={<Pacientes vista="historial" prestador={prestador}/>} />
