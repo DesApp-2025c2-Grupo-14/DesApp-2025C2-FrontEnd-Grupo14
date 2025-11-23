@@ -26,7 +26,14 @@ import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
 import dayjs from "dayjs";
 
-export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, rangoAplicado }) {
+const BACKEND_URL = 'http://localhost:3000'
+
+async function getDetalle(tipo, id) {
+  const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`);
+  return Promise.resolve(response.data);
+}
+
+export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, rangoAplicado, centroMedico }) {
   const { prestadorCentroSeleccionado } = useContext(PrestadorContext);
   const prestadorLogueado = JSON.parse(localStorage.getItem("prestador"));
   const prestadorId =
@@ -42,11 +49,31 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = React.useState("");
   const [tipoSnackbar, setTipoSnackbar] = React.useState("success");
+  const [detalle, setDetalle] = React.useState(null);
   const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(
     prestadorId,
     tipo,
-    rangoAplicado
+    rangoAplicado,
+    centroMedico
   );
+
+  React.useEffect(() => {
+      if (!solicitudSeleccionada) {
+        setDetalle(null);
+        return;
+      }
+  
+      const fetchDetalle = async () => {
+        try {
+          setDetalle(await getDetalle(solicitudSeleccionada.tipo, solicitudSeleccionada.id));
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchDetalle();
+    }, [solicitudSeleccionada]);
+
   const handleOpen = (id, estado) => {
     setSolicitudId(id);
     setNuevoEstado(estado);
@@ -60,7 +87,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
 
   const handleConfirm = async () => {
     try {
-      await axios.patch(`http://localhost:3000/solicitudes/${solicitudId}`, {
+      await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
         estado: nuevoEstado,
         motivo,
         prestadorId,
@@ -92,7 +119,6 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
     { field: "Lugar", headerName: "Lugar de atención", flex: 1.2, headerAlign: "center" },
     { field: "Especialidad", headerName: "Especialidad", flex: 1, headerAlign: "center" },
     { field: "FechaPrestacion", headerName: "Fecha de prestación", flex: 1, headerAlign: "center" },
-    { field: "Observaciones", headerName: "Observaciones", flex: 1, headerAlign: "center" },
     { field: "Estado", headerName: "Estado", flex: 1, headerAlign: "center" },
 
     {
@@ -105,7 +131,8 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
           variant="outlined"
           size="small"
           onClick={() => {
-            setSolicitudSeleccionada(params.row);
+            setSolicitudSeleccionada({tipo: params.row.tipo, id: params.row.id}
+            );
             onSelectSolicitud?.(params.row);
           }}
         >
@@ -190,13 +217,8 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
     FechaPrestacion: s.fechaPrestacion
       ? new Date(s.fechaPrestacion).toLocaleDateString("es-AR")
       : "—",
-    Observaciones: s.observaciones || "—",
     Medico: s.medico || "—",
-    Especialidad: s.especialidad || "—",
-    Motivo: s.motivo || "—",
-    receta: s.receta || {},
-    autorizacion: s.autorizacion || {},
-    reintegro: s.reintegro || {},
+    Especialidad: s.especialidad || "—"
   }));
 
   if (loading)
@@ -231,6 +253,136 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
           />
         </Stack>
       </Paper>
+
+      <Modal
+        open={!!detalle}
+        onClose={() => setSolicitudSeleccionada(null)}
+        aria-labelledby="detalle-solicitud-titulo"
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}
+      >
+        <Paper sx={{ width: "100%",
+                      maxWidth: 600,
+                      height: "auto",
+                      maxHeight: "80vh",
+                      overflowY: "auto",
+                      p: 3,
+                      borderRadius: 3, }}>
+          <Typography id="detalle-solicitud-titulo" variant="h6" gutterBottom>
+            Detalle de la Solicitud
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          {detalle ? (
+            <>
+              <Stack spacing={0.5}>
+                <Typography>
+                  <strong>Fecha:</strong> {dayjs(detalle.fechaPrestacion)
+                                          .tz("America/Argentina/Buenos_Aires")
+                                          .format("DD/MM/YYYY")}
+                </Typography>
+                <Typography>
+                  <strong>Paciente:</strong> {detalle.paciente.nombre + ' ' + detalle.paciente.apellido}
+                </Typography>
+                <Typography>
+                  <strong>Lugar:</strong> {detalle.lugar || "-" }
+                </Typography>
+                {/* { solicitudSeleccionada.tipo !== "Receta" &&
+                  (<>
+                    <Typography>
+                      <strong>Médico:</strong> {solicitudSeleccionada.Medico}
+                    </Typography>
+                    <Typography>
+                      <strong>Especialidad:</strong> {solicitudSeleccionada.Especialidad}
+                    </Typography>
+                  </>)
+                } */}
+                { centroMedico &&
+                  (<>
+                    <Typography>
+                      <strong>Médico:</strong> {detalle.medico}
+                    </Typography>
+                  </>)
+                }
+                { detalle.tipo === "Reintegro" &&
+                  (<>
+                    <Typography>
+                      <strong>Especialidad:</strong> {detalle.especialidad}
+                    </Typography>
+                    <Typography>
+                      <strong>Forma de pago:</strong> {detalle.reintegro.pago}
+                    </Typography>
+                    <Typography>
+                      <strong>Total:</strong> {detalle.reintegro.valorTotal}
+                    </Typography>
+                    <Typography>
+                      <strong>CBU:</strong> {detalle.reintegro.cbu}
+                    </Typography>
+                    <Typography>
+                      <strong>Facturado A:</strong> {detalle.reintegro.facturadoA}
+                    </Typography>
+                    <Typography>
+                      <strong>CUIT:</strong> {detalle.reintegro.cuit}
+                    </Typography>
+                  </>)
+                }
+
+                { detalle.tipo === "Receta" &&
+                  (<>
+                    <Typography>
+                      <strong>Medicamento:</strong> {detalle.receta?.medicamento}
+                    </Typography>
+                    <Typography>
+                      <strong>Cantidad:</strong> {detalle.receta?.cantidad}
+                    </Typography>
+                    <Typography>
+                      <strong>Presentación:</strong> {detalle.receta?.presentacion}
+                    </Typography>
+                  </>)
+                }
+
+                { detalle.tipo === "Autorizacion" &&
+                  (<>
+                    <Typography>
+                      <strong>Dias de internación:</strong> {detalle.autorizacion?.diasInternacion}
+                    </Typography>
+                  </>)
+                }
+                
+                <Typography>
+                  <strong>Estado:</strong> {detalle.estado}
+                </Typography>
+                <Typography>
+                  <strong>Motivo de ac/re/obs:</strong> {detalle.motivo || "-"}
+                </Typography>
+              </Stack>
+              <Divider sx={{ my: 2 }} />
+              
+                
+                  <Typography variant="h6">Observaciones</Typography>
+                  <Box
+                    sx={{
+                      height: "15vh",
+                      bgcolor: "#2E4CA6",
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
+                      overflowY: "auto",
+                      color: "white",
+                    }}
+                  >
+                    {detalle.observaciones || "—"}
+                  </Box>  
+            </>
+          ) : (
+            <Typography>No hay información para mostrar.</Typography>
+          )}
+
+          <Box mt={3} textAlign="right">
+            <Button variant="contained" onClick={() => setSolicitudSeleccionada(null)}>
+              Cerrar
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
 
       {/* SNACKBAR */}
       <Snackbar

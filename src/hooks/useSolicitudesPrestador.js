@@ -1,27 +1,23 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { PrestadorContext } from "../context/PrestadorContext";
 
-export const useSolicitudesPrestador = (prestadorIdProp, tipo = null, rango) => {
-    const { prestadorCentroSeleccionado } = useContext(PrestadorContext);
-
-    // ⬇️ prioridad: prestador individual → prestador de centro
-    const prestadorId = prestadorIdProp || prestadorCentroSeleccionado?._id;
+export const useSolicitudesPrestador = (prestadorIdProp, tipo = null, rango, centroMedico) => {
 
     const [solicitudes, setSolicitudes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchSolicitudes = async () => {
-        if (!prestadorId) return;
+        if (!prestadorIdProp) return;
 
         try {
             setLoading(true);
-            const url = `http://localhost:3000/solicitudes/mis-solicitudes`;
-
+            const url = centroMedico ? 
+                        'http://localhost:3000/solicitudes/mis-solicitudes-centro-medico' : 
+                        'http://localhost:3000/solicitudes/mis-solicitudes';
             const response = await axios.get(url, {
                 params: {
-                    id: prestadorId,
+                    id: prestadorIdProp,
                     tipo,
                     desde: rango[0].toISOString(),
                     hasta: rango[1].toISOString(),
@@ -39,8 +35,8 @@ export const useSolicitudesPrestador = (prestadorIdProp, tipo = null, rango) => 
     };
 
     useEffect(() => {
-        if (prestadorId) fetchSolicitudes();
-    }, [prestadorId, tipo, rango]);
+        if (prestadorIdProp) fetchSolicitudes();
+    }, [prestadorIdProp, tipo, rango]);
 
     return { solicitudes, loading, error, refetch: fetchSolicitudes };
 };

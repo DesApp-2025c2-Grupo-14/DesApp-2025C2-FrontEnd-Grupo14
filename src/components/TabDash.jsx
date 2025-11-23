@@ -7,9 +7,9 @@ import Dashboard from "./Dashboard";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import dayjs from "dayjs"
-export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
+export default function TabDash({ prestadorId, tipo, centroMedico }) {
     const [filtro, setFiltro] = React.useState(1);
-    const [prestadorId, setPrestadorId] = React.useState(propPrestadorId || null);
+    // const [prestadorId, setPrestadorId] = React.useState(propPrestadorId || null);
     const [seleccion, setSeleccion] = React.useState(null);
     const [actualizar, setActualizar] = React.useState(false);
     const [rangoPersonalizado, setRangoPersonalizado] = React.useState([null, null]);
@@ -18,17 +18,6 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
     const handlerFiltro = () => {
         setRangoAplicado([...rangoPersonalizado]);
       };
-
-    React.useEffect(() => {
-      if (!propPrestadorId) {
-        fetch("http://localhost:3000/prestadores")
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.length > 0) setPrestadorId(data[0]._id);
-          })
-          .catch((err) => console.error("Error al obtener prestadores:", err));
-        }
-      }, [propPrestadorId]);
 
       return (
         <Stack
@@ -115,6 +104,7 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
               <Box sx={{ flex: 1, minHeight: 0, height: "inherit", overflow: "hidden" }}>
                 {prestadorId ?(<TablaPaginacion
                   prestadorId={prestadorId}
+                  centroMedico={centroMedico}
                   tipo={tipo}
                   onSelectSolicitud={setSeleccion}
                   onUpdate={() => setActualizar((prev) => !prev)} // Recarga de pagina
@@ -142,6 +132,7 @@ export default function TabDash({ prestadorId: propPrestadorId, tipo }) {
               {prestadorId ? (
                 <Dashboard
                     prestadorId={prestadorId}
+                    centroMedico={centroMedico}
                     tipo={tipo}
                     showLegend={true}
                     chartWidth={320}

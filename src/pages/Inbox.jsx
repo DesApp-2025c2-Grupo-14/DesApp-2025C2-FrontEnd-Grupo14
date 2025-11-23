@@ -11,8 +11,8 @@ export function Inbox(props) {
     setSeleccion({ tipo, id });
   };
   return (
-    <Stack width="100%" height="100vh"> {/* usar 100vh para asegurar altura total */}
-      <Header seccion={props.seccion} usuario={props.usuario} />
+    <Stack width="100%" height="100vh">
+      <Header seccion={props.seccion} usuario={props.prestador.nombre} />
 
       <Stack
         direction="row"

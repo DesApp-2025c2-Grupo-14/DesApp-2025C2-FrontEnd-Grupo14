@@ -23,8 +23,6 @@ dayjs.extend(timezone);
 
 async function getDetalle(tipo, id) {
   const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`);
-  console.log("backend response");
-  console.log(response);
   return Promise.resolve(response.data);
 }
 
@@ -44,12 +42,10 @@ export function DetalleSolicitud(props) {
         console.error(err);
       }
     };
-    console.log("hola");
-    // fetchDetalle();
+
     fetchDetalle();
   }, [props.seleccion]);
 
-  console.log(detalle);
   return (
     <Stack
       direction="column"
@@ -57,7 +53,7 @@ export function DetalleSolicitud(props) {
       height="100%"
       alignItems="space-between"
     >
-      <Header seccion={props.solicitud} usuario="" />
+      <Header seccion={props.solicitud} usuario=""/>
       {detalle && detalle.tipo !== null ? (
         <Toolbar
           sx={{
