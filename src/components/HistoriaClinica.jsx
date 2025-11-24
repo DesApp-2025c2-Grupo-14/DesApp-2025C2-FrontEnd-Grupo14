@@ -74,7 +74,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
         </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
       {dato ?
-        (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>):        
+        (<Button variant="outlined" onClick={() => navigate(-1)}>Volver</Button>):        
         (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>)
       }
       {/* <Button variant="outlined" onClick={restaurarHistorias}>Restaurar datos</Button> */}
