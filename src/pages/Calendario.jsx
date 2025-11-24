@@ -12,14 +12,15 @@ import  dayjs  from "dayjs";
 
 dayjs.locale("es")
 
-export function Calendario() {
+export function Calendario(props) {
+
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null)
   const [turnos, setTurnos] = useState([]);
   
     useEffect(() => {
        async function getTurnos() {
         try {
-          const response = await axios.get("http://localhost:3000/turnos");
+          const response = await axios.get(`http://localhost:3000/turnos?prestador=${props.prestador._id}`)
           console.log("Turnos cargados :",response.data);
           setTurnos(response.data);
         } catch (error) {
@@ -33,7 +34,7 @@ export function Calendario() {
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
 
     <Stack direction='column' width='100%' height='100%' bgcolor='#F2F2F2' >
-    <Header seccion='Calendario' usuario='Ariel Nuñez' />
+    <Header seccion='Calendario' usuario={props.prestador.nombre} />
     <Stack direction="row" spacing={4}  px={2} height="90%">
       <Stack direction="column" paddingInline={1} sx={{ minWidth:"320px", bgcolor: "#aec3f3", borderRadius: 3, border: "2px solid"}}>
         <CalendarioChico
