@@ -16,7 +16,7 @@ export function Pacientes(props) {
             <BuscadorPacientes/>
           </Stack>
           <Stack width="100%" paddingLeft="10px" sx={{ bgcolor: "#F9F9FF",   borderRadius: 3, border: "2px solid"}}>
-            <InfoContainer vista = {props.vista}/>
+            <InfoContainer vista={props.vista} prestador={props.prestador} />
           </Stack>
         </DatosProvider>
       </Stack>
