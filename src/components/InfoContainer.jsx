@@ -20,6 +20,7 @@ export function InfoContainer(props) {
       {vista === "historial" && (
         <HistoriaClinica
           datoSeleccionado={datoSeleccionado}
+          prestador={props.prestador}
           onCerrarHistoria={() => setVista("info")}
         />
       )}

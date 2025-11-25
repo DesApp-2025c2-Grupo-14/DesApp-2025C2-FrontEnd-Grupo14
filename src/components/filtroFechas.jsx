@@ -6,49 +6,47 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import 'dayjs/locale/es';
 
-export default function FiltroFechas  ({ onChange,  modo = "normal"  }) {
-    const [eleccion, setEleccion] = useState("mes");
-    const [desde, setDesde] = useState("");
-    const [hasta, setHasta] = useState("");
-    const [mesSeleccionado, setMesSeleccionado] = useState(dayjs());
+export default function FiltroFechas({ onChange, modo = "normal" }) {
+  const [eleccion, setEleccion] = useState("mes");
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
+  const [mesSeleccionado, setMesSeleccionado] = useState(dayjs());
 
-    useEffect(() => {
-        const inicioMes = dayjs().startOf("month").format("YYYY-MM-DD");
-        const finMes = dayjs().endOf("month").format("YYYY-MM-DD");
-        onChange({ desde: inicioMes, hasta: finMes });
-    }, []);
-    const handleSeleccion = (value) => {
-        setEleccion(value);
+  useEffect(() => {
+    const inicioMes = dayjs().startOf("month").format("YYYY-MM-DD");
+    const finMes = dayjs().endOf("month").format("YYYY-MM-DD");
+    onChange({ desde: inicioMes, hasta: finMes });
+  }, []);
 
-        if (value === "todo") {
-            onChange({desde: null, hasta: null});
-            return;
-        }
+  const handleSeleccion = (value) => {
+    setEleccion(value);
 
-        if (value === "mes") {
-           const inicioMes = dayjs().startOf("month").format("YYYY-MM-DD");
-           const finMes = dayjs().endOf("month").format("YYYY-MM-DD");
-           onChange({desde: inicioMes, hasta: finMes});
-           return;
-        }
-        if (value === "mesElegir" && modo === "historiaClinica") {
+    if (value === "todo") {
+      onChange({ desde: null, hasta: null });
+      return;
     }
-        if (value === "rango" && modo !== "historiaClinica") {
-            onChange({desde: desde || null, hasta: hasta || null});
-            return;
-        }
 
+    if (value === "mes") {
+      const inicioMes = dayjs().startOf("month").format("YYYY-MM-DD");
+      const finMes = dayjs().endOf("month").format("YYYY-MM-DD");
+      onChange({ desde: inicioMes, hasta: finMes });
+      return;
+    }
 
-    };
- // para historia clinica
+    if (value === "rango" && modo !== "historiaClinica") {
+      onChange({ desde: desde || null, hasta: hasta || null });
+      return;
+    }
+  };
+
   const handleMesChange = (value) => {
     setMesSeleccionado(value);
     onChange({
       desde: value.startOf("month").format("YYYY-MM-DD"),
       hasta: value.endOf("month").format("YYYY-MM-DD"),
     });
-
   };
+
   const handleDesde = (value) => {
     setDesde(value);
     onChange({ desde: value, hasta });
@@ -60,36 +58,10 @@ export default function FiltroFechas  ({ onChange,  modo = "normal"  }) {
   };
 
   return (
-    <Box display="flex" gap={2} alignItems="center">
-      {/* Selector general */}
-      <TextField
-        select
-        label="Filtro de fechas"
-        value={eleccion}
-        onChange={(e) => handleSeleccion(e.target.value)}
-        sx={{ width: 200 }}
-      >
-        <MenuItem value="todo">Todo</MenuItem>
-        <MenuItem value="mes">Este mes</MenuItem>
-        {modo !== "historiaClinica" && <MenuItem value="rango">Elegir rango</MenuItem>}
-        {modo === "historiaClinica" && <MenuItem value="mesElegir">Elegir fecha</MenuItem>}
-      </TextField>
-
-    {eleccion === "mesElegir" && modo === "historiaClinica" && (
-         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-        <DatePicker
-          views={["year", "month"]}
-          label="Mes y Año"
-          value={mesSeleccionado}
-          onChange={handleMesChange}
-          format="MMMM YYYY"
-        />
-        </LocalizationProvider>
-      )}
-
-      {/* Solo modo normal: rango con dos fechas */}
+    <Box display="flex" alignItems="center" justifyContent="flex-end" position="relative" marginTop={2} gap={2}>
+      {/* Pickers rango: aparecen a la izquierda */}
       {eleccion === "rango" && modo !== "historiaClinica" && (
-        <>
+        <Box position="absolute" left={-350} display="flex" gap={1}>
           <TextField
             type="date"
             label="Desde"
@@ -104,7 +76,34 @@ export default function FiltroFechas  ({ onChange,  modo = "normal"  }) {
             onChange={(e) => handleHasta(e.target.value)}
             InputLabelProps={{ shrink: true }}
           />
-        </>
+        </Box>
+      )}
+
+      {/* Selector principal siempre a la derecha */}
+      <TextField
+        select
+        label="Filtro de fechas"
+        value={eleccion}
+        onChange={(e) => handleSeleccion(e.target.value)}
+        sx={{ width: 200 }}
+      >
+        <MenuItem value="todo">Todo</MenuItem>
+        <MenuItem value="mes">Este mes</MenuItem>
+        {modo !== "historiaClinica" && <MenuItem value="rango">Elegir rango</MenuItem>}
+        {modo === "historiaClinica" && <MenuItem value="mesElegir">Elegir fecha</MenuItem>}
+      </TextField>
+
+      {/* Mes y año solo para historia clinica */}
+      {eleccion === "mesElegir" && modo === "historiaClinica" && (
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+          <DatePicker
+            views={["year", "month"]}
+            label="Mes y Año"
+            value={mesSeleccionado}
+            onChange={handleMesChange}
+            format="MMMM YYYY"
+          />
+        </LocalizationProvider>
       )}
     </Box>
   );

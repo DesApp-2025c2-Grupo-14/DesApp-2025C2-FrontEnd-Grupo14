@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button, Snackbar, Alert } from "@mui/material";
-//import situacionesMock from "../data/situacionesTerapeuticas";
+//import situaciones from "../data/situacionesTerapeuticas";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
@@ -13,11 +13,11 @@ dayjs.extend(utc);
 
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
+  const [situaciones, setSituaciones] = useState([]);
   const [situacionSeleccionada, setSituacionSeleccionada] = useState();
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
-  const [situaciones, setSituaciones] = useState([]);
   const [filtroFechas, setFiltroFechas] = useState({ desde: null, hasta: null });
 
 
@@ -156,10 +156,12 @@ useEffect(() => {
         <Typography variant="h4" sx={{ textAlign: "center", color: "#1976d2"  }} marginTop={2}>
           Situaciones Terapeuticas
         </Typography>
-        <Stack direction="row" justifyContent="space-between" px={2}>
+        <Box
+          mb={2}
+          sx={{display: "flex",justifyContent: "space-between",alignItems: "center",backgroundColor: "white",padding: "6px 10px",borderRadius: 1,}}>
           <Button variant="outlined" onClick={onCerrarSituacion}>Volver</Button>
           <FiltroFecha onChange={handleFiltro} />
-        </Stack>
+        </Box>
       </Box>
         <Stack
           spacing={2}
@@ -272,7 +274,6 @@ useEffect(() => {
             </Box>
           </DialogContent>
           <DialogActions>
-            {/* boton actualizado que solo ejecuta borrarsituacion */}
             <BotonBajaSituacion onBorrado={borrarSituacion} />
 
             {/* aca se bloquea el boton hasta ingresar fecha */}
@@ -292,7 +293,7 @@ useEffect(() => {
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity={tipoSnackbar}
-          sx={{ width: "100%" }}
+          sx={{ width: "99%" }}
         >
           {mensajeSnackbar}
         </Alert>

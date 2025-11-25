@@ -7,9 +7,7 @@ import { Box, Stack } from "@mui/material";
 import { Icon } from "./Icon"
 import { Link } from "react-router-dom"
 export function Nav(props) {
-    const [selected, setSelected] = useState(null);
 
-    console.log(props.items)
     return (
         <Stack height='25%' width='100%' spacing= 'auto' direction='column'  sx={{pl: 1}}>
             {props.items.map((item, index) => (
@@ -22,12 +20,11 @@ export function Nav(props) {
                         key={index} 
                     >
                         <Icon 
-                            onClick={() => setSelected(index)}
+                            onClick={() => props.onClick}
                             key={index} 
                             icon={item.icon} 
                             color='#F2F2F2' 
                             bgColor= '#2E4CA6'
-                            selectedColor= {selected === index ? '#0339A6' : null}
                             label={item.label} 
                         />
                     </Link>

@@ -12,7 +12,7 @@ import "dayjs/locale/es";
 
 dayjs.locale("es");
 
-export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
+export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria, prestador }) {
   const [historias, setHistorias] = useState([])
   const [historiaSeleccionada, setHistoriaSeleccionada] = useState(null);
   const [verSoloMisNotas, setVerSoloMisNotas] = useState(false);
@@ -23,27 +23,31 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
 
 
   // Simulo el prestador logueado
-  const usuarioActual = "Dra. Martínez";
-
+  //const prestadorLogueado = prestador
   const handleFiltro = (nuevoFiltro) => {
     setFiltroFecha(nuevoFiltro);
   };
+  /* //console.log("Prestador logueado:", prestador); */
+/*   console.log("ID prestador desde React:", prestador);
+console.log("prestador._id:", prestador?._id);
+console.log("prestador.id:", prestador?.id); */
+
   useEffect(()=>{
     const fetchHistorias = async ()=>{
       setError(null)
       try{
         const idPaciente = dato || datoSeleccionado._id;
         if (!idPaciente) return;
-
+        
         const url = `http://localhost:3000/pacientes/${idPaciente}/historiasClinicas`;
         // para filtrar las notas por prestador
         //const params = verSoloMisNotas ? { prestador: usuarioActual } : {};
         const params = {
-          prestador: verSoloMisNotas ? usuarioActual : undefined,
+          prestadorId: verSoloMisNotas ? prestador?._id : undefined,
           desde: filtroFecha.desde || undefined,
           hasta: filtroFecha.hasta || undefined,
         };
-
+        
         // la peticion con el parametro de ver notas si esta activo
         const response = await axios.get(url, { params });
         setHistorias(response.data.historial);
@@ -54,7 +58,7 @@ export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria }) {
       }
     }
     fetchHistorias();
-  }, [dato,datoSeleccionado._id, verSoloMisNotas, filtroFecha ]);
+  }, [dato,datoSeleccionado._id, verSoloMisNotas, filtroFecha, prestador ]);
   
   return (
 <Stack sx={{ alignContent: "center", height: "100%" }}>

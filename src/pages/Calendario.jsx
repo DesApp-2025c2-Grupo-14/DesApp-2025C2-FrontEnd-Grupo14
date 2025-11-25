@@ -12,9 +12,10 @@ import  dayjs  from "dayjs";
 
 dayjs.locale("es")
 
-export function Calendario() {
+export function Calendario(props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null)
   const [turnos, setTurnos] = useState([]);
+
   
     useEffect(() => {
        async function getTurnos() {
@@ -52,6 +53,7 @@ export function Calendario() {
         fechaSeleccionada={fechaSeleccionada}
         setFechaSeleccionada={setFechaSeleccionada}
         turnos = {turnos}
+        prestador = {props.prestador}
       />
       </Stack>
 

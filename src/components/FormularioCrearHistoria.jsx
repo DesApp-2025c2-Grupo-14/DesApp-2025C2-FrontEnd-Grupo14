@@ -7,13 +7,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 dayjs.locale("es");
 
-export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
+export default function FormularioCrearHistoria({ onGuardar , cerrar, prestador }) {
   const [titulo, setTitulo] = useState("");
   const [nota, setNota] = useState("");
   const [error, setError] = useState({});
 
+  
   const handleSubmit = () => {
     // acumulador de errores
+    console.log("Prestador recibido en el formulario:", prestador);
     const nuevosErrores = {};
     // validaciones
     if (!titulo.trim()) nuevosErrores.titulo = "El título es obligatorio";
@@ -23,7 +25,8 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar }) {
     if (Object.keys(nuevosErrores).length > 0) return;
     const nuevaHistoria ={
       titulo,
-      prestador: "Dra. Martínez",
+      prestadorId: prestador._id,
+      prestador: prestador.nombre,
       notas :nota ,
     }
     onGuardar(nuevaHistoria)

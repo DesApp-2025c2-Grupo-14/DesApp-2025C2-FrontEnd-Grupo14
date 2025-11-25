@@ -176,7 +176,7 @@ export  function CalendarioGrande(props) {
        fullWidth
        sx= {{width :"100vw", backgroundColor:"transparent"}}
        >
-        <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave}/>
+        <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave} prestador={props.prestador} />
       </Dialog>
     </Box>
   );

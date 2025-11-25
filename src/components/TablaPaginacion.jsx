@@ -1,273 +1,289 @@
 // src/components/TablaPaginacion.jsx
 import * as React from "react";
+import { useState, useEffect, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import {Paper,CircularProgress,Box,Button,Modal,Typography,Divider,Stack,Toolbar,Dialog,
+import { PrestadorContext } from "../context/PrestadorContext";
+
+import {
+  Paper,
+  CircularProgress,
+  Box,
+  Button,
+  Modal,
+  Typography,
+  Divider,
+  Stack,
+  Toolbar,
+  Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField} from "@mui/material";
+  TextField,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import axios from "axios";
 import { useSolicitudesPrestador } from "../hooks/useSolicitudesPrestador";
-import { DetalleSolicitud } from "./DetalleSolicitud";
+import dayjs from "dayjs";
 
-export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, onUpdate }) {
-      const [pageSize, setPageSize] = React.useState(5);
-      const [solicitudSeleccionada, setSolicitudSeleccionada] = React.useState(null);
-      const [open, setOpen] = React.useState(false);
-      const [nuevoEstado, setNuevoEstado] = React.useState("");
-      const [motivo, setMotivo] = React.useState("");
-      const [solicitudId, setSolicitudId] = React.useState(null);
-      //console.log(prestadorId)
-      //const prestadorId = "69125ea6764b18417d396818";
-      const handleOpen = (id, estado) => {
-        setSolicitudId(id);
-        setNuevoEstado(estado);
-        setOpen(true);
-      };
+const BACKEND_URL = 'http://localhost:3000'
 
-      const handleClose = () => {
-        setMotivo("");
-        setOpen(false);
-      };
+async function getDetalle(tipo, id) {
+  const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`);
+  return Promise.resolve(response.data);
+}
 
-      const handleConfirm = async () => {
+export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, rangoAplicado, centroMedico }) {
+  const { prestadorCentroSeleccionado } = useContext(PrestadorContext);
+  const prestadorLogueado = JSON.parse(localStorage.getItem("prestador"));
+  const prestadorId =
+    prestadorCentroSeleccionado?._id ||            // centro elegido
+    prestadorLogueado?.prestador?._id ||          // prestador individual
+    prestadorLogueado?._id ||                     // fallback por si acaso
+    null;
+  const [solicitudSeleccionada, setSolicitudSeleccionada] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [nuevoEstado, setNuevoEstado] = React.useState("");
+  const [motivo, setMotivo] = React.useState("");
+  const [solicitudId, setSolicitudId] = React.useState(null);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [mensajeSnackbar, setMensajeSnackbar] = React.useState("");
+  const [tipoSnackbar, setTipoSnackbar] = React.useState("success");
+  const [detalle, setDetalle] = React.useState(null);
+  const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(
+    prestadorId,
+    tipo,
+    rangoAplicado,
+    centroMedico
+  );
 
+  React.useEffect(() => {
+      if (!solicitudSeleccionada) {
+        setDetalle(null);
+        return;
+      }
+  
+      const fetchDetalle = async () => {
         try {
-          await axios.patch(`http://localhost:3000/solicitudes/${solicitudId}`, {
-            estado: nuevoEstado,
-            motivo,
-            prestadorId,
-          });
-
-          alert(`Solicitud ${nuevoEstado.toLowerCase()} correctamente.`);
-          await refetch();
-          onUpdate?.();
+          setDetalle(await getDetalle(solicitudSeleccionada.tipo, solicitudSeleccionada.id));
         } catch (err) {
-          console.error("Error al actualizar estado:", err);
-          alert("Error al cambiar el estado de la solicitud.");
-        } finally {
-          handleClose();
+          console.error(err);
         }
       };
 
-      const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(prestadorId, tipo);
-      console.log(solicitudes)
-      const solicitudesFiltradas = React.useMemo(() => {
-        if (!tipo) return solicitudes;
-        return solicitudes.filter((s) => s.tipo?.toLowerCase() === tipo.toLowerCase());
-      }, [solicitudes, tipo]);
-      
-      const columns = [
-        { field: "Integrante", headerName: "Integrante", flex: 1.2 },
-        { field: "Lugar", headerName: "Lugar de atención", flex: 1.2 },
-        { field: "Medico", headerName: "Médico", flex: 1 },
-        { field: "Especialidad", headerName: "Especialidad", flex: 1 },
-        { field: "FechaPrestacion", headerName: "Fecha de prestación", flex: 1 },
-        { field: "Observaciones", headerName: "Observaciones", flex: 1 },
-        { field: "Estado", headerName: "Estado", flex: 1 },
-        //{ field: "Motivo", headerName: "Motivo", flex: 1 },
-        {
-          field: "Detalle",
-          headerName: "Detalle",
-          flex: 0.8,
-          renderCell: (params) => (
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => {
-                setSolicitudSeleccionada(params.row);
-                onSelectSolicitud?.(params.row);
-              }}
-            >
-              Ver detalle
-            </Button>
-          ),
-        },
-        {
-          field: "Acciones",
-          headerName: "Acciones",
-          flex: 1.2,
-          renderCell: (params) => (<>
-            <Box sx={{ display: "flex", gap: 0.5 }}>
-              <Button
-                variant="contained"
-                size="small"
-                color="success"
-                onClick={() => handleOpen(params.row.id, "Aprobada")}
-                disabled={["Aprobada", "Rechazada"].includes(params.row.Estado)}
-                sx={{
-                  minWidth: 28,
-                  height: 24,
-                  p: 0,
-                  fontSize: "0.7rem",
-                  lineHeight: 1,
-                }}
-              >
-                Ac
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                color="error"
-                onClick={() => handleOpen(params.row.id, "Rechazada")}
-                disabled={["Aprobada", "Rechazada"].includes(params.row.Estado)}
-                sx={{
-                  minWidth: 28,
-                  height: 24,
-                  p: 0,
-                  fontSize: "0.7rem",
-                  lineHeight: 1,
-                }}
-              >
-                Re
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                color="warning"
-                onClick={() => handleOpen(params.row.id, "Observada")}
-                disabled={["Aprobada", "Rechazada", "Observada"].includes(params.row.Estado)}
-                sx={{
-                  minWidth: 28,
-                  height: 24,
-                  p: 0,
-                  fontSize: "0.7rem",
-                  lineHeight: 1,
-                }}
-              >
-                Obs
-              </Button>
-            </Box>
-            <Dialog open={open} onClose={handleClose} sx={{
-    "& .MuiBackdrop-root": {
-      backgroundColor: "rgba(0, 0, 0, 0.2)", // más oscuro
+      fetchDetalle();
+    }, [solicitudSeleccionada]);
+
+  const handleOpen = (id, estado) => {
+    setSolicitudId(id);
+    setNuevoEstado(estado);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setMotivo("");
+    setOpen(false);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
+        estado: nuevoEstado,
+        motivo,
+        prestadorId,
+      });
+
+      setMensajeSnackbar("Solicitud actualizada correctamente");
+      setTipoSnackbar("success");
+      setOpenSnackbar(true);
+
+      await refetch();
+      onUpdate?.();
+    } catch (err) {
+      console.error("Error al actualizar estado:", err);
+      setMensajeSnackbar("La solicitud no se pudo actualizar");
+      setTipoSnackbar("error");
+      setOpenSnackbar(true);
+    } finally {
+      handleClose();
+    }
+  };
+  const solicitudesFiltradas = React.useMemo(() => {
+    if (!tipo) return solicitudes;
+    return solicitudes.filter((s) => s.tipo?.toLowerCase() === tipo.toLowerCase());
+  }, [solicitudes, tipo]);
+
+
+  const columns = [
+    { field: "Paciente", headerName: "Paciente", flex: 1.2, headerAlign: "center" },
+    { field: "Lugar", headerName: "Lugar de atención", flex: 1.2, headerAlign: "center" },
+    { field: "Especialidad", headerName: "Especialidad", flex: 1, headerAlign: "center" },
+    { field: "FechaPrestacion", headerName: "Fecha de prestación", flex: 1, headerAlign: "center" },
+    { field: "Estado", headerName: "Estado", flex: 1, headerAlign: "center" },
+
+    {
+      field: "Detalle",
+      headerName: "Detalle",
+      flex: 0.8,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => {
+            setSolicitudSeleccionada({tipo: params.row.tipo, id: params.row.id}
+            );
+            onSelectSolicitud?.(params.row);
+          }}
+        >
+          Ver detalle
+        </Button>
+      ),
     },
-  }}>
-        <DialogTitle>
-          Indique el motivo para {nuevoEstado === "Rechazada" ? "rechazar" : nuevoEstado === "Aprobada" ? "aprobar" : "observar"}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Motivo"
-            type="text"
-            fullWidth
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleConfirm} variant="contained" color="primary">
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
-      </>
-          ),
-        },
-      ];
-      console.log(solicitudesFiltradas)
-      const rows = solicitudesFiltradas.map((s, index) => ({
-        id: s._id || index,
-        tipo: s.tipo,
-        Integrante: `${s.paciente?.nombre || ""} ${s.paciente?.apellido || ""}`.trim(),
-        Lugar: s.lugar || "—",
-        Estado: s.estado,
-        FechaPrestacion: s.fechaPrestacion
-          ? new Date(s.fechaPrestacion).toLocaleDateString("es-AR")
-          : "—",
-        Observaciones: s.observaciones || "—",
-        Medico: s.medico || "—",
-        Especialidad: s.especialidad || "—",
-        Motivo: s.motivo || "—",
-        receta: s.receta || {},
-        autorizacion: s.autorizacion || {},
-        reintegro: s.reintegro || {},
-      }));
 
-      // patch para cambio de estado de solicitud
-      const handleEstado = async (id, nuevoEstado) => {
-        const motivoTexto = prompt(`Ingrese el motivo para ${nuevoEstado}:`) || "";
-        if (motivoTexto === null) {
-          alert("Cambio de estado cancelado.");
-          return;
-        }
-        try {
-          await axios.patch(`http://localhost:3000/solicitudes/${id}`, {
-            estado: nuevoEstado,
-            motivo: motivoTexto,
-            prestadorId,
-          });
+    {
+      field: "Acciones",
+      headerName: "Acciones",
+      flex: 1.2,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <>
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            <Button
+              variant="contained"
+              size="small"
+              color="success"
+              onClick={() => handleOpen(params.row.id, "Aprobada")}
+              disabled={["Aprobada", "Rechazada"].includes(params.row.Estado)}
+            >
+              Ac
+            </Button>
 
-          alert(`Solicitud ${nuevoEstado.toLowerCase()} correctamente.`);
-          await refetch(); // Actualiza la tabla
-          onUpdate?.(); // aviso para que se actualice
-        } catch (err) {
-          console.error("Error al actualizar estado:", err);
-          alert("Error al cambiar el estado de la solicitud.");
-        }
-      };
+            <Button
+              variant="contained"
+              size="small"
+              color="error"
+              onClick={() => handleOpen(params.row.id, "Rechazada")}
+              disabled={["Aprobada", "Rechazada"].includes(params.row.Estado)}
+            >
+              Re
+            </Button>
 
-      if (loading)
-        return (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
-            <CircularProgress />
+            <Button
+              variant="contained"
+              size="small"
+              color="warning"
+              onClick={() => handleOpen(params.row.id, "Observada")}
+              disabled={["Aprobada", "Rechazada", "Observada"].includes(params.row.Estado)}
+            >
+              Obs
+            </Button>
           </Box>
-        );
 
-      if (error) return <p style={{ color: "red" }}>Error al cargar solicitudes.</p>;
-        
+          {/* MODAL DE CAMBIO */}
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>
+              Indique el motivo para {nuevoEstado}
+            </DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Motivo"
+                type="text"
+                fullWidth
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancelar</Button>
+              <Button onClick={handleConfirm} variant="contained" color="primary">
+                Confirmar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      ),
+    },
+  ];
+
+  const rows = solicitudesFiltradas.map((s, index) => ({
+    id: s._id || index,
+    tipo: s.tipo,
+    Paciente: `${s.paciente?.nombre || ""} ${s.paciente?.apellido || ""}`.trim(),
+    Lugar: s.lugar || "—",
+    Estado: s.estado,
+    FechaPrestacion: s.fechaPrestacion
+      ? new Date(s.fechaPrestacion).toLocaleDateString("es-AR")
+      : "—",
+    Medico: s.medico || "—",
+    Especialidad: s.especialidad || "—"
+  }));
+
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+
+  if (error) return <p style={{ color: "red" }}>Error al cargar solicitudes.</p>;
+
   return (
     <>
-      <Paper sx={{ width: "100%", p: 1.5, overflow: "visible", display: "flex", flexDirection: "column" }}>
-        <Box sx={{ width: "100%" }}>
+      <Paper sx={{ width: "100%", height: "100%", overflow: "visible", display: "flex", flexDirection: "column" }}>
+        <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
           <DataGrid
-            autoHeight
             rows={rows}
             columns={columns}
-            pageSize={pageSize}
-            onPageSizeChange={(newSize) => setPageSize(newSize)}
-            rowsPerPageOptions={[3, 5, 10]}
-            pagination
+            pageSize={15}
             sx={{
+              height: "100%",
               border: 0,
               cursor: "pointer",
               "& .MuiDataGrid-columnHeaders": { fontWeight: "bold", fontSize: "0.85rem" },
-              "& .MuiDataGrid-cell": { padding: "2px 4px", fontSize: "0.85rem" },
+              "& .MuiDataGrid-cell": {
+                padding: "2px 4px",
+                fontSize: "0.85rem",
+                display: "flex",
+                justifyContent: "center",
+              },
             }}
           />
-        </Box>
+        </Stack>
       </Paper>
+
       <Modal
-        open={!!solicitudSeleccionada}
+        open={!!detalle}
         onClose={() => setSolicitudSeleccionada(null)}
         aria-labelledby="detalle-solicitud-titulo"
         sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}
       >
         <Paper sx={{ width: "100%",
-                      maxWidth: 600, // 🔹 ancho máximo del modal
-                      height: "auto", // 🔹 se ajusta al contenido
-                      maxHeight: "80vh", // 🔹 limita la altura a 80% de la ventana
-                      overflowY: "auto", // 🔹 agrega scroll si el contenido supera el alto
+                      maxWidth: 600,
+                      height: "auto",
+                      maxHeight: "80vh",
+                      overflowY: "auto",
                       p: 3,
                       borderRadius: 3, }}>
           <Typography id="detalle-solicitud-titulo" variant="h6" gutterBottom>
             Detalle de la Solicitud
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          {solicitudSeleccionada ? (
+          {detalle ? (
             <>
               <Stack spacing={0.5}>
                 <Typography>
-                  <strong>Fecha:</strong> {solicitudSeleccionada.FechaPrestacion}
+                  <strong>Fecha:</strong> {dayjs(detalle.fechaPrestacion)
+                                          .tz("America/Argentina/Buenos_Aires")
+                                          .format("DD/MM/YYYY")}
                 </Typography>
                 <Typography>
-                  <strong>Integrante:</strong> {solicitudSeleccionada.Integrante}
+                  <strong>Paciente:</strong> {detalle.paciente.nombre + ' ' + detalle.paciente.apellido}
                 </Typography>
                 <Typography>
-                  <strong>Lugar:</strong> {solicitudSeleccionada.Lugar}
+                  <strong>Lugar:</strong> {detalle.lugar || "-" }
                 </Typography>
                 {/* { solicitudSeleccionada.tipo !== "Receta" &&
                   (<>
@@ -279,76 +295,68 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
                     </Typography>
                   </>)
                 } */}
-                { solicitudSeleccionada.tipo === "Reintegro" &&
+                { centroMedico &&
                   (<>
                     <Typography>
-                      <strong>Médico:</strong> {solicitudSeleccionada.Medico}
+                      <strong>Médico:</strong> {detalle.medico}
+                    </Typography>
+                  </>)
+                }
+                { detalle.tipo === "Reintegro" &&
+                  (<>
+                    <Typography>
+                      <strong>Especialidad:</strong> {detalle.especialidad}
                     </Typography>
                     <Typography>
-                      <strong>Especialidad:</strong> {solicitudSeleccionada.Especialidad}
+                      <strong>Forma de pago:</strong> {detalle.reintegro.pago}
                     </Typography>
                     <Typography>
-                      <strong>Forma de pago:</strong> {solicitudSeleccionada.reintegro.pago}
+                      <strong>Total:</strong> {detalle.reintegro.valorTotal}
                     </Typography>
                     <Typography>
-                      <strong>Total:</strong> {solicitudSeleccionada.reintegro.valorTotal}
+                      <strong>CBU:</strong> {detalle.reintegro.cbu}
                     </Typography>
                     <Typography>
-                      <strong>CBU:</strong> {solicitudSeleccionada.reintegro.cbu}
+                      <strong>Facturado A:</strong> {detalle.reintegro.facturadoA}
                     </Typography>
                     <Typography>
-                      <strong>Facturado A:</strong> {solicitudSeleccionada.reintegro.facturadoA}
+                      <strong>CUIT:</strong> {detalle.reintegro.cuit}
+                    </Typography>
+                  </>)
+                }
+
+                { detalle.tipo === "Receta" &&
+                  (<>
+                    <Typography>
+                      <strong>Medicamento:</strong> {detalle.receta?.medicamento}
                     </Typography>
                     <Typography>
-                      <strong>CUIT:</strong> {solicitudSeleccionada.reintegro.cuit}
+                      <strong>Cantidad:</strong> {detalle.receta?.cantidad}
+                    </Typography>
+                    <Typography>
+                      <strong>Presentación:</strong> {detalle.receta?.presentacion}
+                    </Typography>
+                  </>)
+                }
+
+                { detalle.tipo === "Autorizacion" &&
+                  (<>
+                    <Typography>
+                      <strong>Dias de internación:</strong> {detalle.autorizacion?.diasInternacion}
                     </Typography>
                   </>)
                 }
                 
                 <Typography>
-                  <strong>Estado:</strong> {solicitudSeleccionada.Estado}
+                  <strong>Estado:</strong> {detalle.estado}
                 </Typography>
                 <Typography>
-                  <strong>Motivo de ac/re/obs:</strong> {solicitudSeleccionada.Motivo || "-"}
+                  <strong>Motivo de ac/re/obs:</strong> {detalle.motivo || "-"}
                 </Typography>
               </Stack>
               <Divider sx={{ my: 2 }} />
-              {solicitudSeleccionada.tipo === "Receta" ? (
-                <>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Stack direction="column" alignItems="center">
-                      <Typography variant="h6">Medicamento</Typography>
-                      <Toolbar>{solicitudSeleccionada.receta?.medicamento || "—"}</Toolbar>
-                    </Stack>
-                    <Stack direction="column" alignItems="center">
-                      <Typography variant="h6">Cantidad</Typography>
-                      <Toolbar>{solicitudSeleccionada.receta?.cantidad || "—"}</Toolbar>
-                    </Stack>
-                  </Stack>
-                  <Stack width="100%" direction="column" alignItems="center">
-                    <Typography variant="h6">Presentación</Typography>
-                    <Toolbar>{solicitudSeleccionada.receta?.presentacion || "—"}</Toolbar>
-                  </Stack>
-                </>
-              ) : solicitudSeleccionada.tipo === "Autorizacion" ? (
-                <>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Stack direction="column" alignItems="center">
-                      <Typography variant="h6">Médico</Typography>
-                      <Toolbar>{solicitudSeleccionada.Medico}</Toolbar>
-                    </Stack>
-                    <Stack direction="column" alignItems="center">
-                      <Typography variant="h6">Especialidad</Typography>
-                      <Toolbar>{solicitudSeleccionada.Especialidad}</Toolbar>
-                    </Stack>
-                  </Stack>
-                  <Stack width="100%" direction="column" alignItems="center">
-                    <Typography variant="h6">Días de internación</Typography>
-                    <Toolbar>{solicitudSeleccionada.autorizacion?.diasInternacion || "—"}</Toolbar>
-                  </Stack>
-                </>
-              ) : (
-                <>
+              
+                
                   <Typography variant="h6">Observaciones</Typography>
                   <Box
                     sx={{
@@ -361,10 +369,8 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
                       color: "white",
                     }}
                   >
-                    {solicitudSeleccionada.Observaciones || "—"}
-                  </Box>
-                </>
-              )}
+                    {detalle.observaciones || "—"}
+                  </Box>  
             </>
           ) : (
             <Typography>No hay información para mostrar.</Typography>
@@ -377,9 +383,22 @@ export default function TablaPaginacion({ prestadorId, tipo, onSelectSolicitud, 
           </Box>
         </Paper>
       </Modal>
+
+      {/* SNACKBAR */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={5000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={tipoSnackbar} sx={{ width: "100%" }}>
+          {mensajeSnackbar}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
+
 
 
 
