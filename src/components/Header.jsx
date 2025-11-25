@@ -3,7 +3,7 @@ import { Box, Stack, Divider, AppBar, Toolbar, Typography } from "@mui/material"
 
 
 export function Header(props) {
-  console.log(props)
+
   return (
     <Toolbar 
       variant="dense"

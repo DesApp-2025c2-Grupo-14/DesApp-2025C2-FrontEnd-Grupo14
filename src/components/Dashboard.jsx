@@ -26,6 +26,7 @@ function PieCenterLabel({ children }) {
 
 export default function Dashboard({
   prestadorId,
+  centroMedico,
   tipo,
   cardHeight = 100,
   centerLabel = "Resumen",
@@ -33,8 +34,8 @@ export default function Dashboard({
   actualizar,
   rangoAplicado,
   sx = {},
+  
 }) {
-
   const [recarga, setRecarga] = React.useState(false)
 
   React.useEffect(() => {
@@ -45,7 +46,8 @@ export default function Dashboard({
     prestadorId,
     tipo,
     actualizar,
-    rangoAplicado
+    rangoAplicado,
+    centroMedico
   );
 
   // 🔄 Refetch cada 10 segundos

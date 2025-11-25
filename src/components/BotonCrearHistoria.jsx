@@ -1,37 +1,45 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { useState } from "react";
 
-export function BotonBajaSituacion({ onBorrado }) {
+export function BotonCrearHistoria({ onGuardar }) {
   const [abierto, setAbierto] = useState(false);
   // llamo a la funcion borrar pasada por props y cierro el dialogo
-  const handleBorrado = () => {
-    onBorrado();
+  const handleCrear = () => {
+    onGuardar();
     setAbierto(false); 
   };
 
   return (
     <>
-      <Button color="error" onClick={() => setAbierto(true)}>
-        Dar de baja
+      <Button sx={{
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              fontWeight: "bold",
+              textTransform: "none",
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#125a9c",
+              },
+            }}onClick={() => setAbierto(true)}>
+        Guardar
       </Button>
       <Dialog
         open={abierto}
         onClose={() => setAbierto(false)}
       >
-        <DialogTitle>Confirmar dar de baja</DialogTitle>
+        <DialogTitle>Confirmar Nota</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ¿Estás seguro de que querés dar de baja la situación terapéutica?
-            Esta acción no se puede deshacer.
+            ¿Estás seguro de que querés guardar esta nota?
+            Una vez guardada no se podra eliminar
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAbierto(false)}>
             Cancelar
           </Button>
-          {/* aca uso la funcion de borrado del padre*/}
-          <Button onClick={handleBorrado} color="error" variant="contained">
-            Dar de baja
+          <Button onClick={handleCrear} color="primary" variant="contained">
+            Crear
           </Button>
         </DialogActions>
       </Dialog>

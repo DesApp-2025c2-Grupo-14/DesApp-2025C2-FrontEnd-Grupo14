@@ -46,13 +46,11 @@ export function DetalleSolicitud(props) {
         console.error(err);
       }
     };
-    console.log("hola");
-    // fetchDetalle();
+
     fetchDetalle();
   }, [props.seleccion]);
   console.log("props.seleccion en Detalle:", props.seleccion);
 
-  console.log(detalle);
   return (
     <Stack
       direction="column"
@@ -60,7 +58,7 @@ export function DetalleSolicitud(props) {
       height="100%"
       alignItems="space-between"
     >
-      <Header seccion={props.solicitud} usuario="" />
+      <Header seccion={props.solicitud} usuario=""/>
       {detalle && detalle.tipo !== null ? (
         <Toolbar
           sx={{

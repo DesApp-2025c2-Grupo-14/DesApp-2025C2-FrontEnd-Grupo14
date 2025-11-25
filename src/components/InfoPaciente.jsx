@@ -2,6 +2,9 @@ import { useContext } from "react";
 import { DatosContext } from "../context/datos";
 import { Box, Typography, Stack, Button, Grid, TextField } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+dayjs.locale("es");
 
 export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
   const { datoSeleccionado } = useContext(DatosContext);
@@ -56,7 +59,7 @@ export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
               <TextField
                 label="Fecha Nacimiento"
                 fullWidth
-                value={datoSeleccionado.fechaNacimiento || ""}
+                value={dayjs(datoSeleccionado.fechaNacimiento).format("DD/MM/YYYY") || ""}
                 InputProps={{ readOnly: true }}
               />
             </Stack>

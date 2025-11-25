@@ -1,26 +1,48 @@
 import { useState, useEffect } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button, Snackbar, Alert } from "@mui/material";
-//import situacionesMock from "../data/situacionesTerapeuticas";
+//import situaciones from "../data/situacionesTerapeuticas";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { BotonBajaSituacion } from "./BotonBajaSituacion";
-import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
+//import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
+import FiltroFecha from "./filtroFechas.jsx";
+import { BotonCrearSituacion } from "./BotonCrearSituacion";
 import axios from "axios";
 
 dayjs.extend(utc);
 
 
 export function SituacionTerapeutica({ datoSeleccionado, onCerrarSituacion }) {
+  const [situaciones, setSituaciones] = useState([]);
   const [situacionSeleccionada, setSituacionSeleccionada] = useState();
   const [error, setError] = useState(null);
   const [crearSituacion,setCrearSituacion]=useState(false)
   const [nuevaFechaFinal, setNuevaFechaFinal] = useState("");
+  const [filtroFechas, setFiltroFechas] = useState({ desde: null, hasta: null });
+
 
   //snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
+ 
 
+const handleFiltro = async ({ desde, hasta }) => {
+  setFiltroFechas({ desde, hasta }); 
+
+  if (!datoSeleccionado?._id) return;
+
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`,
+      { params: { ...(desde && { desde }), ...(hasta && { hasta }) } }
+    );
+    setSituaciones(response.data.situaciones);
+  } catch {
+    setError("No se pudo filtrar las situaciones.");
+    setSituaciones([]);
+  }
+};
 useEffect(() => {
   if (situacionSeleccionada) {
     const fechaFinal = situacionSeleccionada.fechaFinal;
@@ -40,7 +62,10 @@ useEffect(() => {
     const fetchSituaciones = async () =>{
       setError(null)
       try{
-        const response = await axios.get(`http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`);
+        const response = await axios.get(
+      `http://localhost:3000/pacientes/${datoSeleccionado._id}/situacionesTerapeuticas`,
+      { params: { ...(filtroFechas.desde && { desde: filtroFechas.desde }),
+                  ...(filtroFechas.hasta && { hasta: filtroFechas.hasta }) } });
         setSituaciones(response.data.situaciones);
       }catch(err){
       setError("Error al cargar las situaciones terapéuticas.");
@@ -131,10 +156,12 @@ useEffect(() => {
         <Typography variant="h4" sx={{ textAlign: "center", color: "#1976d2"  }} marginTop={2}>
           Situaciones Terapeuticas
         </Typography>
-        <Stack direction="row" justifyContent="space-between" px={2}>
+        <Box
+          mb={2}
+          sx={{display: "flex",justifyContent: "space-between",alignItems: "center",backgroundColor: "white",padding: "6px 10px",borderRadius: 1,}}>
           <Button variant="outlined" onClick={onCerrarSituacion}>Volver</Button>
-          {/* <Button variant="outlined" onClick={restaurarSituaciones}>Restaurar datos</Button> */}
-        </Stack>
+          <FiltroFecha onChange={handleFiltro} />
+        </Box>
       </Box>
         <Stack
           spacing={2}
@@ -193,22 +220,8 @@ useEffect(() => {
           )}
         </Stack>
           <Box width="100%" mx="auto" mt="auto" sx={{ display: "flex", justifyContent: "center" }}>
-            <Button 
-              onClick={() => setCrearSituacion(true)} 
-              variant="contained"
-            >
-              Crear Situación
-            </Button>
+              <BotonCrearSituacion onGuardar={agregarSituacion} />
           </Box>
-        <Dialog
-          open={!!crearSituacion}
-          onClose={() => setCrearSituacion(null)}
-        >
-          <FormularioSituacionTerapeutica
-            onGuardar={agregarSituacion}
-            onCancelar={() => setCrearSituacion(false)}
-          />
-        </Dialog>
       {situacionSeleccionada && (
         <Dialog
           open={true}
@@ -261,7 +274,6 @@ useEffect(() => {
             </Box>
           </DialogContent>
           <DialogActions>
-            {/* boton actualizado que solo ejecuta borrarsituacion */}
             <BotonBajaSituacion onBorrado={borrarSituacion} />
 
             {/* aca se bloquea el boton hasta ingresar fecha */}
@@ -281,7 +293,7 @@ useEffect(() => {
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity={tipoSnackbar}
-          sx={{ width: "100%" }}
+          sx={{ width: "99%" }}
         >
           {mensajeSnackbar}
         </Alert>
