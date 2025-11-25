@@ -65,8 +65,8 @@ export  function CalendarioGrande(props) {
 
   // Al presionar "Crear"
   const handleCrear = (data) => {
-    setOpenDialog(true);
     setSelectedturno(data);
+    setOpenDialog(true);
     setAnchorEl(null);
   };
 
@@ -83,9 +83,9 @@ export  function CalendarioGrande(props) {
 
   const agregarNota= async (nuevaHistoria)=>{
     if (!selectedturno) {
-    console.error("No hay turno seleccionado");
-    return;
-  }
+      console.error("No hay turno seleccionado");
+      return;
+    }
     try{
       const datos ={
         ...nuevaHistoria,
@@ -188,7 +188,13 @@ export  function CalendarioGrande(props) {
        fullWidth
        sx= {{width :"100vw", backgroundColor:"transparent"}}
        >
-        <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave} prestador={props.prestador} />
+        {selectedturno && (
+    <FormularioCrearHistoria
+      onGuardar={agregarNota}
+      cerrar={handleSave}
+      prestador={selectedturno.prestadorId}
+    />
+  )}
       </Dialog>
       <Snackbar
               open={openSnackbar}
