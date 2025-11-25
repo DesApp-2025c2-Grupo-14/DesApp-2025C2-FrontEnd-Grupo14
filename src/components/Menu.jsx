@@ -17,6 +17,8 @@ export function Menu(props) {
       width='100%'
       spacing= 'auto'
       alignItems='center'
+  
+      
       
 
 
