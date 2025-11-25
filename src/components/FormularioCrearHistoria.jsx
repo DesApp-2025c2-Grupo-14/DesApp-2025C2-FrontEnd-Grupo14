@@ -13,7 +13,7 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar, prestador 
   
   const handleSubmit = () => {
     // acumulador de errores
-    console.log("Prestador recibido en el formulario:", prestador);
+    console.log("Prestador recibido en el formulario:", prestador.nombre);
     const nuevosErrores = {};
     // validaciones
     if (!titulo.trim()) nuevosErrores.titulo = "El título es obligatorio";
@@ -23,7 +23,7 @@ export default function FormularioCrearHistoria({ onGuardar , cerrar, prestador 
     if (Object.keys(nuevosErrores).length > 0) return;
     const nuevaHistoria ={
       titulo,
-      prestadorId: prestador._id,
+      prestadorId: prestador,
       prestador: prestador.nombre,
       notas :nota ,
     }
