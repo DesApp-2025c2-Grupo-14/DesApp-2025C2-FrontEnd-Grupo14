@@ -10,6 +10,7 @@ export function Inbox(props) {
   const handleSeleccion = (tipo, id) => {
     setSeleccion({ tipo, id });
   };
+  console.log("seleccion en Inbox:", seleccion);
   return (
     <Stack width="100%" height="100vh">
       <Header seccion={props.seccion} usuario={props.prestador.nombre} />

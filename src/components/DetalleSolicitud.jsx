@@ -22,7 +22,11 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 async function getDetalle(tipo, id) {
-  const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`);
+  const response = await axios.get(
+    `${BACKEND_URL}/solicitudes/detalle/${tipo}/${id}`
+  );
+  console.log("backend response");
+  console.log(response);
   return Promise.resolve(response.data);
 }
 
@@ -45,6 +49,7 @@ export function DetalleSolicitud(props) {
 
     fetchDetalle();
   }, [props.seleccion]);
+  console.log("props.seleccion en Detalle:", props.seleccion);
 
   return (
     <Stack
