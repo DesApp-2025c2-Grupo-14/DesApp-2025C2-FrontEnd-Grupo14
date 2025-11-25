@@ -68,7 +68,7 @@ console.log("prestador.id:", prestador?.id); */
         </Typography>
     <Stack direction="row" justifyContent="space-between" px={2}>
       {dato ?
-        (<Button variant="outlined" onClick={() => navigate(`/calendario`)}>Volver</Button>):        
+        (<Button variant="outlined" onClick={() => navigate(-1)}>Volver</Button>):        
         (<Button variant="outlined" onClick={onCerrarHistoria}>Volver</Button>)
       }
     </Stack>
