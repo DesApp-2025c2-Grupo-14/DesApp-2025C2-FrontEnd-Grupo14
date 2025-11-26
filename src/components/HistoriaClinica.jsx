@@ -132,15 +132,21 @@ console.log("prestador.id:", prestador?.id); */
                     mb: 2
                   }}
                 >
-                  <Typography variant="h5" fontWeight="bold" >
-                    {historia.titulo}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    Notas: {historia.notas}
-                  </Typography>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  {historia.titulo}
+                </Typography>
+
+                <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
+                  Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
+                </Typography>
+
+                <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
+                  Prestador: {historia.prestador}
+                </Typography>
+
+                <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
+                  Notas: {historia.notas}
+                </Typography>
                 </Paper>
               ))}
             </Stack>

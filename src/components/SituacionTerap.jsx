@@ -201,19 +201,22 @@ useEffect(() => {
                     mb: 3
                   }}
                 >
-                  <Typography variant="h5" fontWeight="bold" >
+                  <Typography variant="h5" sx={{ fontSize: "1.6rem", fontWeight: "bold" }} gutterBottom>
                     {situacion.titulo}
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
-                    {/* .utc para evitar desfaces de zona horaria y que muestre correctamente la fecha*/}
+
+                  <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
                     Fecha Inicio: {dayjs(situacion.fechaInicio).utc().format("DD/MM/YYYY")}
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
+
+                  <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
                     Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).utc().format("DD/MM/YYYY") : "No asignada"}
                   </Typography>
-                  <Typography variant="body1" color="text.primary" >
+
+                  <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
                     Descripción: {situacion.descripcion}
                   </Typography>
+
                 </Paper>
               ))}
             </Stack>
