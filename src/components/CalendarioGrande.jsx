@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, Snackbar, Alert} from "@mui/material";
+import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, Snackbar, Alert, Select, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from "react-router-dom";
 import FormularioCrearHistoria from "./FormularioCrearHistoria";
@@ -16,30 +16,36 @@ const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 
 export  function CalendarioGrande(props) {
   const [turnosHoy,setTurnosHoy] = useState([])
+  const especialidadesDisponibles = [
+  ...new Set(props.turnos.map(t => t.especialidad))
+];
   
   //snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
+
+  //para filtrar por especialidad
+  const [especialidadBuscada, setespecialidadBuscada] = useState(null);
     
   useEffect(() => {
-  const fechaBase = dayjs(props.fechaSeleccionada);
-  
-  const diaDeSemana = fechaBase.day();
-  const inicioSemana =
+    const fechaBase = dayjs(props.fechaSeleccionada);
+    const diaDeSemana = fechaBase.day();
+    const inicioSemana =
     diaDeSemana === 0
       ? fechaBase.subtract(6, "day").startOf("day") // si es domingo, ir al lunes anterior
       : fechaBase.startOf("day").subtract(diaDeSemana - 1, "day"); // retrocede hasta lunes
   
-  const finSemana = inicioSemana.add(5, "day").endOf("day"); // sábado al final del día
+    const finSemana = inicioSemana.add(5, "day").endOf("day"); // sábado al final del día
 
-  const turnosFiltrados = props.turnos.filter((t) => {
-    const fechaTurno = dayjs(t.fechaHora);
-    return fechaTurno.isAfter(inicioSemana) && fechaTurno.isBefore(finSemana);
-  });
-
-  setTurnosHoy(turnosFiltrados);
-}, [props.fechaSeleccionada, props.turnos]);
+    const turnosFiltrados = props.turnos.filter((t) => {
+      const fechaTurno = dayjs(t.fechaHora);
+      const cumpleSemana = fechaTurno.isAfter(inicioSemana) && fechaTurno.isBefore(finSemana);
+      const cumpleEspecialidad= !especialidadBuscada || t.especialidad === especialidadBuscada;
+      return cumpleSemana && cumpleEspecialidad
+    });
+    setTurnosHoy(turnosFiltrados);
+  }, [props.fechaSeleccionada, props.turnos, especialidadBuscada]);
  
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState([]);
@@ -74,11 +80,6 @@ export  function CalendarioGrande(props) {
   const handleSave = () => {
     setOpenDialog(false);
     setSelectedturno(null);
-  };
-  //Al presionar "Cancelar" en el formulario
-  const handleCancel = () => {
-    setOpenDialog(false);
-    setAnchorEl(null);
   };
 
   const agregarNota= async (nuevaHistoria)=>{
@@ -115,7 +116,37 @@ export  function CalendarioGrande(props) {
           </Grid>
         ))}
       </Grid>
-
+      <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            mb: 1,
+            gap: 2,
+          }}
+        >
+          <Select
+            value={especialidadBuscada || ""}
+            sx={{
+              ".MuiOutlinedInput-notchedOutline": { border: "none" },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              minWidth: 140,
+              bgcolor: "white",
+              borderRadius: 2,
+            }}
+            onChange={(e) => setespecialidadBuscada(e.target.value===""? null : e.target.value)}
+          >
+            <MenuItem value="">
+              Todas las especialidades
+            </MenuItem>
+            {especialidadesDisponibles.map((esp)=>(
+              <MenuItem key={esp} value={esp} onClick={() =>setespecialidadBuscada()}>
+                {esp}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
       {/* Filas por hora */}
       {hours.map((hora) => (
         <Grid container key={hora} sx={{ borderTop: "2px solid #ddd" }}>
