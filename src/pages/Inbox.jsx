@@ -20,7 +20,7 @@ export function Inbox(props) {
         width="100%"
         height="100%"
       >
-        <Listado onSeleccionar={handleSeleccion} />
+        <Listado onSeleccionar={handleSeleccion} prestador={props.prestador} />
         <DetalleSolicitud seleccion={seleccion} solicitud="" tipo={null} />
       </Stack>
     </Stack>

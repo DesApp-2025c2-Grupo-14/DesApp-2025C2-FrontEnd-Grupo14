@@ -25,6 +25,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { es } from "date-fns/locale";
 import DescriptionIcon from "@mui/icons-material/Description";
 
+
 const BACKEND_URL = "http://localhost:3000";
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -76,7 +77,7 @@ export function Listado(props) {
   const [value, setValue] = React.useState(0);
   const [solicitudes, setSolicitudes] = React.useState([]);
   const [selectedId, setSelectedId] = React.useState(null);
-  const [prestadorActual, setPrestadorActual] = React.useState(null);
+ 
 
   //snackbar
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
@@ -99,15 +100,6 @@ export function Listado(props) {
     setRangoAplicado([...rangoPersonalizado]);
   };
 
-  //  Prestador actual 
-  React.useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/solicitudes/prestador`)
-      .then(({ data }) => setPrestadorActual(data.id))
-      .catch((error) => console.error("Error al obtener prestadorId:", error));
-  }, []);
-
-  // Cada vez que cambia la solapa o el rango de fechas, traemos desde el backend lo que corresponde
   React.useEffect(() => {
     const fetchData = async () => {
       const tipo = getTipoFromTabIndex(value); 
@@ -121,7 +113,7 @@ export function Listado(props) {
 
   const handleAnalizar = async (id) => {
     try {
-      const prestadorId = prestadorActual;
+      const prestadorId = props.prestador?._id;
       await axios.patch(`${BACKEND_URL}/solicitudes/${id}`, {
         prestadorId: prestadorId,
         estado: "En analisis",
@@ -139,6 +131,7 @@ export function Listado(props) {
       setTipoSnackbar("success");
       setMensajeSnackbar("Solicitud pasada a 'En análisis' correctamente.");
       setOpenSnackbar(true);
+      console.log("PRESTADORQUEANALIZA:", prestadorId)
     } catch (error) {
       console.error("Error al analizar solicitud:", error);
 
@@ -153,7 +146,7 @@ export function Listado(props) {
     setValue(newValue);
   };
 
- 
+
   const renderSolicitudes = () =>
     solicitudes.map((s) => (
       <BasicCard
