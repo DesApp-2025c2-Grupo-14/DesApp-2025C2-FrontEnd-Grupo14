@@ -50,7 +50,8 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
   const [mensajeSnackbar, setMensajeSnackbar] = React.useState("");
   const [tipoSnackbar, setTipoSnackbar] = React.useState("success");
   const [detalle, setDetalle] = React.useState(null);
-  const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(
+  const [formError, setFormError] = useState({});
+  const { solicitudes, loading, error, setError, refetch } = useSolicitudesPrestador(
     prestadorId,
     tipo,
     rangoAplicado,
@@ -77,38 +78,46 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
   const handleOpen = (id, estado) => {
     setSolicitudId(id);
     setNuevoEstado(estado);
+    setFormError({});
     setOpen(true);
   };
 
   const handleClose = () => {
     setMotivo("");
     setOpen(false);
+    setFormError({});
   };
 
   const handleConfirm = async () => {
-    try {
-      await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
-        estado: nuevoEstado,
-        motivo,
-        prestadorId,
-      });
+      const nuevoError = {};
+      if (!motivo.trim()) nuevoError.motivo = "El motivo es obligatorio";
 
-      setMensajeSnackbar("Solicitud actualizada correctamente");
-      setTipoSnackbar("success");
-      setOpenSnackbar(true);
+      setFormError(nuevoError);
+      if (Object.keys(nuevoError).length > 0 && nuevoEstado != "Aprobada" ) return;
 
-      await refetch();
-      onUpdate?.();
-    } catch (err) {
-      console.error("Error al actualizar estado:", err);
-      setMensajeSnackbar("La solicitud no se pudo actualizar");
-      setTipoSnackbar("error");
-      setOpenSnackbar(true);
-    } finally {
-      handleClose();
-    }
-  };
-  const solicitudesFiltradas = React.useMemo(() => {
+      try {
+        await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
+          estado: nuevoEstado,
+          motivo,
+          prestadorId,
+        });
+
+        setMensajeSnackbar("Solicitud actualizada correctamente");
+        setTipoSnackbar("success");
+        setOpenSnackbar(true);
+
+        await refetch();
+        onUpdate?.();
+      } catch (err) {
+        console.error("Error al actualizar estado:", err);
+        setMensajeSnackbar("La solicitud no se pudo actualizar");
+        setTipoSnackbar("error");
+        setOpenSnackbar(true);
+      } finally {
+        handleClose();
+      }
+    };
+      const solicitudesFiltradas = React.useMemo(() => {
     if (!tipo) return solicitudes;
     return solicitudes.filter((s) => s.tipo?.toLowerCase() === tipo.toLowerCase());
   }, [solicitudes, tipo]);
@@ -194,6 +203,12 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
                 fullWidth
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
+                error={
+                  ["Rechazada", "Observada"].includes(nuevoEstado) && !!formError.motivo
+                }
+                helperText={
+                  ["Rechazada", "Observada"].includes(nuevoEstado) ? formError.motivo : ""
+                }
               />
             </DialogContent>
             <DialogActions>
