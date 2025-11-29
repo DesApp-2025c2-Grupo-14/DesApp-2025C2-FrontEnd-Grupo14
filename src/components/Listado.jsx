@@ -137,7 +137,7 @@ export function Listado(props) {
 
       // Mostrar snackbar de error
       setTipoSnackbar("error");
-      setMensajeSnackbar("Error al analizar la solicitud.");
+      setMensajeSnackbar(error.response.data.mensaje);
       setOpenSnackbar(true);
     }
   };
