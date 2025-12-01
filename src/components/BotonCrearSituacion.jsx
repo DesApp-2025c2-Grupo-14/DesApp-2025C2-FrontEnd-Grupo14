@@ -1,32 +1,37 @@
-import { useState,useEffect } from "react";
-import { Box, Typography, Paper, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button, } from "@mui/material";
-//import situacionesData from "../data/situacionesTerapeuticas";
-import { IconButton } from "@mui/material";
-export function BotonCrearSituacion(setCrearSituacion) {
-/*   const [items, setItems] = useState([]);
+import { useState } from "react";
+import { Button, Dialog } from "@mui/material";
+import FormularioSituacionTerapeutica from "./FormularioCrearSituacion";
 
-  // Al montar el componente, leemos los datos desde localStorage
-  useEffect(() => {
-    const storedItems = localStorage.getItem("situaciones");
-    if (storedItems) {
-      // Si ya hay datos guardados, los usamos
-      setItems(JSON.parse(storedItems));
-    } else {
-      // Si no hay nada, usamos el mock inicial
-      setItems(situacionesData);
-      localStorage.setItem("situaciones", JSON.stringify(situacionesData));
-    }
-  }, []); */
+// aca delego lo que anteriormente estaba en SituacionTerap
+export function BotonCrearSituacion({ onGuardar }) {
+  const [abierto, setAbierto] = useState(false);
+
+  const handleGuardar = (nuevaSituacion) => {
+    onGuardar(nuevaSituacion); 
+    setAbierto(false); 
+  };
 
   return (
-    <Box>
+    <>
       <Button
         variant="contained"
         sx={{ borderRadius: 3, px: 3 }}
-        onClick={setCrearSituacion}
+        onClick={() => setAbierto(true)}
       >
-        <Typography>Crear situación</Typography>
+        Crear Situación
       </Button>
-    </Box>
-  )
+      <Dialog
+        open={abierto}
+        onClose={() => setAbierto(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{sx: {backgroundColor: "transparent", boxShadow: "none"}}} // para que el dialogo no tenga fondo blanco ni sombra
+      >
+        <FormularioSituacionTerapeutica
+          onGuardar={handleGuardar}
+          onCancelar={() => setAbierto(false)}
+        />
+      </Dialog>
+    </>
+  );
 }

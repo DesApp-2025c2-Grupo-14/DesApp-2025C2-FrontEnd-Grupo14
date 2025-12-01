@@ -29,7 +29,7 @@ import dayjs from "dayjs";
 const BACKEND_URL = 'http://localhost:3000'
 
 async function getDetalle(tipo, id) {
-  const response = await axios.get(`${BACKEND_URL}/solicitudes/${tipo}/${id}`);
+  const response = await axios.get(`${BACKEND_URL}/solicitudes/detalle/${tipo}/${id}`);
   return Promise.resolve(response.data);
 }
 
@@ -84,6 +84,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
 
   const handleClose = () => {
     setMotivo("");
+    setErrorMotivo(null)
     setOpen(false);
     setFormError({});
   };

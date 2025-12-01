@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField} from "@mui/material";
+import { Box, Grid,  Stack, Typography, Button, Menu, MenuItem, Dialog, Snackbar, Alert, Select, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from "react-router-dom";
 import FormularioCrearHistoria from "./FormularioCrearHistoria";
@@ -16,25 +16,36 @@ const hours = Array.from({ length: 11 }, (_, i) => 7 + i); // de 7hs a 17hs
 
 export  function CalendarioGrande(props) {
   const [turnosHoy,setTurnosHoy] = useState([])
+  const especialidadesDisponibles = [
+  ...new Set(props.turnos.map(t => t.especialidad))
+];
   
+  //snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [mensajeSnackbar, setMensajeSnackbar] = useState("");
+  const [tipoSnackbar, setTipoSnackbar] = useState("success");
+
+  //para filtrar por especialidad
+  const [especialidadBuscada, setespecialidadBuscada] = useState(null);
+    
   useEffect(() => {
-  const fechaBase = dayjs(props.fechaSeleccionada);
-  
-  const diaDeSemana = fechaBase.day();
-  const inicioSemana =
+    const fechaBase = dayjs(props.fechaSeleccionada);
+    const diaDeSemana = fechaBase.day();
+    const inicioSemana =
     diaDeSemana === 0
       ? fechaBase.subtract(6, "day").startOf("day") // si es domingo, ir al lunes anterior
       : fechaBase.startOf("day").subtract(diaDeSemana - 1, "day"); // retrocede hasta lunes
   
-  const finSemana = inicioSemana.add(5, "day").endOf("day"); // sábado al final del día
+    const finSemana = inicioSemana.add(5, "day").endOf("day"); // sábado al final del día
 
-  const turnosFiltrados = props.turnos.filter((t) => {
-    const fechaTurno = dayjs(t.fechaHora);
-    return fechaTurno.isAfter(inicioSemana) && fechaTurno.isBefore(finSemana);
-  });
-
-  setTurnosHoy(turnosFiltrados);
-}, [props.fechaSeleccionada, props.turnos]);
+    const turnosFiltrados = props.turnos.filter((t) => {
+      const fechaTurno = dayjs(t.fechaHora);
+      const cumpleSemana = fechaTurno.isAfter(inicioSemana) && fechaTurno.isBefore(finSemana);
+      const cumpleEspecialidad= !especialidadBuscada || t.especialidad === especialidadBuscada;
+      return cumpleSemana && cumpleEspecialidad
+    });
+    setTurnosHoy(turnosFiltrados);
+  }, [props.fechaSeleccionada, props.turnos, especialidadBuscada]);
  
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedturno, setSelectedturno] = useState([]);
@@ -60,8 +71,8 @@ export  function CalendarioGrande(props) {
 
   // Al presionar "Crear"
   const handleCrear = (data) => {
-    setOpenDialog(true);
     setSelectedturno(data);
+    setOpenDialog(true);
     setAnchorEl(null);
   };
 
@@ -70,17 +81,12 @@ export  function CalendarioGrande(props) {
     setOpenDialog(false);
     setSelectedturno(null);
   };
-  //Al presionar "Cancelar" en el formulario
-  const handleCancel = () => {
-    setOpenDialog(false);
-    setAnchorEl(null);
-  };
 
   const agregarNota= async (nuevaHistoria)=>{
     if (!selectedturno) {
-    console.error("No hay turno seleccionado");
-    return;
-  }
+      console.error("No hay turno seleccionado");
+      return;
+    }
     try{
       const datos ={
         ...nuevaHistoria,
@@ -88,8 +94,15 @@ export  function CalendarioGrande(props) {
       }
       // post de situaciones usando id para crear
       await axios.post(`http://localhost:3000/pacientes/${selectedturno.pacienteId._id}/crearHistoria`, datos)
+      // Snackbar confirmacion
+      setMensajeSnackbar("Nota creada con éxito");
+      setTipoSnackbar("success");
+      setOpenSnackbar(true);
     }catch(error){
     console.error("Error al crear la nueva situacion:", error);
+    setMensajeSnackbar("No se pudo crear la nota.");
+    setTipoSnackbar("error");
+    setOpenSnackbar(true);
     }
   }
     
@@ -103,7 +116,37 @@ export  function CalendarioGrande(props) {
           </Grid>
         ))}
       </Grid>
-
+      <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            mb: 1,
+            gap: 2,
+          }}
+        >
+          <Select
+            value={especialidadBuscada || ""}
+            sx={{
+              ".MuiOutlinedInput-notchedOutline": { border: "none" },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+              minWidth: 140,
+              bgcolor: "white",
+              borderRadius: 2,
+            }}
+            onChange={(e) => setespecialidadBuscada(e.target.value===""? null : e.target.value)}
+          >
+            <MenuItem value="">
+              Todas las especialidades
+            </MenuItem>
+            {especialidadesDisponibles.map((esp)=>(
+              <MenuItem key={esp} value={esp} onClick={() =>setespecialidadBuscada()}>
+                {esp}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
       {/* Filas por hora */}
       {hours.map((hora) => (
         <Grid container key={hora} sx={{ borderTop: "2px solid #ddd" }}>
@@ -176,8 +219,29 @@ export  function CalendarioGrande(props) {
        fullWidth
        sx= {{width :"100vw", backgroundColor:"transparent"}}
        >
-        <FormularioCrearHistoria onGuardar = {agregarNota} cerrar = {handleSave}/>
+        {selectedturno && (
+    <FormularioCrearHistoria
+      onGuardar={agregarNota}
+      cerrar={handleSave}
+      prestador={selectedturno.prestadorId}
+    />
+  )}
       </Dialog>
+      <Snackbar
+              open={openSnackbar}
+              autoHideDuration={3000}
+              onClose={() => setOpenSnackbar(false)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity={tipoSnackbar}
+                sx={{
+                 width: "100%", backgroundColor:"yellowgreen"   }}
+              >
+                {mensajeSnackbar}
+              </Alert>
+            </Snackbar>
     </Box>
   );
 }
