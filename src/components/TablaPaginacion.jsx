@@ -50,8 +50,8 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
   const [mensajeSnackbar, setMensajeSnackbar] = React.useState("");
   const [tipoSnackbar, setTipoSnackbar] = React.useState("success");
   const [detalle, setDetalle] = React.useState(null);
-  const [errorMotivo, setErrorMotivo] = React.useState(null);
-  const { solicitudes, loading, error, refetch } = useSolicitudesPrestador(
+  const [formError, setFormError] = useState({});
+  const { solicitudes, loading, error, setError, refetch } = useSolicitudesPrestador(
     prestadorId,
     tipo,
     rangoAplicado,
@@ -79,6 +79,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
   const handleOpen = (id, estado) => {
     setSolicitudId(id);
     setNuevoEstado(estado);
+    setFormError({});
     setOpen(true);
   };
 
@@ -86,37 +87,39 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
     setMotivo("");
     setErrorMotivo(null)
     setOpen(false);
+    setFormError({});
   };
 
   const handleConfirm = async () => {
-    let errorTexto = null
-    if (!motivo.trim()) errorTexto = "El motivo es obligatorio"
-    setErrorMotivo(errorTexto);
+      const nuevoError = {};
+      if (!motivo.trim()) nuevoError.motivo = "El motivo es obligatorio";
 
-    if(errorTexto && nuevoEstado !== "Aprobada") return
-    try {
-      await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
-        estado: nuevoEstado,
-        motivo,
-        prestadorId,
-      });
+      setFormError(nuevoError);
+      if (Object.keys(nuevoError).length > 0 && nuevoEstado != "Aprobada" ) return;
 
-      setMensajeSnackbar("Solicitud actualizada correctamente");
-      setTipoSnackbar("success");
-      setOpenSnackbar(true);
+      try {
+        await axios.patch(`${BACKEND_URL}/solicitudes/${solicitudId}`, {
+          estado: nuevoEstado,
+          motivo,
+          prestadorId,
+        });
 
-      await refetch();
-      onUpdate?.();
-    } catch (err) {
-      console.error("Error al actualizar estado:", err);
-      setMensajeSnackbar(err.response.data.mensaje);
-      setTipoSnackbar("error");
-      setOpenSnackbar(true);
-    } finally {
-      handleClose();
-    }
-  };
-  const solicitudesFiltradas = React.useMemo(() => {
+        setMensajeSnackbar("Solicitud actualizada correctamente");
+        setTipoSnackbar("success");
+        setOpenSnackbar(true);
+
+        await refetch();
+        onUpdate?.();
+      } catch (err) {
+        console.error("Error al actualizar estado:", err);
+        setMensajeSnackbar("La solicitud no se pudo actualizar");
+        setTipoSnackbar("error");
+        setOpenSnackbar(true);
+      } finally {
+        handleClose();
+      }
+    };
+      const solicitudesFiltradas = React.useMemo(() => {
     if (!tipo) return solicitudes;
     return solicitudes.filter((s) => s.tipo?.toLowerCase() === tipo.toLowerCase());
   }, [solicitudes, tipo]);
@@ -190,30 +193,26 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
 
           {/* MODAL DE CAMBIO */}
           <Dialog open={open} onClose={handleClose}>
-            {nuevoEstado === "Aprobada" ? (
-              <DialogTitle>¿Desea aprobar la solicitud?</DialogTitle>
-            ) : (
-              <DialogTitle>
-                Indique el motivo de {nuevoEstado === "Rechazada" ? "rechazo" : "observación"}
-              </DialogTitle>
-            )}
-
-            {nuevoEstado !== "Aprobada" && (
-              <DialogContent>
-                <TextField
-                  required
-                  autoFocus
-                  margin="dense"
-                  label="Motivo"
-                  type="text"
-                  fullWidth
-                  error={!!errorMotivo}
-                  helperText={errorMotivo}
-                  value={motivo}
-                  onChange={(e) => setMotivo(e.target.value)}
-                />
-              </DialogContent>
-            )}
+            <DialogTitle>
+              Indique el motivo para {nuevoEstado}
+            </DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Motivo"
+                type="text"
+                fullWidth
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+                error={
+                  ["Rechazada", "Observada"].includes(nuevoEstado) && !!formError.motivo
+                }
+                helperText={
+                  ["Rechazada", "Observada"].includes(nuevoEstado) ? formError.motivo : ""
+                }
+              />
+            </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancelar</Button>
               <Button onClick={handleConfirm} variant="contained" color="primary">
