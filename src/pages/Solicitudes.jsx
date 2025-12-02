@@ -8,10 +8,13 @@ import TabPanel from "@mui/lab/TabPanel";
 import * as React from "react";
 import TabDash from "../components/TabDash";
 import axios from "axios";
-
+import dayjs from "dayjs"
 export function Solicitudes(props) {
   const [value, setValue] = React.useState("1");
   const [prestadorId, setPrestadorId] = React.useState(null);
+  const [filtro, setFiltro] = React.useState(1);
+  const [rangoAplicado, setRangoAplicado] = React.useState([dayjs().startOf('day').toDate(), dayjs().endOf('day').toDate()]);
+  const [rangoPersonalizado, setRangoPersonalizado] = React.useState([null, null]);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -58,6 +61,12 @@ export function Solicitudes(props) {
                 prestadorId={props.prestador._id}
                 centroMedico={props.prestador.centroMedico}
                 tipo="Reintegro"
+                filtro={filtro}
+                rango={rangoAplicado}
+                rangoPersonalizado={rangoPersonalizado}
+                onChangeFiltro={setFiltro}
+                onChangeRango={setRangoAplicado}
+                onChangeRangoPersonalizado={setRangoPersonalizado}
               />
             </TabPanel>
 
@@ -72,6 +81,12 @@ export function Solicitudes(props) {
                 prestadorId={props.prestador._id}
                 centroMedico={props.prestador.centroMedico}
                 tipo="Autorizacion"
+                filtro={filtro}
+                rango={rangoAplicado}
+                rangoPersonalizado={rangoPersonalizado}
+                onChangeFiltro={setFiltro}
+                onChangeRango={setRangoAplicado}
+                onChangeRangoPersonalizado={setRangoPersonalizado}
               />
             </TabPanel>
 
@@ -86,6 +101,12 @@ export function Solicitudes(props) {
                 prestadorId={props.prestador._id}
                 centroMedico={props.prestador.centroMedico}
                 tipo="Receta"
+                filtro={filtro}
+                rango={rangoAplicado}
+                rangoPersonalizado={rangoPersonalizado}
+                onChangeFiltro={setFiltro}
+                onChangeRango={setRangoAplicado}
+                onChangeRangoPersonalizado={setRangoPersonalizado}
               />
             </TabPanel>
           </TabContext>

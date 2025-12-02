@@ -57,6 +57,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
     rangoAplicado,
     centroMedico
   );
+  console.log(rangoAplicado)
 
   React.useEffect(() => {
       if (!solicitudSeleccionada) {
