@@ -1,47 +1,34 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Box, Typography, Paper, Button, ButtonGroup } from "@mui/material";
+import { Box, Typography, Paper, Button, ButtonGroup, List, ListItemText, Divider } from "@mui/material";
 import axios from "axios";
 import { PrestadorContext } from "../context/PrestadorContext";
 
 export function Inicio({ prestador }) {
     const [esCentroMedico, setEsCentroMedico] = useState(false);
     const [prestadoresCentro, setPrestadoresCentro] = useState([]);
-    const [prestadorSeleccionado, setPrestadorSeleccionado] = useState(null);
 
-    // ⬇️ Importante: Guardamos globalmente el prestador elegido
+    const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState(null);
+
     const { setPrestadorCentroSeleccionado } = useContext(PrestadorContext);
 
     useEffect(() => {
         if (!prestador) return;
 
-        const esCM = !prestador.especialidad; 
+        const esCM = !prestador.especialidad;
         setEsCentroMedico(esCM);
 
-        if (esCM) {
-            fetchPrestadoresCentro(prestador._id);
-        }
+        if (esCM) fetchPrestadoresCentro(prestador._id);
     }, [prestador]);
 
     const fetchPrestadoresCentro = async (idCentro) => {
         try {
-            const res = await axios.get(`http://localhost:3000/centroMedico/${idCentro}/prestadores`);
+            const res = await axios.get(`http://localhost:3000/prestadores/centroMedico/${idCentro}/prestadores`);
             setPrestadoresCentro(res.data.prestadores || []);
         } catch (error) {
             console.error("Error cargando prestadores del centro:", error);
         }
     };
-
-    // ⬇️ Cuando seleccionan uno
-    const seleccionarPrestador = (p) => {
-        setPrestadorSeleccionado(p);
-        setPrestadorCentroSeleccionado(p); // guardado global
-    };
-
-    // ⬇️ Cuando vuelven atrás
-    const volver = () => {
-        setPrestadorSeleccionado(null);
-        setPrestadorCentroSeleccionado(null);
-    };
+    const especialidadesUnicas = [...new Set(prestadoresCentro.map(p => p.especialidad))];
 
     if (!prestador) return null;
 
@@ -66,36 +53,46 @@ export function Inicio({ prestador }) {
 
                 {esCentroMedico && (
                     <>
-                        {!prestadorSeleccionado && (
-                            <>
-                                <Typography variant="h6" mt={2}>
-                                    Seleccioná una especialidad
-                                </Typography>
+                        {/* Botones de especialidades */}
+                        <Typography variant="h6" mt={3}>
+                            Seleccioná una especialidad
+                        </Typography>
 
-                                <ButtonGroup sx={{ mt: 2 }} variant="contained" disableElevation>
-                                    {prestadoresCentro.map((p) => (
-                                        <Button key={p._id} onClick={() => seleccionarPrestador(p)}>
-                                            {p.especialidad}
-                                        </Button>
-                                    ))}
-                                </ButtonGroup>
-                            </>
-                        )}
-
-                        {prestadorSeleccionado && (
-                            <>
-                                <Typography variant="h6" mt={3} fontWeight="bold">
-                                    {prestadorSeleccionado.nombre}
-                                </Typography>
-
-                                <Typography variant="h6" mt={1}>
-                                    Especialidad: <strong>{prestadorSeleccionado.especialidad}</strong>
-                                </Typography>
-
-                                <Button variant="outlined" sx={{ mt: 3 }} onClick={volver}>
-                                    Volver
+                        <ButtonGroup variant="contained" sx={{ mt: 2 }} disableElevation>
+                            {especialidadesUnicas.map((esp, i) => (
+                                <Button
+                                    key={i}
+                                    onClick={() =>
+                                        setEspecialidadSeleccionada(esp === especialidadSeleccionada ? null : esp)
+                                    }
+                                    color={esp === especialidadSeleccionada ? "info" : "inherit"}
+                                >
+                                    {esp}
                                 </Button>
-                            </>
+                            ))}
+                        </ButtonGroup>
+
+                        {/* Prestadores segun especialidad*/}
+                        {especialidadSeleccionada && (
+                            <Box mt={3} textAlign="center">
+                                <Typography variant="h6" fontWeight="bold" mb={1}>
+                                    Especialidad: {especialidadSeleccionada}
+                                </Typography>
+
+                                <List>
+                                    {prestadoresCentro
+                                        .filter(p => p.especialidad === especialidadSeleccionada)
+                                        .map(p => (
+                                            <Box key={p._id}>
+                                                <ListItemText
+                                                    primary={p.nombre}
+                                                    secondary={`CUIT: ${p.cuit || "—"}`}
+                                                    sx={{ p: 2,border: "5px solid #6bc0e7ee", borderRadius : "15px"}}
+                                                />
+                                            </Box>
+                                        ))}
+                                </List>
+                            </Box>
                         )}
                     </>
                 )}
@@ -103,6 +100,8 @@ export function Inicio({ prestador }) {
         </Box>
     );
 }
+
+
 
 
 
