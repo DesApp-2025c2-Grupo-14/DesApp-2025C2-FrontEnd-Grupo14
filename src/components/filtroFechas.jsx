@@ -32,7 +32,13 @@ export default function FiltroFechas({ onChange, modo = "normal" }) {
       onChange({ desde: inicioMes, hasta: finMes });
       return;
     }
-
+    
+    if (value === "año") {
+      const inicioMes = dayjs().startOf("year").format("YYYY-MM-DD");
+      const finMes = dayjs().endOf("year").format("YYYY-MM-DD");
+      onChange({ desde: inicioMes, hasta: finMes });
+      return;
+    }
     if (value === "rango" && modo !== "historiaClinica") {
       onChange({ desde: desde || null, hasta: hasta || null });
       return;
@@ -59,7 +65,6 @@ export default function FiltroFechas({ onChange, modo = "normal" }) {
 
   return (
     <Box display="flex" alignItems="center" justifyContent="flex-end" position="relative" marginTop={2} gap={2}>
-      {/* Pickers rango: aparecen a la izquierda */}
       {eleccion === "rango" && modo !== "historiaClinica" && (
         <Box position="absolute" left={-350} display="flex" gap={1}>
           <TextField
@@ -79,7 +84,6 @@ export default function FiltroFechas({ onChange, modo = "normal" }) {
         </Box>
       )}
 
-      {/* Selector principal siempre a la derecha */}
       <TextField
         select
         label="Filtro de fechas"
@@ -89,6 +93,7 @@ export default function FiltroFechas({ onChange, modo = "normal" }) {
       >
         <MenuItem value="todo">Todo</MenuItem>
         <MenuItem value="mes">Este mes</MenuItem>
+        <MenuItem value="año">Este año</MenuItem>
         {modo !== "historiaClinica" && <MenuItem value="rango">Elegir rango</MenuItem>}
         {modo === "historiaClinica" && <MenuItem value="mesElegir">Elegir fecha</MenuItem>}
       </TextField>
