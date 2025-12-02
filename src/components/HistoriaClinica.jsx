@@ -124,7 +124,7 @@ console.log("prestador.id:", prestador?.id); */
                     borderRadius: 3,
                     bgcolor: "white",
                     width: "90%",
-                    textAlign: "center",
+                    textAlign: "left",
                     cursor: "pointer",
                     "&:hover": {
                       backgroundColor: "#f5f5f5",
@@ -144,8 +144,8 @@ console.log("prestador.id:", prestador?.id); */
                   Prestador: {historia.prestador}
                 </Typography>
 
-                <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
-                  Notas: {historia.notas}
+                <Typography sx={{ fontSize: "1.2rem", whiteSpace: "pre-line" }} gutterBottom>
+                  Notas: {historia.notas.replace(/\. /g, ".\n").trim()}
                 </Typography>
                 </Paper>
               ))}

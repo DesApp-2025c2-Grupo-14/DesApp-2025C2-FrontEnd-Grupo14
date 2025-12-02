@@ -192,7 +192,7 @@ useEffect(() => {
                     bgcolor: "white",
                     boxShadow: 3,
                     width: "90%",
-                    textAlign: "center",
+                    textAlign: "left",
                     cursor: "pointer",
                     transition: "background-color 0.5s ease", // para mostrar mejor el cambio de color
                     "&:hover": {
