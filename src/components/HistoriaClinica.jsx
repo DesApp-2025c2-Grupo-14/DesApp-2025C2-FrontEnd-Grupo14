@@ -1,16 +1,15 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import {Box,Typography,Paper,Stack,Dialog,DialogTitle,DialogContent,DialogActions,Button,Checkbox} from "@mui/material";
-//import historiasMock from "../data/historiasClinicas";
 import { useParams, useNavigate } from "react-router-dom";
 import FiltroFecha from "./filtroFechas.jsx";
 import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-
+import utc from "dayjs/plugin/utc";
 
 
 dayjs.locale("es");
+dayjs.extend(utc);
 
 export function HistoriaClinica({ datoSeleccionado, onCerrarHistoria, prestador }) {
   const [historias, setHistorias] = useState([])
@@ -124,7 +123,7 @@ console.log("prestador.id:", prestador?.id); */
                     borderRadius: 3,
                     bgcolor: "white",
                     width: "90%",
-                    textAlign: "center",
+                    textAlign: "left",
                     cursor: "pointer",
                     "&:hover": {
                       backgroundColor: "#f5f5f5",
@@ -137,7 +136,7 @@ console.log("prestador.id:", prestador?.id); */
                 </Typography>
 
                 <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
-                  Fecha: {dayjs(historia.fecha).format("DD/MM/YYYY")}
+                  Fecha: {dayjs.utc(historia.fecha).format("DD/MM/YYYY")}
                 </Typography>
 
                 <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
@@ -170,7 +169,7 @@ console.log("prestador.id:", prestador?.id); */
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Fecha</Typography>
-              <Typography>{dayjs(historiaSeleccionada?.fecha).format("DD/MM/YYYY")}</Typography>
+              <Typography>{dayjs.utc(historiaSeleccionada?.fecha).format("DD/MM/YYYY")}</Typography>
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Prestador</Typography>
