@@ -86,7 +86,7 @@ export function DetalleSolicitud(props) {
                     Fecha
                   </Typography>
                   <Toolbar variant="body2" color="inherit">
-                    <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
+                    <Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>
                     {(detalle.fechaPrestacion &&
                       dayjs(detalle.fechaPrestacion)
                         .tz("America/Argentina/Buenos_Aires")
@@ -100,7 +100,7 @@ export function DetalleSolicitud(props) {
                     Lugar de atención
                   </Typography>
                   <Toolbar>
-                    <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
+                    <Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>
                     {detalle.lugar || "Sin especificar"}
                     </Typography>
                   </Toolbar>
@@ -112,7 +112,7 @@ export function DetalleSolicitud(props) {
                 Paciente
               </Typography>
               <Toolbar>
-                <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
+                <Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>
                   {detalle.paciente.nombre + " " + detalle.paciente.apellido}
                 </Typography>
               </Toolbar>
@@ -124,13 +124,13 @@ export function DetalleSolicitud(props) {
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Medicamento
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.medicamento}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.receta.medicamento}</Typography></Toolbar>
                 </Stack>
                 <Stack direction="column" alignItems="center">
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Cantidad
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.cantidad}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.receta.cantidad}</Typography></Toolbar>
                 </Stack>
               </Stack>
             ) : (
@@ -139,13 +139,13 @@ export function DetalleSolicitud(props) {
                   <Typography variant="h5" color="inherit">
                     Médico
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.medico || "Sin asignar"}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.medico || "Sin asignar"}</Typography></Toolbar>
                 </Stack>
                 <Stack direction="column" alignItems="center">
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Especialidad
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.especialidad}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.especialidad}</Typography></Toolbar>
                 </Stack>
               </Stack>
             )}
@@ -155,7 +155,7 @@ export function DetalleSolicitud(props) {
                 <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                   Dias de internación
                 </Typography>
-                <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.autorizacion.diasInternacion}</Typography></Toolbar>
+                <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.autorizacion.diasInternacion}</Typography></Toolbar>
               </Stack>
             )}
 
@@ -164,28 +164,35 @@ export function DetalleSolicitud(props) {
                 <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                   Presentación
                 </Typography>
-                <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.presentacion}</Typography></Toolbar>
+                <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.receta.presentacion}</Typography></Toolbar>
               </Stack>
             )}
+
+
             {detalle.tipo === "Reintegro" && (
-              <Stack direction="row" justifyContent="center" spacing={2}>
+
                 <Stack width="100%" direction="column" alignItems="center">
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Forma de pago
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.pago}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.reintegro.pago}</Typography></Toolbar>
                 </Stack>
-                <Stack width="100%" direction="column" alignItems="center">
+
+            )}
+
+            {detalle.tipo === "Reintegro" && (
+              <Stack direction="row" justifyContent="space-between">
+                <Stack direction="column" alignItems="center">
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     CBU
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.cbu || "-"}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.reintegro.cbu}</Typography></Toolbar>
                 </Stack>
-                <Stack width="100%" direction="column" alignItems="center">
+                <Stack direction="column" alignItems="center">
                   <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Facturado A
                   </Typography>
-                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.facturadoA || "-"}</Typography></Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", color: "black", borderRadius: 1, p: 1 }}>{detalle.reintegro.facturadoA}</Typography></Toolbar>
                 </Stack>
               </Stack>
             )}
@@ -212,7 +219,7 @@ export function DetalleSolicitud(props) {
                     wordBreak: "break-word",
                   }}
                 >
-                  <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.observaciones || "Sin observaciones."}</Typography>
+                  <Typography sx={{ fontSize: "1.2rem", color: "White", borderRadius: 1, p: 1 }}>{detalle.observaciones || "Sin observaciones."}</Typography>
                 </Typography>
               </Box>
             </Stack>
