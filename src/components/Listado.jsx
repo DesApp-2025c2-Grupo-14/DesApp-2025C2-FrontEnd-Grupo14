@@ -153,8 +153,8 @@ export function Listado(props) {
         key={s._id}
         nombreSolicitud={
           (s.tipo === "Autorizacion" ? "Autorización" : s.tipo) +
-          " - " +
-          (s.paciente?.nombre || "Sin paciente")
+          " - " + 
+          (s.paciente?.nombre + " " + s.paciente?.apellido || "Sin paciente")
         }
         descripcion={s.observaciones}
         fecha={

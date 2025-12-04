@@ -82,83 +82,115 @@ export function DetalleSolicitud(props) {
             {
               <Stack direction="row" justifyContent="space-between">
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Fecha
                   </Typography>
-                  <Toolbar>
+                  <Toolbar variant="body2" color="inherit">
+                    <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
                     {(detalle.fechaPrestacion &&
                       dayjs(detalle.fechaPrestacion)
                         .tz("America/Argentina/Buenos_Aires")
                         .format("DD/MM/YYYY HH:mm")) ||
                       "--/--/---- --:--"}
+                    </Typography>
                   </Toolbar>
                 </Stack>
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Lugar de atención
                   </Typography>
-                  <Toolbar>{detalle.lugar || "Sin especificar"}</Toolbar>
+                  <Toolbar>
+                    <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
+                    {detalle.lugar || "Sin especificar"}
+                    </Typography>
+                  </Toolbar>
                 </Stack>
               </Stack>
             }
             <Stack width="100%" direction="column" alignItems="center">
-              <Typography variant="h6" color="inherit">
+              <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                 Paciente
               </Typography>
-              <Toolbar>{detalle.paciente.nombre}</Toolbar>
+              <Toolbar>
+                <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>
+                  {detalle.paciente.nombre + " " + detalle.paciente.apellido}
+                </Typography>
+              </Toolbar>
             </Stack>
 
             {detalle.tipo === "Receta" ? (
               <Stack direction="row" justifyContent="space-between">
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Medicamento
                   </Typography>
-                  <Toolbar>{detalle.receta.medicamento}</Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.medicamento}</Typography></Toolbar>
                 </Stack>
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Cantidad
                   </Typography>
-                  <Toolbar>{detalle.receta.cantidad}</Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.cantidad}</Typography></Toolbar>
                 </Stack>
               </Stack>
             ) : (
               <Stack direction="row" justifyContent="space-between">
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit">
                     Médico
                   </Typography>
-                  <Toolbar>{detalle.medico}</Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.medico || "Sin asignar"}</Typography></Toolbar>
                 </Stack>
                 <Stack direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                     Especialidad
                   </Typography>
-                  <Toolbar>{detalle.especialidad}</Toolbar>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.especialidad}</Typography></Toolbar>
                 </Stack>
               </Stack>
             )}
 
             {detalle.tipo === "Autorizacion" && (
               <Stack width="100%" direction="column" alignItems="center">
-                <Typography variant="h6" color="inherit">
+                <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                   Dias de internación
                 </Typography>
-                <Toolbar>{detalle.autorizacion.diasInternacion}</Toolbar>
+                <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.autorizacion.diasInternacion}</Typography></Toolbar>
               </Stack>
             )}
 
             {detalle.tipo === "Receta" && (
               <Stack width="100%" direction="column" alignItems="center">
-                <Typography variant="h6" color="inherit">
+                <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                   Presentación
                 </Typography>
-                <Toolbar>{detalle.receta.presentacion}</Toolbar>
+                <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.receta.presentacion}</Typography></Toolbar>
+              </Stack>
+            )}
+            {detalle.tipo === "Reintegro" && (
+              <Stack direction="row" justifyContent="center" spacing={2}>
+                <Stack width="100%" direction="column" alignItems="center">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
+                    Forma de pago
+                  </Typography>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.pago}</Typography></Toolbar>
+                </Stack>
+                <Stack width="100%" direction="column" alignItems="center">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
+                    CBU
+                  </Typography>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.cbu || "-"}</Typography></Toolbar>
+                </Stack>
+                <Stack width="100%" direction="column" alignItems="center">
+                  <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
+                    Facturado A
+                  </Typography>
+                  <Toolbar><Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.reintegro.facturadoA || "-"}</Typography></Toolbar>
+                </Stack>
               </Stack>
             )}
             <Stack>
-              <Typography variant="h6" color="inherit">
+              <Typography variant="h5" color="inherit" sx={{ mb: 2 }}>
                 Observaciones
               </Typography>
               <Box
@@ -180,35 +212,13 @@ export function DetalleSolicitud(props) {
                     wordBreak: "break-word",
                   }}
                 >
-                  {detalle.observaciones || "Sin observaciones."}
+                  <Typography sx={{ fontSize: "1.2rem", backgroundColor: "#2E4CA6", color: "white", borderRadius: 1, p: 1 }}>{detalle.observaciones || "Sin observaciones."}</Typography>
                 </Typography>
               </Box>
             </Stack>
-            {detalle.tipo === "Reintegro" && (
-              <Stack direction="row" justifyContent="center" spacing={2}>
-                <Stack width="100%" direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
-                    Forma de pago
-                  </Typography>
-                  <Toolbar>{detalle.reintegro.pago}</Toolbar>
-                </Stack>
-                <Stack width="100%" direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
-                    CBU
-                  </Typography>
-                  <Toolbar>{detalle.reintegro.cbu || "-"}</Toolbar>
-                </Stack>
-                <Stack width="100%" direction="column" alignItems="center">
-                  <Typography variant="h6" color="inherit">
-                    Facturado A
-                  </Typography>
-                  <Toolbar>{detalle.reintegro.facturadoA || "-"}</Toolbar>
-                </Stack>
-              </Stack>
-            )}
             {detalle.tipo === "Reintegro" && <Button>Ver factura</Button>}
 
-            <Typography variant="h6" color="inherit"></Typography>
+            <Typography variant="h5" color="inherit" sx={{ mb: 2 }}></Typography>
           </Stack>
         </Toolbar>
       ) : (

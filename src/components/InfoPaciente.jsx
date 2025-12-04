@@ -9,6 +9,11 @@ dayjs.locale("es");
 export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
   const { datoSeleccionado } = useContext(DatosContext);
 
+  const formatearTelefono = (tel) => {
+  const lada = tel.slice(0, 2);  
+  const resto = tel.slice(2);    
+  return `+54 ${lada} ${resto}`;
+};
 
   return (
     <Stack sx={{height: "100%", width:'100%' }}>
@@ -99,7 +104,7 @@ export function InfoPaciente({ onAbrirHistoria, onAbrirSituacion }) {
               <TextField
                 label="Teléfono"
                 fullWidth
-                value={datoSeleccionado.telefono || ""}
+                value={formatearTelefono(datoSeleccionado.telefono) || ""}
                 InputProps={{ readOnly: true }}
               />
             </Stack>

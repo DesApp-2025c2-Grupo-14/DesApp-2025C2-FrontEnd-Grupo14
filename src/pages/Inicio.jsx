@@ -55,7 +55,7 @@ export function Inicio({ prestador }) {
                     <>
                         {/* Botones de especialidades */}
                         <Typography variant="h6" mt={3}>
-                            Seleccioná una especialidad
+                            Especialidades
                         </Typography>
 
                         <ButtonGroup variant="contained" sx={{ mt: 2 }} disableElevation>
