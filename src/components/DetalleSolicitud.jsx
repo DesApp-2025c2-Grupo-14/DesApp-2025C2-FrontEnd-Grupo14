@@ -202,7 +202,7 @@ export function DetalleSolicitud(props) {
               </Typography>
               <Box
                 sx={{
-                  height: "15vh",
+                  height: "10vh",
                   bgcolor: "#2E4CA6",
                   px: 2,
                   py: 1,
