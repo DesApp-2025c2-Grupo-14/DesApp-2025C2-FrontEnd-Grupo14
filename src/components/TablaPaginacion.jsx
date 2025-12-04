@@ -189,7 +189,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
           </Box>
 
           {/* MODAL DE CAMBIO */}
-          <Dialog open={open} onClose={handleClose}>
+          {/* <Dialog open={open} onClose={handleClose}>
             {nuevoEstado === "Aprobada" ? (
               <DialogTitle>¿Desea aprobar la solicitud?</DialogTitle>
             ) : (
@@ -220,7 +220,7 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
                 Confirmar
               </Button>
             </DialogActions>
-          </Dialog>
+          </Dialog> */}
         </>
       ),
     },
@@ -271,7 +271,38 @@ export default function TablaPaginacion({ tipo, onSelectSolicitud, onUpdate, ran
           />
         </Stack>
       </Paper>
+      <Dialog open={open} onClose={handleClose}>
+        {nuevoEstado === "Aprobada" ? (
+          <DialogTitle>¿Desea aprobar la solicitud?</DialogTitle>
+        ) : (
+          <DialogTitle>
+            Indique el motivo de {nuevoEstado === "Rechazada" ? "rechazo" : "observación"}
+          </DialogTitle>
+        )}
 
+        {nuevoEstado !== "Aprobada" && (
+          <DialogContent>
+            <TextField
+              required
+              autoFocus
+              margin="dense"
+              label="Motivo"
+              type="text"
+              fullWidth
+              error={!!errorMotivo}
+              helperText={errorMotivo}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+            />
+          </DialogContent>
+        )}
+        <DialogActions>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleConfirm} variant="contained" color="primary">
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Modal
         open={!!detalle}
         onClose={() => setSolicitudSeleccionada(null)}
