@@ -58,7 +58,6 @@ export function DetalleSolicitud(props) {
       height="100%"
       alignItems="space-between"
     >
-      <Header seccion={props.solicitud} usuario=""/>
       {detalle && detalle.tipo !== null ? (
         <Toolbar
           sx={{
