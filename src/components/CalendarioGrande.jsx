@@ -37,8 +37,8 @@ export function CalendarioGrande(props) {
   const [mensajeSnackbar, setMensajeSnackbar] = useState("");
   const [tipoSnackbar, setTipoSnackbar] = useState("success");
 
-  //para filtrar por especialidad
-  const [prestadorBuscado, setprestadorBuscado] = useState(null);
+  const { prestadorBuscado, setPrestadorBuscado } = props;
+
 
   useEffect(() => {
     const fechaBase = dayjs(props.fechaSeleccionada);
@@ -146,7 +146,7 @@ export function CalendarioGrande(props) {
               borderRadius: 2,
             }}
             onChange={(e) =>
-              setprestadorBuscado(e.target.value === "" ? null : e.target.value)
+              setPrestadorBuscado(e.target.value === "" ? null : e.target.value)
             }
           >
             <MenuItem value="">Todos</MenuItem>
@@ -154,7 +154,7 @@ export function CalendarioGrande(props) {
               <MenuItem
                 key={esp}
                 value={esp}
-                onClick={() => setprestadorBuscado()}
+                onClick={() => setPrestadorBuscado()}
               >
                 {esp}
               </MenuItem>
