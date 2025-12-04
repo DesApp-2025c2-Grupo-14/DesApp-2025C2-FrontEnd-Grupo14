@@ -15,7 +15,12 @@ dayjs.locale("es")
 export function Calendario(props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null)
   const [turnos, setTurnos] = useState([]);
-
+  const [prestadorBuscado, setPrestadorBuscado] = useState(null);
+  
+  const turnosFiltrados = turnos.filter((t) => {
+    if (!prestadorBuscado) return true;
+    return t.prestadorId.nombre === prestadorBuscado;
+  });
   
     useEffect(() => {
        async function getTurnos() {
@@ -40,11 +45,12 @@ export function Calendario(props) {
         <CalendarioChico
           fechaSeleccionada={fechaSeleccionada}
           setFechaSeleccionada ={setFechaSeleccionada}
-          turnos = {turnos}
+          turnos = {turnosFiltrados}
         />
         <TurnosDiarios
           fechaSeleccionada ={fechaSeleccionada}
           turnos = {turnos}
+          prestadorBuscado ={prestadorBuscado}
         />
       </Stack>
       
@@ -52,8 +58,10 @@ export function Calendario(props) {
       <CalendarioGrande
         fechaSeleccionada={fechaSeleccionada}
         setFechaSeleccionada={setFechaSeleccionada}
-        turnos = {turnos}
+        turnos = {turnosFiltrados}
         prestador = {props.prestador}
+        prestadorBuscado ={prestadorBuscado}
+        setPrestadorBuscado = {setPrestadorBuscado}
       />
       </Stack>
 

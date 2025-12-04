@@ -36,6 +36,10 @@ function ServerDay(props) {
 export function CalendarioChico(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [highlightedDays, setHighlightedDays] = React.useState([]);
+  const [fechaCalendario,setFechaCalendario] = React.useState(
+    props.fechaSeleccionada && dayjs(props.fechaSeleccionada).isValid()
+    ? dayjs(props.fechaSeleccionada)
+    : dayjs());
 
   const calcularDiasConTurnos = (date) => {
     if (!date || !dayjs(date).isValid()) return;
@@ -60,22 +64,20 @@ export function CalendarioChico(props) {
 
   const handleMonthChange = (date) => {
     setIsLoading(true);
-    if (date && dayjs(date).isValid()) {
-      calcularDiasConTurnos(date);
-    }
+    setFechaCalendario(date);
+    calcularDiasConTurnos(date);
     setIsLoading(false);
   };
-
-  const fechaCalendario = props.fechaSeleccionada && dayjs(props.fechaSeleccionada).isValid()
-      ? props.fechaSeleccionada
-      : dayjs();
 
   return (
 
       <Box sx={{width:"100%"}}>
         <DateCalendar
           value={fechaCalendario}
-          onChange={(nuevaFecha)=>props.setFechaSeleccionada(nuevaFecha)}
+          onChange={(nuevaFecha)=>{
+            props.setFechaSeleccionada(nuevaFecha);
+            setFechaCalendario(nuevaFecha);
+          }}
           loading={isLoading}
           onMonthChange={handleMonthChange}
           showDaysOutsideCurrentMonth
