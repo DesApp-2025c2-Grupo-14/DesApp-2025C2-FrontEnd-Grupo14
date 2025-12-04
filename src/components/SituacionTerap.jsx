@@ -213,8 +213,8 @@ useEffect(() => {
                     Fecha Fin: {situacion.fechaFinal ? dayjs(situacion.fechaFinal).utc().format("DD/MM/YYYY") : "No asignada"}
                   </Typography>
 
-                  <Typography sx={{ fontSize: "1.2rem" }} gutterBottom>
-                    Descripción: {situacion.descripcion}
+                  <Typography sx={{ fontSize: "1.2rem", whiteSpace: "pre-line" }} gutterBottom>
+                    Descripción: {situacion.descripcion.replace(/\.\s*/g, ".\n")}
                   </Typography>
 
                 </Paper>
@@ -271,8 +271,8 @@ useEffect(() => {
             </Box>
             <Box mb={2} bgcolor="white" p={2} borderRadius={2}>
               <Typography variant="subtitle2">Descripción</Typography>
-              <Typography whiteSpace="pre-line">
-                {situacionSeleccionada.descripcion}
+              <Typography whiteSpace="pre-line" sx={{ textAlign: "left" }}>
+                {situacionSeleccionada.descripcion.replace(/\.\s*/g, ".\n")}
               </Typography>
             </Box>
           </DialogContent>
